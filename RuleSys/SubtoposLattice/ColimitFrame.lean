@@ -49,7 +49,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Colimit Frame Structure
@@ -442,4 +442,4 @@ theorem hennessyMilner_vgTraceB :
 ### Theorem count: 12
 -/
 
-end Ruliology
+end RTS

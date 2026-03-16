@@ -35,7 +35,7 @@ import RuleSys.PresheafTopos.TraceTopology
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: The Trace Separation Theorem
@@ -204,4 +204,4 @@ theorem trace_density_summary :
     (∀ G : FinDigraph, isTraceCovering G (pathGeneratedSieve G)) :=
   ⟨fun _ _ _ _ => trace_separation_iff, pathGeneratedSieve_trace_covering⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

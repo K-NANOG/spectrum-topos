@@ -25,7 +25,7 @@ import RuleSys.PresheafTopos.CharacteristicFormula
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -174,4 +174,4 @@ theorem geo_tree_decomposition (φ : LTSGeoFormula L 1)
          φ.satisfies H (fun _ => w)) :=
   geo_tree_decomposition_aux φ G v d
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

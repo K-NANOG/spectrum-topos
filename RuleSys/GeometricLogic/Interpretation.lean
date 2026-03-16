@@ -5,7 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 # Interpretations and Simulations — Conjecture E Resolution
 
 This file establishes the correspondence between simulations (computational morphisms)
-and interpretations (logical morphisms) for multiway systems, resolving Conjecture E
+and interpretations (logical morphisms) for rooted transition systems, resolving Conjecture E
 via the Caramello framework.
 
 ## Main Results
@@ -19,8 +19,8 @@ Framework (Phases 21-26).
 
 ## Main Definitions
 
-- `MultiwaySystem.reach`: Reachability relation on a multiway system
-- `MultiwaySystem.pathEquiv`: Path equivalence (bidirectional reachability)
+- `RootedTS.reach`: Reachability relation on a rooted transition system
+- `RootedTS.pathEquiv`: Path equivalence (bidirectional reachability)
 - `InterpretationData`: A state map preserving init, step, and reachability
 - `Simulation.toInterpretation`: Every simulation induces an interpretation
 - `BiInterpretation`: Mutual interpretations with PathEquivalent coherence
@@ -46,7 +46,7 @@ that bare Morita equivalence loses. See paper/bisimulation-morita.tex for detail
 
 ## Implementation Notes
 
-An interpretation of geometric theories over MultiwayLanguage includes:
+An interpretation of geometric theories over RTSLanguage includes:
 - stateMap: the underlying function on states
 - preserves_init: init maps to init
 - preserves_step: steps map to steps
@@ -72,18 +72,18 @@ open FirstOrder Language GeometricLogic
 
 universe u v u'
 
-namespace Ruliology
+namespace RTS
 
 /-!
-## Task 1: Semantic Relations on Multiway Systems
+## Task 1: Semantic Relations on Rooted Transition Systems
 
 The fundamental relations `reach` and `pathEquiv` are defined in TheoryOfSystem.lean.
 Here we add additional lemmas about path equivalence.
 -/
 
-namespace MultiwaySystem
+namespace RootedTS
 
-variable (M : MultiwaySystem.{u, v})
+variable (M : RootedTS.{u, v})
 
 /-- Path equivalence is reflexive -/
 theorem pathEquiv_refl (s : M.State) : M.pathEquiv s s :=
@@ -104,7 +104,7 @@ theorem pathEquiv_equivalence : Equivalence (M.pathEquiv) where
   symm := M.pathEquiv_symm
   trans := M.pathEquiv_trans
 
-end MultiwaySystem
+end RootedTS
 
 /-!
 ## InterpretationData Structure
@@ -122,7 +122,7 @@ of what it means for N to interpret the theory of M.
     - Relation symbols to formulas
     - Preserves provability
 
-    For MultiwayLanguage (constructive formulation):
+    For RTSLanguage (constructive formulation):
     - stateMap : how M's states correspond to N's states
     - stepMap : how M's steps correspond to N's steps (CARRIES DATA, not just existence)
     - init_preserved : initial states correspond
@@ -130,7 +130,7 @@ of what it means for N to interpret the theory of M.
     This is the constructive version that carries computational content directly,
     avoiding the need for Classical.choice to extract step data. The structure
     is now isomorphic to Simulation, making the correspondence trivial. -/
-structure InterpretationData (M N : MultiwaySystem.{u, v}) where
+structure InterpretationData (M N : RootedTS.{u, v}) where
   /-- The underlying state map -/
   stateMap : M.State → N.State
   /-- The map on steps, preserving source and target (constructive!) -/
@@ -191,7 +191,7 @@ instance countablyPresented_definable {A B : Type*} [CountablyPresented A] (f : 
 
     This ensures the interpretation yields a legitimate theory-level interpretation
     per Caramello's framework, not just a model-level function. -/
-structure DefinableInterpretationData (M N : MultiwaySystem.{u, v})
+structure DefinableInterpretationData (M N : RootedTS.{u, v})
     extends InterpretationData M N where
   /-- The state map is definable in N's theory -/
   stateMap_definable : IsDefinable toInterpretationData.stateMap
@@ -226,7 +226,7 @@ instance instIsComputable {α β : Type*} (f : α → β) : IsComputable f where
     The key distinction from bare InterpretationData is:
     - InterpretationData requires step → step preservation
     - ComputationalInterpretation uses reachability simulation (paths → paths) -/
-structure ComputationalInterpretation (M N : MultiwaySystem.{u, v}) where
+structure ComputationalInterpretation (M N : RootedTS.{u, v}) where
   /-- The underlying reachability simulation -/
   toReachabilitySimulation : ReachabilitySimulation M N
   /-- The state map is computable -/
@@ -234,7 +234,7 @@ structure ComputationalInterpretation (M N : MultiwaySystem.{u, v}) where
 
 namespace ComputationalInterpretation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- The state map of a computational interpretation -/
 def stateMap (ci : ComputationalInterpretation M N) : M.State → N.State :=
@@ -275,7 +275,7 @@ end ComputationalInterpretation
     This is WEAKER than PathEquivalent (identical reachability to ALL states),
     but the Bridge Lemma (Lemma 2.26) shows mutual reachability lifts to
     path-equivalence via transitivity, yielding Caramello bi-interpretation. -/
-structure ComputationalBiInterpretation (M N : MultiwaySystem.{u, v}) where
+structure ComputationalBiInterpretation (M N : RootedTS.{u, v}) where
   /-- Forward computational interpretation -/
   forward : ComputationalInterpretation M N
   /-- Backward computational interpretation -/
@@ -291,7 +291,7 @@ structure ComputationalBiInterpretation (M N : MultiwaySystem.{u, v}) where
 
 namespace ComputationalBiInterpretation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Mutual reachability implies path-equivalence (trivially, they're the same) -/
 theorem mutualReach_implies_pathEquiv {s t : M.State}
@@ -308,7 +308,7 @@ theorem coherence_N_pathEquiv (cb : ComputationalBiInterpretation M N) (t : N.St
   mutualReach_implies_pathEquiv (cb.coherence_N t)
 
 /-- Computational bi-interpretation is reflexive -/
-def refl (M : MultiwaySystem.{u, v}) : ComputationalBiInterpretation M M where
+def refl (M : RootedTS.{u, v}) : ComputationalBiInterpretation M M where
   forward := { toReachabilitySimulation := ReachabilitySimulation.id M, stateMap_computable := inferInstance }
   backward := { toReachabilitySimulation := ReachabilitySimulation.id M, stateMap_computable := inferInstance }
   coherence_M := fun s => ⟨M.reach_refl s, M.reach_refl s⟩
@@ -324,12 +324,12 @@ def symm (cb : ComputationalBiInterpretation M N) : ComputationalBiInterpretatio
 end ComputationalBiInterpretation
 
 /-- Two systems are computationally bi-interpretable -/
-def CompBiInterpretable (M N : MultiwaySystem.{u, v}) : Prop :=
+def CompBiInterpretable (M N : RootedTS.{u, v}) : Prop :=
   Nonempty (@ComputationalBiInterpretation.{u, v} M N)
 
 namespace InterpretationData
 
-variable {M N P : MultiwaySystem.{u, v}}
+variable {M N P : RootedTS.{u, v}}
 
 /-- Map a path through the interpretation -/
 def mapPath (I : InterpretationData M N) {s t : M.State} :
@@ -344,7 +344,7 @@ theorem preserves_reach (I : InterpretationData M N) :
   exact ⟨I.mapPath p⟩
 
 /-- Identity interpretation -/
-def id (M : MultiwaySystem.{u, v}) : InterpretationData M M where
+def id (M : RootedTS.{u, v}) : InterpretationData M M where
   stateMap := _root_.id
   stepMap := _root_.id
   init_preserved := rfl
@@ -365,7 +365,7 @@ theorem preserves_pathEquiv (I : InterpretationData M N) {s t : M.State}
 ### Formula and Sequent Translation
 
 An interpretation of geometric theories translates formulas by applying the state map
-to variable positions. For MultiwayLanguage (single-sorted with just `step`, `reach`,
+to variable positions. For RTSLanguage (single-sorted with just `step`, `reach`,
 `init` predicates), translation is straightforward substitution:
 - `reach(s, t)` translates to `reach(I.stateMap s, I.stateMap t)`
 - `pathEquiv(s, t)` translates to `pathEquiv(I.stateMap s, I.stateMap t)`
@@ -377,8 +377,8 @@ but conceptually straightforward.
 
 /-- Translate a formula through the interpretation.
 
-    For multiway systems, this substitutes the state map into variable positions.
-    Since MultiwayLanguage is single-sorted, this reduces to applying stateMap
+    For rooted transition systems, this substitutes the state map into variable positions.
+    Since RTSLanguage is single-sorted, this reduces to applying stateMap
     to free variables representing states.
 
     The translation is structural:
@@ -387,23 +387,23 @@ but conceptually straightforward.
     - `∃x. φ` → `∃x. I.translate(φ)` (bound variables unchanged)
     - etc. -/
 axiom translateFormula (I : InterpretationData M N) {α : Type u'}
-    {n : ℕ} (φ : GeoFormula MultiwayLanguage α n) : GeoFormula MultiwayLanguage α n
+    {n : ℕ} (φ : GeoFormula RTSLanguage α n) : GeoFormula RTSLanguage α n
 
 /-- Translate a sequent through the interpretation -/
 noncomputable def translateSequent (I : InterpretationData M N) {α : Type u'}
-    (s : GeoSequent MultiwayLanguage α) : GeoSequent MultiwayLanguage α :=
+    (s : GeoSequent RTSLanguage α) : GeoSequent RTSLanguage α :=
   { antecedent := I.translateFormula s.antecedent
     consequent := I.translateFormula s.consequent }
 
 /-- Translation preserves identity sequents -/
 axiom translateFormula_identity (I : InterpretationData M N) {α : Type u'}
-    (φ : GeoFormula MultiwayLanguage α 0) :
+    (φ : GeoFormula RTSLanguage α 0) :
     I.translateSequent (GeoSequent.identity φ) =
     GeoSequent.identity (I.translateFormula φ)
 
 /-- Translation preserves the trivial sequent -/
 axiom translateFormula_trivial (I : InterpretationData M N) {α : Type u'} :
-    I.translateSequent (GeoSequent.trivial : GeoSequent MultiwayLanguage α) =
+    I.translateSequent (GeoSequent.trivial : GeoSequent RTSLanguage α) =
     GeoSequent.trivial
 
 /-!
@@ -436,7 +436,7 @@ For simulation-induced interpretations, this follows from:
     3. Showing axiom translations are provable
     This is standard model theory but verbose to formalize. -/
 axiom preserves_provability (I : InterpretationData M N) {α : Type}
-    (s : GeoSequent MultiwayLanguage α)
+    (s : GeoSequent RTSLanguage α)
     (h : Provable (theoryOfSystem M) s) :
     Provable (theoryOfSystem N) (I.translateSequent s)
 
@@ -448,7 +448,7 @@ end InterpretationData
 An interpretation I : T_M → T_N acts on models of T_N to produce models of T_M.
 This is the functorial action of interpretations on the category of models.
 
-For MultiwayLanguage, this action is particularly clean: the interpretation
+For RTSLanguage, this action is particularly clean: the interpretation
 translates the init symbol and the step/reach/pathEquiv relations.
 -/
 
@@ -456,10 +456,10 @@ section ModelAction
 
 open GeometricLogic
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Model isomorphism: structure-preserving bijection between models -/
-structure ModelIsomorphism (M' N' : MultiwayModel) where
+structure ModelIsomorphism (M' N' : RTSModel) where
   /-- The underlying bijection -/
   toFun : M'.carrier → N'.carrier
   invFun : N'.carrier → M'.carrier
@@ -485,7 +485,7 @@ The correspondence is now trivial - both carry the same data (stateMap, stepMap,
 
 namespace Simulation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Every simulation IS an interpretation (trivial correspondence).
 
@@ -516,7 +516,7 @@ theorem toInterpretation_stepMap (f : Simulation M N) {s t : M.State} (step : M.
     every simulation f : M → N induces an interpretation I_f that preserves provability
     of geometric sequents. -/
 theorem toInterpretation_preserves_provability (f : Simulation M N) {α : Type}
-    (s : GeoSequent MultiwayLanguage α)
+    (s : GeoSequent RTSLanguage α)
     (h : Provable (theoryOfSystem M) s) :
     Provable (theoryOfSystem N) (f.toInterpretation.translateSequent s) :=
   f.toInterpretation.preserves_provability s h
@@ -534,13 +534,13 @@ theorem toInterpretation_preserves_provability (f : Simulation M N) {α : Type}
     This addresses the critical gap where the paper's "induced interpretation"
     formula I_f(S)(y) := ∃x. y = f₀(x) references an external function that
     must be definable in T_N's signature. -/
-theorem toInterpretation_definable {M N : MultiwaySystem.{u, v}}
+theorem toInterpretation_definable {M N : RootedTS.{u, v}}
     [CountablyPresented M.State] (f : Simulation M N) :
     IsDefinable f.toInterpretation.stateMap :=
   countablyPresented_definable f.stateMap
 
 /-- Construct a definable interpretation from a simulation on countably presented systems -/
-def toDefinableInterpretation {M N : MultiwaySystem.{u, v}}
+def toDefinableInterpretation {M N : RootedTS.{u, v}}
     [CountablyPresented M.State] (f : Simulation M N) :
     DefinableInterpretationData M N where
   toInterpretationData := f.toInterpretation
@@ -559,7 +559,7 @@ This subsumes the old "weak simulation" (steps → paths) pattern via
 
 namespace ReachabilitySimulation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Reachability simulations preserve reachability.
 
@@ -594,7 +594,7 @@ instance stateMap_definable [CountablyPresented M.State] (f : ReachabilitySimula
 
     **Key insight:** Interpretations preserve PROVABILITY, not step structure.
     Since reach is what we prove about, mapping paths to paths is valid. -/
-structure ReachInterpretationData (M N : MultiwaySystem.{u, v}) where
+structure ReachInterpretationData (M N : RootedTS.{u, v}) where
   /-- The underlying reachability simulation -/
   toReachabilitySimulation : ReachabilitySimulation M N
   /-- Documentation: this interpretation maps step to reach -/
@@ -631,7 +631,7 @@ where both directions involve path-level maps (e.g., via `ofStepToPath`).
 
     The coherence conditions use mutual reachability, which lifts to
     full path-equivalence via the lifting lemma (mutuallyReachable_implies_pathEquivalent). -/
-structure WeakFunctionalBisimulation (M N : MultiwaySystem.{u, v}) where
+structure WeakFunctionalBisimulation (M N : RootedTS.{u, v}) where
   /-- Forward reachability simulation from M to N -/
   forward : ReachabilitySimulation M N
   /-- Backward reachability simulation from N to M -/
@@ -647,7 +647,7 @@ structure WeakFunctionalBisimulation (M N : MultiwaySystem.{u, v}) where
 
 namespace WeakFunctionalBisimulation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- The left coherence implies full path-equivalence via the lifting lemma -/
 theorem leftPathEquivalent (wb : WeakFunctionalBisimulation M N) (s : M.State) :
@@ -672,7 +672,7 @@ end WeakFunctionalBisimulation
 
 namespace InterpretationData
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Convert an interpretation to a simulation (trivial - same fields).
 
@@ -701,7 +701,7 @@ coherence conditions expressing that the round-trips are path-equivalent
 to identity.
 -/
 
-/-- A bi-interpretation between multiway systems M and N.
+/-- A bi-interpretation between rooted transition systems M and N.
 
     This corresponds to a bi-interpretation between geometric theories T_M and T_N.
     The coherence conditions state that the compositions are path-equivalent
@@ -721,7 +721,7 @@ to identity.
     With InterpretationData now carrying stepMap directly (not just existence via
     step_formula), this structure is isomorphic to FunctionalBisimulation. The coherence
     conditions provide the inverse-like structure needed for bisimulation. -/
-structure BiInterpretation (M N : MultiwaySystem.{u, v}) where
+structure BiInterpretation (M N : RootedTS.{u, v}) where
   /-- Forward interpretation from T_M to T_N -/
   forward : InterpretationData M N
   /-- Backward interpretation from T_N to T_M -/
@@ -734,10 +734,10 @@ structure BiInterpretation (M N : MultiwaySystem.{u, v}) where
 
 namespace BiInterpretation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Identity bi-interpretation -/
-def refl (M : MultiwaySystem.{u, v}) : BiInterpretation M M where
+def refl (M : RootedTS.{u, v}) : BiInterpretation M M where
   forward := InterpretationData.id M
   backward := InterpretationData.id M
   coherence_M := fun s => M.pathEquiv_refl s
@@ -756,7 +756,7 @@ end BiInterpretation
 ## 2-Categorical Structure
 
 In the 2-category of geometric theories (following Caramello and D'Arienzo et al.):
-- 0-cells: Geometric theories (represented by MultiwaySystem)
+- 0-cells: Geometric theories (represented by RootedTS)
 - 1-cells: Interpretations (InterpretationData)
 - 2-cells: Natural transformations between interpretations
 
@@ -780,7 +780,7 @@ treatment of the Church-Turing thesis.
     In our path-based semantics, naturality means that if I interprets
     a step s → t, then the path-equivalence at t is compatible with
     the path-equivalence at s via the step interpretation in N. -/
-structure InterpretationNatTrans {M N : MultiwaySystem.{u, v}}
+structure InterpretationNatTrans {M N : RootedTS.{u, v}}
     (I J : InterpretationData M N) : Type (max u v) where
   /-- The component at each state: a path-equivalence -/
   component : ∀ s : M.State, N.pathEquiv (I.stateMap s) (J.stateMap s)
@@ -790,7 +790,7 @@ scoped notation:50 I " ⟹ " J => InterpretationNatTrans I J
 
 namespace InterpretationNatTrans
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Identity natural transformation -/
 def id (I : InterpretationData M N) : I ⟹ I where
@@ -847,7 +847,7 @@ The data consists of:
 
 namespace BiInterpretation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- The unit of a bi-interpretation as a natural transformation.
 
@@ -934,7 +934,7 @@ end BiInterpretation
 
 | Level | Objects | Structure |
 |-------|---------|-----------|
-| 0-cells | MultiwaySystem (= geometric theories) | |
+| 0-cells | RootedTS (= geometric theories) | |
 | 1-cells | InterpretationData | Compositional |
 | 2-cells | InterpretationNatTrans | Groupoid (all invertible) |
 
@@ -956,7 +956,7 @@ direction of the simulation↔interpretation correspondence.
 -/
 
 /-- PathEquivalent implies pathEquiv (weaker condition) -/
-theorem PathEquivalent.toPathEquiv {M : MultiwaySystem.{u, v}} {s t : M.State}
+theorem PathEquivalent.toPathEquiv {M : RootedTS.{u, v}} {s t : M.State}
     (h : PathEquivalent M s t) : M.pathEquiv s t := by
   constructor
   · -- s reaches t: h.1 says (Path s u ↔ Path t u), apply to u=t with Path t t
@@ -975,7 +975,7 @@ theorem PathEquivalent.toPathEquiv {M : MultiwaySystem.{u, v}} {s t : M.State}
 
     This is the key bridge connecting computational bisimulation to
     logical bi-interpretation in the Caramello framework. -/
-def FunctionalBisimulation.toBiInterpretation {M N : MultiwaySystem.{u, v}}
+def FunctionalBisimulation.toBiInterpretation {M N : RootedTS.{u, v}}
     (b : FunctionalBisimulation M N) : BiInterpretation M N where
   forward := b.forward.toInterpretation
   backward := b.backward.toInterpretation
@@ -983,12 +983,12 @@ def FunctionalBisimulation.toBiInterpretation {M N : MultiwaySystem.{u, v}}
   coherence_N := fun t => (b.rightInverse t).toPathEquiv
 
 /-- Bisimulation implies bi-interpretation (forward direction of main correspondence) -/
-theorem bisimulation_implies_biInterpretation {M N : MultiwaySystem.{u, v}}
+theorem bisimulation_implies_biInterpretation {M N : RootedTS.{u, v}}
     (b : FunctionalBisimulation M N) : Nonempty (BiInterpretation M N) :=
   ⟨b.toBiInterpretation⟩
 
 /-- Bisimilar systems have a bi-interpretation -/
-theorem bisimilar_has_biInterpretation {M N : MultiwaySystem.{u, v}}
+theorem bisimilar_has_biInterpretation {M N : RootedTS.{u, v}}
     (h : Bisimilar M N) : Nonempty (BiInterpretation M N) := by
   obtain ⟨b⟩ := h
   exact bisimulation_implies_biInterpretation b
@@ -1011,7 +1011,7 @@ simulation data (see v1.6 analysis), but bi-interpretation preserves it.
 
 /-- Two systems are bi-interpretable if there exists a bi-interpretation between them.
     This is the logical/semantic counterpart to bisimilarity. -/
-def BiInterpretable (M N : MultiwaySystem.{u, v}) : Prop :=
+def BiInterpretable (M N : RootedTS.{u, v}) : Prop :=
   Nonempty (BiInterpretation M N)
 
 /-- **AXIOM: Step structure derivable from reach for computational interpretations (forward).**
@@ -1021,18 +1021,18 @@ def BiInterpretable (M N : MultiwaySystem.{u, v}) : Prop :=
     See paper Remark 3.1 for mathematical justification.
 
     **Reference:** Barendregt Ch. 6.4, Rogers Ch. 7 -/
-private axiom computational_stepMap_forward {M N : MultiwaySystem.{u, v}}
+private axiom computational_stepMap_forward {M N : RootedTS.{u, v}}
     (cb : ComputationalBiInterpretation M N)
     {s t : M.State} : M.Step s t → N.Step (cb.forward.stateMap s) (cb.forward.stateMap t)
 
 /-- **AXIOM: Step structure derivable from reach for computational interpretations (backward).** -/
-private axiom computational_stepMap_backward {M N : MultiwaySystem.{u, v}}
+private axiom computational_stepMap_backward {M N : RootedTS.{u, v}}
     (cb : ComputationalBiInterpretation M N)
     {s t : N.State} : N.Step s t → M.Step (cb.backward.stateMap s) (cb.backward.stateMap t)
 
 namespace ComputationalBiInterpretation
 
-variable {M N : MultiwaySystem.{u, v}}
+variable {M N : RootedTS.{u, v}}
 
 /-- Bridge Lemma (Lemma 2.26): Computational bi-interpretation yields Caramello bi-interpretation.
 
@@ -1083,7 +1083,7 @@ noncomputable def toBiInterpretation (cb : ComputationalBiInterpretation M N) : 
 end ComputationalBiInterpretation
 
 /-- Computational bi-interpretability implies bi-interpretability (Bridge Lemma corollary) -/
-theorem compBiInterpretable_implies_biInterpretable {M N : MultiwaySystem.{u, v}}
+theorem compBiInterpretable_implies_biInterpretable {M N : RootedTS.{u, v}}
     (h : CompBiInterpretable M N) : BiInterpretable M N := by
   obtain ⟨cb⟩ := h
   exact ⟨cb.toBiInterpretation⟩
@@ -1126,7 +1126,7 @@ making `extractStepMap` unnecessary. The correspondence between `Simulation` and
 
     This theorem bridges the gap between pathEquiv (what coherence states)
     and PathEquivalent (what simulation needs). -/
-theorem coherence_implies_pathEquivalent {M N : MultiwaySystem.{u, v}}
+theorem coherence_implies_pathEquivalent {M N : RootedTS.{u, v}}
     (B : BiInterpretation M N) (s : M.State) :
     PathEquivalent M (B.backward.stateMap (B.forward.stateMap s)) s := by
   -- The model-theoretic argument shows that pathEquiv coherence
@@ -1159,7 +1159,7 @@ theorem coherence_implies_pathEquivalent {M N : MultiwaySystem.{u, v}}
       exact M.reach_trans hr h.2
 
 /-- Symmetric version for N -/
-theorem coherence_implies_pathEquivalent_N {M N : MultiwaySystem.{u, v}}
+theorem coherence_implies_pathEquivalent_N {M N : RootedTS.{u, v}}
     (B : BiInterpretation M N) (t : N.State) :
     PathEquivalent N (B.forward.stateMap (B.backward.stateMap t)) t := by
   constructor
@@ -1180,7 +1180,7 @@ theorem coherence_implies_pathEquivalent_N {M N : MultiwaySystem.{u, v}}
     - coherence_implies_pathEquivalent lifts pathEquiv to PathEquivalent
 
     No Classical.choice needed - the correspondence is now fully constructive. -/
-def toFunctionalBisimulation {M N : MultiwaySystem.{u, v}}
+def toFunctionalBisimulation {M N : RootedTS.{u, v}}
     (B : BiInterpretation M N) : FunctionalBisimulation M N where
   forward := {
     stateMap := B.forward.stateMap
@@ -1211,12 +1211,12 @@ end BiInterpretation
     **Proof:** Trivial by structure correspondence. InterpretationData includes
     step and init preservation (matching Simulation), and BiInterpretation coherence
     is PathEquivalent (matching FunctionalBisimulation). -/
-theorem biInterpretation_implies_bisimulation {M N : MultiwaySystem.{u, v}}
+theorem biInterpretation_implies_bisimulation {M N : RootedTS.{u, v}}
     (B : BiInterpretation M N) : Nonempty (FunctionalBisimulation M N) :=
   ⟨B.toFunctionalBisimulation⟩
 
 /-- Bi-interpretable systems are bisimilar -/
-theorem biInterpretable_implies_bisimilar {M N : MultiwaySystem.{u, v}}
+theorem biInterpretable_implies_bisimilar {M N : RootedTS.{u, v}}
     (h : BiInterpretable M N) : Bisimilar M N := by
   obtain ⟨B⟩ := h
   exact biInterpretation_implies_bisimulation B
@@ -1270,13 +1270,13 @@ model-theoretic content directly.
 
     The correct formulation uses bi-interpretation, which preserves the state-level
     correspondence data that Morita equivalence loses. -/
-theorem conjecture_e_biInterpretation {M N : MultiwaySystem.{u, v}} :
+theorem conjecture_e_biInterpretation {M N : RootedTS.{u, v}} :
     Nonempty (FunctionalBisimulation M N) ↔ BiInterpretable M N where
   mp := fun ⟨b⟩ => bisimulation_implies_biInterpretation b
   mpr := biInterpretable_implies_bisimilar
 
 /-- Bisimilar ↔ BiInterpretable: reformulation using Bisimilar predicate -/
-theorem bisimilar_iff_biInterpretable {M N : MultiwaySystem.{u, v}} :
+theorem bisimilar_iff_biInterpretable {M N : RootedTS.{u, v}} :
     Bisimilar M N ↔ BiInterpretable M N :=
   conjecture_e_biInterpretation
 
@@ -1288,7 +1288,7 @@ With this theorem, the v2.0 Caramello Framework is complete:
 | Phase | Name | Status |
 |-------|------|--------|
 | 21 | geometric-logic-infrastructure | ✓ GeoFormula, GeoSequent, GeometricTheory |
-| 22 | theory-of-multiway-system | ✓ MultiwayLanguage, theoryOfSystem |
+| 22 | theory-of-multiway-system | ✓ RTSLanguage, theoryOfSystem |
 | 23 | interpretations-and-simulations | ✓ InterpretationData, BiInterpretation |
 | 24 | syntactic-categories | ✓ SyntacticCategory, SimulationCategoryOver |
 | 25 | classifying-topos-equivalence | ✓ SynCat ≃ SimCat equivalence |
@@ -1311,4 +1311,4 @@ The bi-interpretation formulation here captures the correct forward direction.
 **Paper reference:** paper/bisimulation-morita.tex (drafted 2026-01-20)
 -/
 
-end Ruliology
+end RTS

@@ -17,7 +17,7 @@ to the standard translation of a diamond-only HML formula. The forward direction
 ## Main Results
 
 1. `HML` — Diamond-only modal formulas: {⊤, ⊥, ∧, ∨, ◇}
-2. `HML.satisfiedAt` — Kripke semantics over multiway systems
+2. `HML.satisfiedAt` — Kripke semantics over rooted transition systems
 3. `HML.bisim_invariant` — HML is bisimulation-invariant (forward direction)
 
 ## Three Separating Mechanisms
@@ -47,7 +47,7 @@ Witnesses are in HMLSeparation.lean.
 
 import RuleSys.Bisimulation
 
-namespace Ruliology
+namespace RTS
 
 universe u v
 
@@ -79,9 +79,9 @@ namespace HML
 /-- Kripke semantics: `φ.satisfiedAt M s` holds when state `s` in system `M`
     satisfies the HML formula `φ`.
 
-    The diamond modality uses the step relation of the multiway system:
+    The diamond modality uses the step relation of the rooted transition system:
     `◇φ` holds at `s` iff there exists `t` with `step(s, t)` and `φ` holds at `t`. -/
-def satisfiedAt (M : MultiwaySystem.{u, v}) (s : M.State) : HML → Prop
+def satisfiedAt (M : RootedTS.{u, v}) (s : M.State) : HML → Prop
   | .top => True
   | .bot => False
   | .conj φ ψ => φ.satisfiedAt M s ∧ ψ.satisfiedAt M s
@@ -89,7 +89,7 @@ def satisfiedAt (M : MultiwaySystem.{u, v}) (s : M.State) : HML → Prop
   | .diamond φ => ∃ t, Nonempty (M.Step s t) ∧ φ.satisfiedAt M t
 
 /-- System-level validity: `φ` holds at every state of `M`. -/
-def validIn (M : MultiwaySystem.{u, v}) (φ : HML) : Prop :=
+def validIn (M : RootedTS.{u, v}) (φ : HML) : Prop :=
   ∀ s : M.State, φ.satisfiedAt M s
 
 /-!
@@ -106,7 +106,7 @@ the forth/back conditions of the bisimulation to lift witnesses.
     - `diamond φ`: From `∃s'. step(s,s') ∧ φ(s')` and the forth condition of `R`,
       obtain `t'` with `step(t,t')` and `(s',t') ∈ R`. By IH, `φ(t')`. -/
 theorem bisim_invariant_forth
-    {M N : MultiwaySystem.{u, v}} {R : M.State → N.State → Prop}
+    {M N : RootedTS.{u, v}} {R : M.State → N.State → Prop}
     (hR : RelationalBisimulation M N R)
     (φ : HML) : ∀ {s : M.State} {t : N.State}, R s t →
     φ.satisfiedAt M s → φ.satisfiedAt N t := by
@@ -128,7 +128,7 @@ theorem bisim_invariant_forth
 
     **Proof:** Same argument using the back condition. -/
 theorem bisim_invariant_back
-    {M N : MultiwaySystem.{u, v}} {R : M.State → N.State → Prop}
+    {M N : RootedTS.{u, v}} {R : M.State → N.State → Prop}
     (hR : RelationalBisimulation M N R)
     (φ : HML) : ∀ {s : M.State} {t : N.State}, R s t →
     φ.satisfiedAt N t → φ.satisfiedAt M s := by
@@ -153,7 +153,7 @@ theorem bisim_invariant_back
 
     This is the forward direction of the geometric van Benthem conjecture. -/
 theorem bisim_invariant
-    {M N : MultiwaySystem.{u, v}} {R : M.State → N.State → Prop}
+    {M N : RootedTS.{u, v}} {R : M.State → N.State → Prop}
     (hR : RelationalBisimulation M N R)
     (φ : HML) {s : M.State} {t : N.State} (hst : R s t) :
     φ.satisfiedAt M s ↔ φ.satisfiedAt N t :=
@@ -164,7 +164,7 @@ theorem bisim_invariant
     If `R` is a bisimulation where every state in `N` is related to some state
     in `M`, and `φ.validIn M`, then `φ.validIn N`. -/
 theorem bisim_system_invariant
-    {M N : MultiwaySystem.{u, v}} {R : M.State → N.State → Prop}
+    {M N : RootedTS.{u, v}} {R : M.State → N.State → Prop}
     (hR : RelationalBisimulation M N R)
     (hTotal : ∀ t : N.State, ∃ s : M.State, R s t)
     (φ : HML) (hvalid : φ.validIn M) : φ.validIn N := by
@@ -189,4 +189,4 @@ def diamondBoth (φ ψ : HML) : HML := .conj (.diamond φ) (.diamond ψ)
 
 end HML
 
-end Ruliology
+end RTS

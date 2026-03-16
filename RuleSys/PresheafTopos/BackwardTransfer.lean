@@ -38,7 +38,7 @@ import RuleSys.PresheafTopos.BudgetBisimulation
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -129,4 +129,4 @@ theorem geo_backward_transfer (φ : LTSGeoFormula L 1)
       (fun _ => TreeVertex.rootPath G v d) :=
   geo_backward_transfer_constructive φ hbi d hd G v hsat
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

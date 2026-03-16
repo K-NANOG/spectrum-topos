@@ -49,7 +49,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: EnergyLTBridge Structure
@@ -381,4 +381,4 @@ theorem energy_lt_bridge_summary {Lab : Type} [Fintype Lab] [DecidableEq Lab]
 2. `pf_ft_nucleus_sup_unnamed`: j_PF ⊔ j_FT doesn't equal j_e for any named e
 -/
 
-end Ruliology
+end RTS

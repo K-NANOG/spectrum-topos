@@ -62,7 +62,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: The Non-Monotonicity Theorem
@@ -216,4 +216,4 @@ already captures the key insight: the propositional theory creates symmetries
 invisible to graph theory.
 -/
 
-end Ruliology
+end RTS

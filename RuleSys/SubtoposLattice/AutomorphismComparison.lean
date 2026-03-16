@@ -48,7 +48,7 @@ set_option autoImplicit false
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 universe u
 
@@ -301,4 +301,4 @@ theorem topos_detects_beyond_graph :
     Fintype.card (LindenbaumAut twoCycleTransTheory) :=
   ⟨graphAut_equal, automorphism_comparison⟩
 
-end Ruliology
+end RTS

@@ -34,7 +34,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Label Types
@@ -695,4 +695,4 @@ theorem vgPairA_traceEquiv_vgPairB :
     · exact vgPairA_trace_ab
     · exact vgPairA_trace_ac
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

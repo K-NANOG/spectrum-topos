@@ -58,7 +58,7 @@ Proved by structural induction on the `Provable` derivation.
 /-- **Generic soundness of geometric logic.**
 
     If a geometric sequent s is provable from theory T, then every
-    MultiwayModel that satisfies T (as a set of sequents) also satisfies s.
+    RTSModel that satisfies T (as a set of sequents) also satisfies s.
 
     Proof: structural induction on the derivation.
     - `ax`: the model satisfies all axioms of T by hypothesis
@@ -71,9 +71,9 @@ Proved by structural induction on the `Provable` derivation.
     - `disj_elim`: case split on the disjunction
     - `exist_intro`: pick any witness (bound var unused via castLE)
     - `exist_elim`: Frobenius — distribute context into ∃ scope -/
-theorem Provable.sound {α : Type} {s : GeoSequent MultiwayLanguage α}
-    {T : GeometricTheory MultiwayLanguage} :
-    Provable T s → ∀ m : MultiwayModel, satisfiesTheorySeq m T → satisfiesSequent' m s := by
+theorem Provable.sound {α : Type} {s : GeoSequent RTSLanguage α}
+    {T : GeometricTheory RTSLanguage} :
+    Provable T s → ∀ m : RTSModel, satisfiesTheorySeq m T → satisfiesSequent' m s := by
   intro h
   induction h with
   | ax hmem => intro m hT; exact hT _ hmem
@@ -117,9 +117,9 @@ theorem Provable.sound {α : Type} {s : GeoSequent MultiwayLanguage α}
 
     The hypothesis is strengthened: we require the sequent to hold in ALL models
     of T_M, not just the canonical model. This is the standard formulation. -/
-theorem theoryOfSystem_complete (M : Ruliology.MultiwaySystem) {α : Type}
-    {s : GeoSequent MultiwayLanguage α}
-    (h : ∀ m : MultiwayModel.{0}, satisfiesTheorySeq m (theoryOfSystem M) → satisfiesSequent' m s) :
+theorem theoryOfSystem_complete (M : RTS.RootedTS) {α : Type}
+    {s : GeoSequent RTSLanguage α}
+    (h : ∀ m : RTSModel.{0}, satisfiesTheorySeq m (theoryOfSystem M) → satisfiesSequent' m s) :
     Provable (theoryOfSystem M) s :=
   FunctionalFormula.geometric_completeness h
 
@@ -137,7 +137,7 @@ theorem theoryOfSystem_complete (M : Ruliology.MultiwaySystem) {α : Type}
     nested axiom dependencies:
 
     1. **`systemSpecificAxioms` (TheoryOfSystem.lean:239)**: The theory
-       `theoryOfSystem M = multiwayTheory ∪ systemSpecificAxioms M` includes
+       `theoryOfSystem M = rtsTheory ∪ systemSpecificAxioms M` includes
        system-specific axioms that are themselves axiomatized. The bridge from
        "canonical model satisfies s" to "all models of T_M satisfy s" requires
        knowing that `systemSpecificAxioms M` completely determines the step
@@ -162,9 +162,9 @@ theorem theoryOfSystem_complete (M : Ruliology.MultiwaySystem) {α : Type}
     - `FirstSeparation.lean:300`: pathSys_proves_sigma_tot
     - `SecondSeparation.lean:274`: twoCycle_proves_sigma_det
     - `NonEquivalence.lean:241`: detCounter_proves_sigma_det -/
-axiom theoryOfSystem_complete_canonical (M : Ruliology.MultiwaySystem) {α : Type}
-    (s : GeoSequent MultiwayLanguage α) :
-    satisfiesSequent' (Ruliology.MultiwaySystem.canonicalModel M) s →
+axiom theoryOfSystem_complete_canonical (M : RTS.RootedTS) {α : Type}
+    (s : GeoSequent RTSLanguage α) :
+    satisfiesSequent' (RTS.RootedTS.canonicalModel M) s →
     Provable (theoryOfSystem M) s
 
 /-!
@@ -175,7 +175,7 @@ bridging the formula-level evaluation to direct semantic predicates.
 -/
 
 /-- σ_tot satisfaction ↔ totality (every state has a successor). -/
-theorem satisfiesSequent'_sigma_tot_iff (m : MultiwayModel) :
+theorem satisfiesSequent'_sigma_tot_iff (m : RTSModel) :
     satisfiesSequent' m sigma_tot ↔ ∀ x : m.carrier, ∃ y : m.carrier, m.step x y := by
   constructor
   · intro h x
@@ -188,7 +188,7 @@ theorem satisfiesSequent'_sigma_tot_iff (m : MultiwayModel) :
     exact ⟨y, hy⟩
 
 /-- σ_det satisfaction ↔ determinism (functional step relation). -/
-theorem satisfiesSequent'_sigma_det_iff (m : MultiwayModel) :
+theorem satisfiesSequent'_sigma_det_iff (m : RTSModel) :
     satisfiesSequent' m sigma_det ↔
     ∀ x y z : m.carrier, m.step x y → m.step x z → y = z := by
   constructor
@@ -200,7 +200,7 @@ theorem satisfiesSequent'_sigma_det_iff (m : MultiwayModel) :
     exact h (val 0) (val 1) (val 2) h1 h2
 
 /-- σ_conf satisfaction ↔ weak confluence. -/
-theorem satisfiesSequent'_sigma_conf_iff (m : MultiwayModel) :
+theorem satisfiesSequent'_sigma_conf_iff (m : RTSModel) :
     satisfiesSequent' m sigma_conf ↔
     ∀ x y z : m.carrier, m.step x y → m.step x z →
       ∃ w : m.carrier, m.step y w ∧ m.step z w := by
@@ -215,7 +215,7 @@ theorem satisfiesSequent'_sigma_conf_iff (m : MultiwayModel) :
     exact ⟨w, hw1, hw2⟩
 
 /-- σ_loop satisfaction ↔ universal self-loop. -/
-theorem satisfiesSequent'_sigma_loop_iff (m : MultiwayModel) :
+theorem satisfiesSequent'_sigma_loop_iff (m : RTSModel) :
     satisfiesSequent' m sigma_loop ↔ ∀ x : m.carrier, m.step x x := by
   constructor
   · intro h x
@@ -229,11 +229,11 @@ theorem satisfiesSequent'_sigma_loop_iff (m : MultiwayModel) :
 /-- The canonical model of M satisfies theoryOfSystem M.
 
     With the syntactic definition, this follows from `syntactic_sub_semantic`:
-    every axiom of T_M (= multiwayTheory ∪ systemSpecificAxioms M) is satisfied
+    every axiom of T_M (= rtsTheory ∪ systemSpecificAxioms M) is satisfied
     by the canonical model, because the syntactic theory is a subtheory of the
     semantic closure. -/
-theorem canonicalModel_satisfies_theorySeq (M : Ruliology.MultiwaySystem) :
-    satisfiesTheorySeq (Ruliology.MultiwaySystem.canonicalModel M) (theoryOfSystem M) :=
+theorem canonicalModel_satisfies_theorySeq (M : RTS.RootedTS) :
+    satisfiesTheorySeq (RTS.RootedTS.canonicalModel M) (theoryOfSystem M) :=
   fun p hp => syntactic_sub_semantic M p hp
 
 /-!
@@ -271,7 +271,7 @@ to be available to all separation files without circular imports.
 
     2. **Language generality**: The axiom is stated for arbitrary first-order
        languages L, but `geometric_completeness` (Barr's theorem) is only
-       axiomatized for `MultiwayLanguage`. Even restricting to `MultiwayLanguage`
+       axiomatized for `RTSLanguage`. Even restricting to `RTSLanguage`
        would still require ingredient (1).
 
     3. **Deligne's theorem / enough points**: The "inverse" direction (topos
@@ -279,7 +279,7 @@ to be available to all separation files without circular imports.
        having enough points (Deligne's theorem), which is deep topos theory
        not formalized in Mathlib.
 
-    **Downstream uses** (4 sites, all with MultiwayLanguage theories):
+    **Downstream uses** (4 sites, all with RTSLanguage theories):
     - `FirstSeparation.lean`: fork/pathSys via σ_tot
     - `SecondSeparation.lean`: hubSpokes/twoCycle via σ_det
     - `NonEquivalence.lean`: detCounter/binarySplit via σ_det

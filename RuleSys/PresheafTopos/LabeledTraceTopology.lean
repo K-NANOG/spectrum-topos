@@ -35,7 +35,7 @@ import RuleSys.PresheafTopos.LabeledLTS
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: The Labeled Trace Covering Predicate
@@ -233,4 +233,4 @@ theorem labeled_trace_density_summary {L : Type} [Fintype L] [DecidableEq L] :
     (∀ G : FinLTS L, isLabeledTraceCovering G (traceGeneratedSieve G)) :=
   ⟨fun _ _ _ _ => labeled_trace_separation_iff, traceGeneratedSieve_labeled_trace_covering⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

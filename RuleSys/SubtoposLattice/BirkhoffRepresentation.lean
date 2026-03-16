@@ -43,7 +43,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: SpectrumElement — All 30 Elements of L₃₀
@@ -448,4 +448,4 @@ theorem card_J_eq_M : joinIrreducibles.length = meetIrreducibles.length := by na
 
 end SpectrumElement
 
-end Ruliology
+end RTS

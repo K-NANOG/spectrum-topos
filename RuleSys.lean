@@ -7,10 +7,10 @@ Grothendieck topologies on classifying toposes via Caramello's bridge technique.
 
 ## Structure
 
-- `RuleSys.Basic`: Category of multiway systems
-- `RuleSys.Ruliad`: Presheaf topos construction
+- `RuleSys.Basic`: Category of rooted transition systems
+- `RuleSys.RTSTopos`: Presheaf topos construction
 - `RuleSys.Observer`: Observers as coverages
-- `RuleSys.TwoCategory`: 2-equivalence ObsCtxt ≃ SubTop(Ruliad)
+- `RuleSys.TwoCategory`: 2-equivalence ObsCtxt ≃ SubTop(RTSTopos)
 - `RuleSys.GeometricTheory`: Geometric theory and Morita equivalence
 - `RuleSys.Bisimulation`: Relational and functional bisimulation
 - `RuleSys.HML`: Diamond-only Hennessy–Milner logic
@@ -19,7 +19,7 @@ Grothendieck topologies on classifying toposes via Caramello's bridge technique.
 -/
 
 import RuleSys.Basic
-import RuleSys.Ruliad
+import RuleSys.RTSTopos
 import RuleSys.Observer
 import RuleSys.TwoCategory
 import RuleSys.GeometricTheory
@@ -63,7 +63,7 @@ import RuleSys.LabeledLindenbaum
 import RuleSys.LabeledSymmetry
 -- Presheaf topos: f.p.LTS category and classifying topos properties
 import RuleSys.PresheafTopos
--- Bridge: MultiwaySystem ↔ FinLTS Unit formal functor
-import RuleSys.MultiwayToLTS
--- Van Benthem bridge: geometric van Benthem theorem for MultiwaySystem images
+-- Bridge: RootedTS ↔ FinLTS Unit formal functor
+import RuleSys.RTSToLTS
+-- Van Benthem bridge: geometric van Benthem theorem for RootedTS images
 import RuleSys.VanBenthemBridge

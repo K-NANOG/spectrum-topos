@@ -49,7 +49,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Energy-to-Nucleus Map Structure
@@ -347,4 +347,4 @@ beyond classical process algebra.
 ### Theorem count: 8
 -/
 
-end Ruliology
+end RTS

@@ -50,7 +50,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: Single-Label Spectrum Collapse
@@ -393,4 +393,4 @@ theorem coframe_computation_summary {L : Type*} [Order.Frame L]
 2. `two_label_order_reflects`: |L|≥2 antitone map reflects order
 -/
 
-end Ruliology
+end RTS

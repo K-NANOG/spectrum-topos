@@ -47,7 +47,7 @@ import RuleSys.PresheafTopos.LabeledTraceTopology
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Labeled Bisimulation Definition
@@ -560,4 +560,4 @@ theorem labeled_bisim_bracket_summary {L : Type} [Fintype L] [DecidableEq L] :
    fun _ h_tree _ _ hS => labeled_spectrum_bracket_upper h_tree hS,
    fun _ h_path _ _ hS => labeled_spectrum_bracket_lower h_path hS⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

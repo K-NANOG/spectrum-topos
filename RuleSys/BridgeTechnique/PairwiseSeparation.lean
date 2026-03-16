@@ -52,7 +52,7 @@ set_option autoImplicit false
 
 universe u
 
-open CategoryTheory GeometricLogic.Propositional Ruliology
+open CategoryTheory GeometricLogic.Propositional RTS
 
 /-!
 ## Section 1: Pairwise Non-Equivalence

@@ -67,7 +67,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Graded Atom Type
@@ -247,4 +247,4 @@ noncomputable def mkDepth1Theory (State : Type) [Fintype State] [DecidableEq Sta
           ⟨.top, disjunction⟩)
     baseNonEdgeAxioms ∪ baseTotalityAxioms ∪ depth1ImpossibilityAxioms ∪ depth1TotalityAxioms
 
-end Ruliology
+end RTS

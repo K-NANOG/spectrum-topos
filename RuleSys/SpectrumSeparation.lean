@@ -46,7 +46,7 @@ import RuleSys.LabeledHML
 
 set_option autoImplicit false
 
-namespace Ruliology
+namespace RTS
 
 open LabeledHML
 
@@ -347,4 +347,4 @@ theorem labeled_spectrum_collapse_broken :
       phi.satisfiedAt vgTraceBLTS .q0 ∧ ¬ phi.satisfiedAt vgTraceALTS .p0 :=
   pair1_trace_neq_simulation
 
-end Ruliology
+end RTS

@@ -42,7 +42,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Morita Invariant Structure
@@ -266,7 +266,7 @@ theorem graded_tower_separates :
 
 hubSpokes (unlabeled, card 5, aut 2) and vgSym (labeled, card 5, aut 2) share
 the same basic invariants. However, they have different geometric theories:
-hubSpokes uses MultiwayLanguage (step : State → State) while vgSym uses
+hubSpokes uses RTSLanguage (step : State → State) while vgSym uses
 labeled transitions (step_a, step_b, step_c : State → State).
 
 Different languages → different geometric theories → different syntactic categories.
@@ -398,4 +398,4 @@ The classifying topos is a complete invariant for this catalog.
 ### Theorem count: 12
 -/
 
-end Ruliology
+end RTS

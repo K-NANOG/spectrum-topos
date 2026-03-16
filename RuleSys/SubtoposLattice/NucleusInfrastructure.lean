@@ -50,7 +50,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Nucleus Applicability Verification
@@ -548,4 +548,4 @@ axiom nucleus_count_eq_two_pow_joinIrred
 ```
 -/
 
-end Ruliology
+end RTS

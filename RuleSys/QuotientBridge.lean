@@ -20,7 +20,7 @@ quotient M/∼ collapses the branching structure that σ_det detects.
 
 ## Main Results
 
-- `quotientSystem`: construct the quotient multiway system
+- `quotientSystem`: construct the quotient rooted transition system
 - `quotientProjection`: simulation M → quotientSystem M
 - `bisimilar_implies_quotient_strongBisim`: bisimulation lifts to strong bisim on quotients
 - `quotient_bridge`: bisimilar → quotient toposes equivalent
@@ -36,7 +36,7 @@ import RuleSys.GeometricLogic.SyntacticCategory
 
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Quotient System Construction
@@ -46,12 +46,12 @@ classes [s] under PathEquivalent, and there is a step [s₁] → [s₂] iff ther
 exist representatives s₁' ∈ [s₁], s₂' ∈ [s₂] with a step s₁' → s₂' in M.
 -/
 
-/-- The quotient multiway system M/∼ where ∼ is path equivalence.
+/-- The quotient rooted transition system M/∼ where ∼ is path equivalence.
 
     - State: `Quotient (pathEquivalentSetoid M)` — equivalence classes of states
     - Step: `[s₁] → [s₂]` iff ∃ representatives with a step between them
     - init: `⟦M.init⟧` — the equivalence class of the initial state -/
-def quotientSystem (M : MultiwaySystem.{0, 0}) : MultiwaySystem.{0, 0} where
+def quotientSystem (M : RootedTS.{0, 0}) : RootedTS.{0, 0} where
   State := Quotient (pathEquivalentSetoid M)
   Step := fun q₁ q₂ =>
     PLift (∃ s₁ s₂ : M.State, ⟦s₁⟧ = q₁ ∧ ⟦s₂⟧ = q₂ ∧ Nonempty (M.Step s₁ s₂))
@@ -60,7 +60,7 @@ def quotientSystem (M : MultiwaySystem.{0, 0}) : MultiwaySystem.{0, 0} where
 /-- The canonical projection M → M/∼ is a simulation.
     Maps each state to its equivalence class, and each step to
     the existential witness in the quotient. -/
-def quotientProjection (M : MultiwaySystem.{0, 0}) :
+def quotientProjection (M : RootedTS.{0, 0}) :
     Simulation M (quotientSystem M) where
   stateMap := fun s => ⟦s⟧
   stepMap := fun {s t} step => ⟨⟨s, t, rfl, rfl, ⟨step⟩⟩⟩
@@ -79,12 +79,12 @@ the forward map descends to quotients.
 
     Given b : FunctionalBisimulation M N, the forward stateMap preserves path equivalence
     (by `forward_preserves_pathEquivalent`), so it descends to a function on quotients. -/
-def bisim_quotient_map {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimulation M N) :
+def bisim_quotient_map {M N : RootedTS.{0, 0}} (b : FunctionalBisimulation M N) :
     Quotient (pathEquivalentSetoid M) → Quotient (pathEquivalentSetoid N) :=
   Quotient.map b.forward.stateMap (fun _ _ h => b.forward_preserves_pathEquivalent h)
 
 /-- A bisimulation's backward simulation descends to quotients. -/
-def bisim_quotient_map_back {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimulation M N) :
+def bisim_quotient_map_back {M N : RootedTS.{0, 0}} (b : FunctionalBisimulation M N) :
     Quotient (pathEquivalentSetoid N) → Quotient (pathEquivalentSetoid M) :=
   Quotient.map b.backward.stateMap (fun _ _ h => b.backward_preserves_pathEquivalent h)
 
@@ -92,7 +92,7 @@ def bisim_quotient_map_back {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimul
 
     For any s : M.State, bisim_quotient_map_back (bisim_quotient_map ⟦s⟧) = ⟦s⟧
     because b.backward(b.forward(s)) is path-equivalent to s (by leftInverse). -/
-theorem bisim_quotient_left_inverse {M N : MultiwaySystem.{0, 0}}
+theorem bisim_quotient_left_inverse {M N : RootedTS.{0, 0}}
     (b : FunctionalBisimulation M N) (q : Quotient (pathEquivalentSetoid M)) :
     bisim_quotient_map_back b (bisim_quotient_map b q) = q := by
   induction q using Quotient.ind with
@@ -102,7 +102,7 @@ theorem bisim_quotient_left_inverse {M N : MultiwaySystem.{0, 0}}
     exact Quotient.sound (b.leftInverse s)
 
 /-- The quotient maps compose to the identity on N's quotient. -/
-theorem bisim_quotient_right_inverse {M N : MultiwaySystem.{0, 0}}
+theorem bisim_quotient_right_inverse {M N : RootedTS.{0, 0}}
     (b : FunctionalBisimulation M N) (q : Quotient (pathEquivalentSetoid N)) :
     bisim_quotient_map b (bisim_quotient_map_back b q) = q := by
   induction q using Quotient.ind with
@@ -125,7 +125,7 @@ classes in N/∼.
     with s₁' → s₂' in M), we apply b.forward to get
     b.forward(s₁') → b.forward(s₂') in N, which witnesses
     [b.forward(s₁')] → [b.forward(s₂')] in N/∼. -/
-def bisim_quotient_stepMap {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimulation M N)
+def bisim_quotient_stepMap {M N : RootedTS.{0, 0}} (b : FunctionalBisimulation M N)
     {q₁ q₂ : (quotientSystem M).State}
     (step : (quotientSystem M).Step q₁ q₂) :
     (quotientSystem N).Step (bisim_quotient_map b q₁) (bisim_quotient_map b q₂) := by
@@ -135,7 +135,7 @@ def bisim_quotient_stepMap {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimula
   exact ⟨b.forward.stateMap s₁, b.forward.stateMap s₂, rfl, rfl, ⟨b.forward.stepMap st⟩⟩
 
 /-- The quotient backward map preserves steps. -/
-def bisim_quotient_stepMap_back {M N : MultiwaySystem.{0, 0}} (b : FunctionalBisimulation M N)
+def bisim_quotient_stepMap_back {M N : RootedTS.{0, 0}} (b : FunctionalBisimulation M N)
     {q₁ q₂ : (quotientSystem N).State}
     (step : (quotientSystem N).Step q₁ q₂) :
     (quotientSystem M).Step (bisim_quotient_map_back b q₁) (bisim_quotient_map_back b q₂) := by
@@ -156,7 +156,7 @@ the quotient state types (proved in Part 2).
 
     The forward and backward quotient maps are actual inverses on states
     (not just path-equivalent), so the quotient bisimulation is strong. -/
-def bisimilar_implies_quotient_strongBisim {M N : MultiwaySystem.{0, 0}}
+def bisimilar_implies_quotient_strongBisim {M N : RootedTS.{0, 0}}
     (b : FunctionalBisimulation M N) :
     StrongBisimulation (quotientSystem M) (quotientSystem N) where
   forward := {
@@ -201,11 +201,11 @@ all transition structure, hence all provable geometric sequents.
     isomorphic models have identical theories, hence equivalent classifying toposes.
 
     **Mathematical justification:** Two systems with state-level bijection
-    preserving all transitions are isomorphic as multiway systems. Isomorphic
+    preserving all transitions are isomorphic as rooted transition systems. Isomorphic
     systems have identical geometric theories Th_G(M) = Th_G(N) (literally
     the same provable sequents), hence identical classifying toposes. -/
 axiom strongBisim_implies_topos_equiv
-    (M N : MultiwaySystem.{0, 0}) :
+    (M N : RootedTS.{0, 0}) :
     StrongBisimulation M N →
     Nonempty (GeometricLogic.classifyingToposOf M ≌
               GeometricLogic.classifyingToposOf N)
@@ -216,7 +216,7 @@ axiom strongBisim_implies_topos_equiv
 
 /-- **Quotient Bridge Theorem**
 
-    Bisimilar multiway systems have equivalent quotient classifying toposes:
+    Bisimilar rooted transition systems have equivalent quotient classifying toposes:
     if M ≈ N, then E[Th_G(M/∼)] ≃ E[Th_G(N/∼)].
 
     The proof proceeds:
@@ -230,7 +230,7 @@ axiom strongBisim_implies_topos_equiv
     branching structure that σ_det detects.
 
     **Axiom count: 1** (strongBisim_implies_topos_equiv) -/
-theorem quotient_bridge (M N : MultiwaySystem.{0, 0}) (h : Bisimilar M N) :
+theorem quotient_bridge (M N : RootedTS.{0, 0}) (h : Bisimilar M N) :
     Nonempty (GeometricLogic.classifyingToposOf (quotientSystem M) ≌
               GeometricLogic.classifyingToposOf (quotientSystem N)) := by
   obtain ⟨b⟩ := h
@@ -238,4 +238,4 @@ theorem quotient_bridge (M N : MultiwaySystem.{0, 0}) (h : Bisimilar M N) :
     (quotientSystem M) (quotientSystem N)
     (bisimilar_implies_quotient_strongBisim b)
 
-end Ruliology
+end RTS

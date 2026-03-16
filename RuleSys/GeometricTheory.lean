@@ -7,15 +7,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 This file formalizes:
 
 1. The geometric theory T_Comp of computations (flat functors on RuleSys)
-2. The Ruliad as the classifying topos for T_Comp
-3. Morita equivalence between Sh(J_O) and Ruliad for complete observers
+2. The RTSTopos as the classifying topos for T_Comp
+3. Morita equivalence between Sh(J_O) and RTSTopos for complete observers
 4. Topos-theoretic invariants: Booleanness, two-valuedness
 5. Correspondence between invariants and sampling properties
 
 ## Mathematical Content
 
 The geometric theory of computations has:
-- Sorts: States, Steps (for each multiway system)
+- Sorts: States, Steps (for each rooted transition system)
 - Function symbols: init, source, target
 - Relations: reachability, halting
 - Axioms: composition of steps, simulation compatibility
@@ -36,10 +36,10 @@ open CategoryTheory.Limits
 
 universe u v
 
-namespace Ruliology
+namespace RTS
 
-/-- The terminal multiway system (single state, no transitions) -/
-def terminalSystem : MultiwaySystem.{0, 0} where
+/-- The terminal rooted transition system (single state, no transitions) -/
+def terminalSystem : RootedTS.{0, 0} where
   State := Unit
   Step := fun _ _ => Empty
   init := ()
@@ -128,8 +128,8 @@ structure SetModel.{w} where
   /-- Reachability relation -/
   reachableInterp : StateInterp → StateInterp → Prop
 
-/-- Every multiway system gives a model of T_Comp -/
-def modelFromSystem (M : MultiwaySystem.{0, 0}) : SetModel where
+/-- Every rooted transition system gives a model of T_Comp -/
+def modelFromSystem (M : RootedTS.{0, 0}) : SetModel where
   StateInterp := M.State
   StepInterp := Σ s t : M.State, M.Step s t
   PathInterp := Σ s t : M.State, M.Path s t
@@ -139,19 +139,19 @@ def modelFromSystem (M : MultiwaySystem.{0, 0}) : SetModel where
   reachableInterp := fun s t => Nonempty (M.Path s t)
 
 /-!
-## Task 21: Ruliad Classifies T_Comp
+## Task 21: RTSTopos Classifies T_Comp
 
-The Ruliad is the classifying topos for T_Comp, meaning:
+The RTSTopos is the classifying topos for T_Comp, meaning:
 - Models of T_Comp in any Grothendieck topos E
-- correspond to geometric morphisms E → Ruliad
+- correspond to geometric morphisms E → RTSTopos
 -/
 
-/-- A topos morphism (geometric morphism) from E to Ruliad -/
+/-- A topos morphism (geometric morphism) from E to RTSTopos -/
 structure ToposMorphism (E : Type*) [Category E] where
   /-- The inverse image functor -/
-  inverse : Ruliad.{0, 0} ⥤ E
+  inverse : RTSTopos.{0, 0} ⥤ E
   /-- The direct image functor -/
-  direct : E ⥤ Ruliad.{0, 0}
+  direct : E ⥤ RTSTopos.{0, 0}
   /-- The adjunction (inverse ⊣ direct) -/
   adj : inverse ⊣ direct
   /-- inverse preserves finite limits -/
@@ -161,28 +161,28 @@ structure ToposMorphism (E : Type*) [Category E] where
 axiom classifying_topos_correspondence (E : Type*) [Category E] [HasFiniteLimits E] :
     (ToposMorphism E) ≃ { M : SetModel // True }
 
-/-- The generic model in the Ruliad (at universe 1) -/
+/-- The generic model in the RTSTopos (at universe 1) -/
 def genericModel : SetModel.{1} where
-  StateInterp := Σ M : MultiwaySystem.{0, 0}, M.State
-  StepInterp := Σ M : MultiwaySystem.{0, 0}, Σ s t : M.State, M.Step s t
-  PathInterp := Σ M : MultiwaySystem.{0, 0}, Σ s t : M.State, M.Path s t
+  StateInterp := Σ M : RootedTS.{0, 0}, M.State
+  StepInterp := Σ M : RootedTS.{0, 0}, Σ s t : M.State, M.Step s t
+  PathInterp := Σ M : RootedTS.{0, 0}, Σ s t : M.State, M.Path s t
   initInterp := ⟨terminalSystem, ()⟩
   sourceInterp := fun x => ⟨x.1, x.2.1⟩
   targetInterp := fun x => ⟨x.1, x.2.2.1⟩
   reachableInterp := fun x y => x.1 = y.1
 
-/-- The Ruliad classifies T_Comp.
+/-- The RTSTopos classifies T_Comp.
 
     NOTE: The original statement `∀ M, ∃! f, True` is mathematically incorrect.
-    It claims there is exactly one geometric morphism Type → Ruliad regardless of M,
+    It claims there is exactly one geometric morphism Type → RTSTopos regardless of M,
     but M is unused and `∃! f, True` requires `Subsingleton (ToposMorphism Type)`.
     In fact, points of a presheaf topos correspond to flat functors, so there are
-    generally many geometric morphisms Set → Ruliad (one per flat functor / model).
+    generally many geometric morphisms Set → RTSTopos (one per flat functor / model).
 
     The correct statement is that models of T_Comp correspond bijectively to
     geometric morphisms, which is exactly `classifying_topos_correspondence`.
     We weaken the statement to existence (dropping the false uniqueness claim). -/
-theorem ruliad_classifies_TComp :
+theorem multiwayTopos_classifies_TComp :
     ∀ (M : SetModel), ∃ (f : ToposMorphism (Type)), True := by
   intro M
   -- Use the classifying topos correspondence to obtain a geometric morphism
@@ -193,12 +193,12 @@ theorem ruliad_classifies_TComp :
 ## Task 22: Morita Equivalence
 
 Two geometric theories are Morita equivalent if they have equivalent
-classifying toposes. For complete observers, Sh(J_O) ≃ Ruliad.
+classifying toposes. For complete observers, Sh(J_O) ≃ RTSTopos.
 -/
 
 /-- An observer is complete if it distinguishes all computationally distinct states -/
 def ObserverData.isComplete (O : ObserverData.{u, v}) : Prop :=
-  ∀ (M : MultiwaySystem.{u, v}) (s t : M.State),
+  ∀ (M : RootedTS.{u, v}) (s t : M.State),
     O.stateEq M s t → (∀ u, Nonempty (M.Path s u) ↔ Nonempty (M.Path t u))
 
 /-- The finest observer is complete -/
@@ -210,27 +210,27 @@ theorem finest_is_complete : ObserverData.finest.{u, v}.isComplete := by
   rw [h]
 
 /-- Morita equivalence: two sites with equivalent sheaf categories -/
-def MoritaEquivalent (J₁ J₂ : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
+def MoritaEquivalent (J₁ J₂ : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
   Nonempty (Sheaf J₁ (Type) ≌ Sheaf J₂ (Type))
 
 /-- MoritaEquivalent is reflexive: every topology is Morita equivalent to itself -/
-def MoritaEquivalent.refl (J : GrothendieckTopology (MultiwaySystem.{0, 0})) :
+def MoritaEquivalent.refl (J : GrothendieckTopology (RootedTS.{0, 0})) :
     MoritaEquivalent J J :=
   ⟨CategoryTheory.Functor.asEquivalence (𝟭 (Sheaf J Type))⟩
 
 /-- MoritaEquivalent is symmetric -/
-def MoritaEquivalent.symm {J₁ J₂ : GrothendieckTopology (MultiwaySystem.{0, 0})}
+def MoritaEquivalent.symm {J₁ J₂ : GrothendieckTopology (RootedTS.{0, 0})}
     (h : MoritaEquivalent J₁ J₂) : MoritaEquivalent J₂ J₁ :=
   h.elim (fun e => ⟨e.symm⟩)
 
 /-- MoritaEquivalent is transitive -/
-def MoritaEquivalent.trans {J₁ J₂ J₃ : GrothendieckTopology (MultiwaySystem.{0, 0})}
+def MoritaEquivalent.trans {J₁ J₂ J₃ : GrothendieckTopology (RootedTS.{0, 0})}
     (h₁ : MoritaEquivalent J₁ J₂) (h₂ : MoritaEquivalent J₂ J₃) :
     MoritaEquivalent J₁ J₃ :=
   h₁.elim (fun e₁ => h₂.elim (fun e₂ => ⟨e₁.trans e₂⟩))
 
 /-- The trivial topology (only maximal sieves cover) -/
-def trivialTopology : GrothendieckTopology (MultiwaySystem.{0, 0}) where
+def trivialTopology : GrothendieckTopology (RootedTS.{0, 0}) where
   sieves := fun _ S => S = ⊤
   top_mem' := fun _ => rfl
   pullback_stable' := fun {_ _} {S} _ hS => by
@@ -249,7 +249,7 @@ def trivialTopology : GrothendieckTopology (MultiwaySystem.{0, 0}) where
     have h3 : (R.pullback g).arrows (𝟙 Z) := by rw [h2]; trivial
     simpa using h3
 
-/-- For complete observers, the sheaf topos is equivalent to Ruliad.
+/-- For complete observers, the sheaf topos is equivalent to RTSTopos.
 
     BLOCKED: Constructing a categorical equivalence Sheaf J_O Type ≌ Sheaf trivialTopology Type
     requires building explicit adjoint functors (sheafification and inclusion) and proving
@@ -260,9 +260,9 @@ def trivialTopology : GrothendieckTopology (MultiwaySystem.{0, 0}) where
 
     The mathematical content is: a complete observer's topology makes every presheaf
     a sheaf (since the observer already distinguishes everything relevant), so
-    Sh(J_O) ≃ PSh(RuleSys) = Ruliad ≃ Sh(trivialTopology). -/
+    Sh(J_O) ≃ PSh(RuleSys) = RTSTopos ≃ Sh(trivialTopology). -/
 -- Axiom: A complete observer's topology yields a sheaf topos equivalent to
--- the presheaf topos (Ruliad). The constructive proof requires sheafification
+-- the presheaf topos (RTSTopos). The constructive proof requires sheafification
 -- infrastructure and adjoint functor constructions not available in Mathlib.
 axiom complete_observer_morita_ax :
   ∀ (O : ObserverData.{0, 0}), O.isComplete →
@@ -284,20 +284,20 @@ Key invariants of a topos that correspond to computational properties:
 /-- Sieve-level Boolean: every covering sieve has a covering complement.
     This is a site-level property, NOT preserved by Morita equivalence.
     Retained as internal implementation detail. -/
-def SieveBoolean (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∀ (X : MultiwaySystem.{0, 0}) (S : Sieve X),
+def SieveBoolean (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∀ (X : RootedTS.{0, 0}) (S : Sieve X),
     S ∈ J X → ∃ (Sc : Sieve X), Sc ∈ J X ∧ S ⊓ Sc = ⊥ ∧ S ⊔ Sc = ⊤
 
 /-- Sieve-level two-valued: every covering sieve is ⊥ or ⊤.
     Site-level property, NOT preserved by Morita equivalence. -/
-def SieveTwoValued (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∀ (X : MultiwaySystem.{0, 0}) (S : Sieve X), S ∈ J X → S = ⊥ ∨ S = ⊤
+def SieveTwoValued (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∀ (X : RootedTS.{0, 0}) (S : Sieve X), S ∈ J X → S = ⊥ ∨ S = ⊤
 
 /-- Sieve-level enough points: non-empty covering sieves have arrows.
     Site-level property, NOT preserved by Morita equivalence. -/
-def SieveHasEnoughPoints (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∀ (X : MultiwaySystem.{0, 0}) (S : Sieve X),
-    S ∈ J X → S ≠ ⊥ → ∃ (Y : MultiwaySystem.{0, 0}) (f : Y ⟶ X), S.arrows f
+def SieveHasEnoughPoints (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∀ (X : RootedTS.{0, 0}) (S : Sieve X),
+    S ∈ J X → S ≠ ⊥ → ∃ (Y : RootedTS.{0, 0}) (f : Y ⟶ X), S.arrows f
 
 /-- A Grothendieck topology is Boolean if its sheaf topos is Boolean.
 
@@ -308,24 +308,24 @@ def SieveHasEnoughPoints (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Pr
 
     This resolves the fundamental mismatch where sieve-level `SieveBoolean` could not
     transfer across Morita equivalence. -/
-def IsBoolean (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∃ (J' : GrothendieckTopology (MultiwaySystem.{0, 0})),
+def IsBoolean (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∃ (J' : GrothendieckTopology (RootedTS.{0, 0})),
     MoritaEquivalent J J' ∧ SieveBoolean J'
 
 /-- A Grothendieck topology is two-valued if its sheaf topos is two-valued.
 
     **Categorical definition via Morita closure:** J is two-valued if there exists
     a Morita-equivalent topology J' satisfying the sieve-level two-valued condition. -/
-def IsTwoValued (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∃ (J' : GrothendieckTopology (MultiwaySystem.{0, 0})),
+def IsTwoValued (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∃ (J' : GrothendieckTopology (RootedTS.{0, 0})),
     MoritaEquivalent J J' ∧ SieveTwoValued J'
 
 /-- A topology has enough points if its sheaf topos has enough points.
 
     **Categorical definition via Morita closure:** J has enough points if there exists
     a Morita-equivalent topology J' satisfying the sieve-level enough points condition. -/
-def HasEnoughPoints (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
-  ∃ (J' : GrothendieckTopology (MultiwaySystem.{0, 0})),
+def HasEnoughPoints (J : GrothendieckTopology (RootedTS.{0, 0})) : Prop :=
+  ∃ (J' : GrothendieckTopology (RootedTS.{0, 0})),
     MoritaEquivalent J J' ∧ SieveHasEnoughPoints J'
 
 /-- The trivial topology is NOT Boolean in the sieve-complement sense.
@@ -346,7 +346,7 @@ def HasEnoughPoints (J : GrothendieckTopology (MultiwaySystem.{0, 0})) : Prop :=
     into it, trivialTopology fails IsBoolean. We use a conditional formulation
     to avoid needing to construct such a system. -/
 theorem trivial_not_boolean_conditional
-    (X : MultiwaySystem.{0, 0})
+    (X : RootedTS.{0, 0})
     (hNonTrivial : (⊤ : Sieve X) ≠ (⊥ : Sieve X)) :
     ¬ (∃ (Sc : Sieve X), Sc ∈ trivialTopology X ∧ (⊤ : Sieve X) ⊓ Sc = ⊥ ∧ ⊤ ⊔ Sc = ⊤) := by
   intro ⟨Sc, hSc_cov, hInf, _⟩
@@ -381,7 +381,7 @@ The topos-theoretic invariants correspond to computational sampling:
 
 /-- An observer induces deterministic evolution if paths are unique -/
 def ObserverData.isDeterministic (O : ObserverData.{u, v}) : Prop :=
-  ∀ (M : MultiwaySystem.{u, v}) (s t₁ t₂ : M.State),
+  ∀ (M : RootedTS.{u, v}) (s t₁ t₂ : M.State),
     Nonempty (M.Step s t₁) → Nonempty (M.Step s t₂) → O.stateEq M t₁ t₂
 
 /-- An observer provides complete sampling if it distinguishes
@@ -531,9 +531,9 @@ theorem observerTopology_has_enough_points (O : ObserverData.{0, 0}) :
 
 | Computational Concept      | Topos-Theoretic Concept           |
 |---------------------------|-----------------------------------|
-| Multiway system           | Object in RuleSys                 |
+| Rooted transition system           | Object in RuleSys                 |
 | Simulation                | Morphism in RuleSys               |
-| Ruliad                    | Presheaf topos [RuleSys^op, Set]  |
+| RTSTopos                    | Presheaf topos [RuleSys^op, Set]  |
 | Observer                  | Grothendieck topology             |
 | What observer sees        | Sheaf topos Sh(J_O)               |
 | Deterministic evolution   | Boolean topos                     |
@@ -577,4 +577,4 @@ theorem topos_computation_dictionary :
   · exact two_valued_iff_complete
   · exact observerTopology_has_enough_points
 
-end Ruliology
+end RTS

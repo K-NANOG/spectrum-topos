@@ -55,7 +55,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Three-Label Alphabet
@@ -427,13 +427,6 @@ sets) will be defined in later phases (120-121). The extensive docstrings
 preserve the mathematical content and proof sketches for later formalization.
 -/
 
-/-- Pair 1: vgTraceA and vgTraceB are trace equivalent.
-Both have trace set {ab, ac}. Both have Lindenbaum cardinality 5.
-The base Lindenbaum algebra does NOT distinguish these systems — this is a
-key insight: trace-equivalent systems can produce isomorphic Lindenbaum algebras.
-Concrete proof requires labeled HML trace formulas (Phase 120). -/
-axiom vgPair1_traceEquivalent : True
-
 /-- Pair 1: vgTraceA and vgTraceB are NOT simulation equivalent.
 No simulation from vgTraceA to vgTraceB exists: p1 (ready {b}) and p2 (ready {c})
 cannot both map to q1 (ready {b,c}) while preserving the simulation condition.
@@ -443,13 +436,6 @@ then p1 can only do b, while q1 can also do c — the simulation must find a mat
 c-step from p1, which doesn't exist.
 Concrete proof via distinguishing formula: see `SpectrumSeparation.pair1_trace_neq_simulation`. -/
 theorem vgPair1_not_simulationEquiv : True := trivial
-
-/-- Pair 2: vgSimA and vgTraceB are simulation equivalent.
-Simulation vgSimA → vgTraceB: r0↦q0, r1↦q1, r2↦q1, r3↦q2, r4↦q2, r5↦q3.
-Simulation vgTraceB → vgSimA: q0↦r0, q1↦r2, q2↦r4, q3↦r5.
-Both simulations preserve the step relation.
-Concrete proof requires labeled simulation definitions (Phase 120). -/
-axiom vgPair2_simulationEquiv : True
 
 /-- Pair 2: vgSimA and vgTraceB are NOT ready-simulation equivalent.
 Ready-simulation requires preserving ready sets (sets of enabled actions).
@@ -478,4 +464,4 @@ bisimulation. Each adjacent pair is separated by concrete counterexamples:
 See `SpectrumSeparation.labeled_four_level_separation` for the full proof. -/
 theorem labeled_spectrum_has_four_levels : True := trivial
 
-end Ruliology
+end RTS

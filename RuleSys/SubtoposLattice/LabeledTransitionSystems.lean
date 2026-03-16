@@ -51,7 +51,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Generic Labeled Transition Theory Construction
@@ -232,13 +232,13 @@ theorem labeledBranchingAlgebra_card :
 ## Part 4: LabeledLTS Structure and Theory Connection
 
 We define a strong labeled transition system (no tau-transitions) as a
-structure `LabeledLTS`, with conversions to the unlabeled `MultiwaySystem`
+structure `LabeledLTS`, with conversions to the unlabeled `RootedTS`
 (forgetting labels) and to `PropGeoTheory` (via `mkLabeledTransitionTheory`).
 -/
 
 /-- A strong labeled transition system (LTS) with a finite set of actions.
 
-Unlike `LabeledMultiwaySystem` in `WeakBisimulation.lean` which uses
+Unlike `LabeledRootedTS` in `WeakBisimulation.lean` which uses
 `Option Label` to model tau-transitions, this structure uses bare `Label`
 for strong transitions only. This matches the van Glabbeek spectrum setting
 where all transitions are observable.
@@ -252,12 +252,12 @@ structure LabeledLTS (Label : Type*) where
   Step : State → Label → State → Type*
   init : State
 
-/-- Forget the labels of a `LabeledLTS`, producing an unlabeled `MultiwaySystem`.
+/-- Forget the labels of a `LabeledLTS`, producing an unlabeled `RootedTS`.
 
 A transition exists in the unlabeled system iff there exists SOME label
 under which it exists in the labeled system. This is compatible with
 existing HML/bisimulation infrastructure which operates on unlabeled systems. -/
-def LabeledLTS.toMultiwaySystem {Label : Type*} (M : LabeledLTS Label) : MultiwaySystem where
+def LabeledLTS.toRootedTS {Label : Type*} (M : LabeledLTS Label) : RootedTS where
   State := M.State
   Step := fun s t => Σ a, M.Step s a t
   init := M.init
@@ -304,4 +304,4 @@ theorem labeledBranchingLTS_theory_eq :
       labeledBranching_hasEdge = labeledBranchingTheory :=
   rfl
 
-end Ruliology
+end RTS

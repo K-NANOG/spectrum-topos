@@ -36,7 +36,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Enriched Atom Type
@@ -335,4 +335,4 @@ This is the energy-theoretic explanation of the classic linear/branching time sp
 ### Theorem count: 20+
 -/
 
-end Ruliology
+end RTS

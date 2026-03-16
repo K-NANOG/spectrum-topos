@@ -35,7 +35,7 @@ import RuleSys.SpectrumSeparation
 
 set_option autoImplicit false
 
-namespace Ruliology
+namespace RTS
 
 open LabeledHML GeometricLogic.Propositional
 
@@ -279,4 +279,4 @@ theorem labeled_lindenbaum_bridge :
   ⟨lindenbaum_partial_separation, lindenbaum_spectrum_gap.1,
    pair1_trace_neq_simulation, pair2_simulation_neq_readySim⟩
 
-end Ruliology
+end RTS

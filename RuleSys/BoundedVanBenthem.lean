@@ -34,7 +34,7 @@ pairs. The surviving atoms are exactly the HML-expressible ones.
 
 import RuleSys.HMLSeparation
 
-namespace Ruliology
+namespace RTS
 
 universe u v
 
@@ -53,13 +53,13 @@ def HML.depth : HML → ℕ
   | .disj φ ψ => max φ.depth ψ.depth
   | .diamond φ => φ.depth + 1
 
-/-- A state property: a predicate on states of any multiway system at universe (0,0). -/
-def StateProp := ∀ (M : MultiwaySystem.{0, 0}), M.State → Prop
+/-- A state property: a predicate on states of any rooted transition system at universe (0,0). -/
+def StateProp := ∀ (M : RootedTS.{0, 0}), M.State → Prop
 
 /-- A state property is bisimulation-invariant if it is preserved by all
     relational bisimulations. -/
 def BisimInvariant (P : StateProp) : Prop :=
-  ∀ (M N : MultiwaySystem.{0, 0}) (R : M.State → N.State → Prop),
+  ∀ (M N : RootedTS.{0, 0}) (R : M.State → N.State → Prop),
     RelationalBisimulation M N R →
     ∀ (s : M.State) (t : N.State), R s t → (P M s ↔ P N t)
 
@@ -119,8 +119,8 @@ theorem selfLoopProp_not_bisimInvariant : ¬ BisimInvariant selfLoopProp := by
 /-- HML formulas of depth 0 contain no diamonds, so they evaluate
     to constant True or False at every state. -/
 theorem hml_depth0_constant (φ : HML) (hd : φ.depth = 0) :
-    (∀ (M : MultiwaySystem.{0, 0}) (s : M.State), φ.satisfiedAt M s) ∨
-    (∀ (M : MultiwaySystem.{0, 0}) (s : M.State), ¬ φ.satisfiedAt M s) := by
+    (∀ (M : RootedTS.{0, 0}) (s : M.State), φ.satisfiedAt M s) ∨
+    (∀ (M : RootedTS.{0, 0}) (s : M.State), ¬ φ.satisfiedAt M s) := by
   induction φ with
   | top => exact Or.inl (fun _ _ => trivial)
   | bot => exact Or.inr (fun _ _ h => h)
@@ -160,7 +160,7 @@ inductive SourceState : Type
 
 /-- Source graph: src→sink, sink→sink. Init: src.
     src has a successor (sink) but no predecessor. -/
-def sourceGraph : MultiwaySystem.{0, 0} where
+def sourceGraph : RootedTS.{0, 0} where
   State := SourceState
   Step := fun s t => match s, t with
     | .src, .sink => Unit
@@ -176,7 +176,7 @@ inductive BackEdgeState : Type
 
 /-- Back-edge graph: root→loop, loop→loop, loop→root. Init: root.
     root has a successor (loop) AND a predecessor (loop). -/
-def backEdgeGraph : MultiwaySystem.{0, 0} where
+def backEdgeGraph : RootedTS.{0, 0} where
   State := BackEdgeState
   Step := fun s t => match s, t with
     | .root, .loop => Unit
@@ -351,8 +351,8 @@ theorem hasSucProp_bisimInvariant : BisimInvariant hasSucProp := by
     and the only non-trivial depth-0 geometric atom is not bisimulation-invariant. -/
 theorem vanBenthem_depth0 :
     (∀ φ : HML, φ.depth = 0 →
-      (∀ (M : MultiwaySystem.{0, 0}) (s : M.State), φ.satisfiedAt M s) ∨
-      (∀ (M : MultiwaySystem.{0, 0}) (s : M.State), ¬ φ.satisfiedAt M s)) ∧
+      (∀ (M : RootedTS.{0, 0}) (s : M.State), φ.satisfiedAt M s) ∨
+      (∀ (M : RootedTS.{0, 0}) (s : M.State), ¬ φ.satisfiedAt M s)) ∧
     ¬ BisimInvariant selfLoopProp :=
   ⟨hml_depth0_constant, selfLoopProp_not_bisimInvariant⟩
 
@@ -451,7 +451,7 @@ inductive CycleEntryState : Type
   deriving DecidableEq
 
 /-- Cycle-entry graph: entry node a feeds into a 2-cycle b↔c. -/
-def cycleEntry : MultiwaySystem.{0, 0} where
+def cycleEntry : RootedTS.{0, 0} where
   State := CycleEntryState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -469,7 +469,7 @@ inductive StretchedEntryState : Type
   deriving DecidableEq
 
 /-- Stretched-entry graph: entry a' feeds into a 2-cycle c'↔d' via intermediate b'. -/
-def stretchedEntry : MultiwaySystem.{0, 0} where
+def stretchedEntry : RootedTS.{0, 0} where
   State := StretchedEntryState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -795,4 +795,4 @@ theorem depth2_unique_bisimInvariant (a : Depth2Atom) :
     subst h
     exact succHasSuccProp_bisimInvariant
 
-end Ruliology
+end RTS

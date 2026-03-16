@@ -38,14 +38,14 @@ open FirstOrder Language GeometricLogic
 namespace GeometricLogic
 
 -- Abbreviation for canonical model
-private abbrev cm (M : Ruliology.MultiwaySystem) := Ruliology.MultiwaySystem.canonicalModel M
+private abbrev cm (M : RTS.RootedTS) := RTS.RootedTS.canonicalModel M
 
 /-!
 ## σ_tot: Totality — pathSys vs fork
 -/
 
 /-- pathSys satisfies σ_tot: every state has a successor. -/
-theorem pathSys_satisfies_sigma_tot : satisfiesSequent' (cm Ruliology.pathSys) sigma_tot := by
+theorem pathSys_satisfies_sigma_tot : satisfiesSequent' (cm RTS.pathSys) sigma_tot := by
   rw [satisfiesSequent'_sigma_tot_iff]
   intro x
   match x with
@@ -53,16 +53,16 @@ theorem pathSys_satisfies_sigma_tot : satisfiesSequent' (cm Ruliology.pathSys) s
   | .y => exact ⟨.y, ⟨()⟩⟩
 
 /-- fork does NOT satisfy σ_tot: state c has no successor. -/
-theorem fork_not_satisfies_sigma_tot : ¬ satisfiesSequent' (cm Ruliology.fork) sigma_tot := by
+theorem fork_not_satisfies_sigma_tot : ¬ satisfiesSequent' (cm RTS.fork) sigma_tot := by
   rw [satisfiesSequent'_sigma_tot_iff]
   push_neg
-  exact ⟨.c, fun t ht => Ruliology.fork_c_halting t ht⟩
+  exact ⟨.c, fun t ht => RTS.fork_c_halting t ht⟩
 
 /-- T_fork does not prove σ_tot. -/
 theorem fork_not_proves_sigma_tot :
-    ¬ Provable (theoryOfSystem Ruliology.fork) sigma_tot := by
+    ¬ Provable (theoryOfSystem RTS.fork) sigma_tot := by
   intro h
-  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq Ruliology.fork)
+  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq RTS.fork)
   exact fork_not_satisfies_sigma_tot hsound
 
 /-!
@@ -70,7 +70,7 @@ theorem fork_not_proves_sigma_tot :
 -/
 
 /-- twoCycle satisfies σ_det: each state has exactly one successor. -/
-theorem twoCycle_satisfies_sigma_det : satisfiesSequent' (cm Ruliology.twoCycle) sigma_det := by
+theorem twoCycle_satisfies_sigma_det : satisfiesSequent' (cm RTS.twoCycle) sigma_det := by
   rw [satisfiesSequent'_sigma_det_iff]
   intro x y z ⟨s1⟩ ⟨s2⟩
   match x, y, s1, z, s2 with
@@ -79,16 +79,16 @@ theorem twoCycle_satisfies_sigma_det : satisfiesSequent' (cm Ruliology.twoCycle)
 
 /-- hubSpokes does NOT satisfy σ_det: state a has distinct successors b and c. -/
 theorem hubSpokes_not_satisfies_sigma_det :
-    ¬ satisfiesSequent' (cm Ruliology.hubSpokes) sigma_det := by
+    ¬ satisfiesSequent' (cm RTS.hubSpokes) sigma_det := by
   rw [satisfiesSequent'_sigma_det_iff]
   push_neg
-  exact ⟨.a, .b, .c, ⟨()⟩, ⟨()⟩, Ruliology.HubSpokeState.noConfusion⟩
+  exact ⟨.a, .b, .c, ⟨()⟩, ⟨()⟩, RTS.HubSpokeState.noConfusion⟩
 
 /-- T_hubSpokes does not prove σ_det. -/
 theorem hubSpokes_not_proves_sigma_det :
-    ¬ Provable (theoryOfSystem Ruliology.hubSpokes) sigma_det := by
+    ¬ Provable (theoryOfSystem RTS.hubSpokes) sigma_det := by
   intro h
-  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq Ruliology.hubSpokes)
+  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq RTS.hubSpokes)
   exact hubSpokes_not_satisfies_sigma_det hsound
 
 /-!
@@ -97,7 +97,7 @@ theorem hubSpokes_not_proves_sigma_det :
 
 /-- diamondGraph satisfies σ_conf. -/
 theorem diamondGraph_satisfies_sigma_conf :
-    satisfiesSequent' (cm Ruliology.diamondGraph) sigma_conf := by
+    satisfiesSequent' (cm RTS.diamondGraph) sigma_conf := by
   rw [satisfiesSequent'_sigma_conf_iff]
   intro x y z ⟨s1⟩ ⟨s2⟩
   match x, y, s1, z, s2 with
@@ -111,7 +111,7 @@ theorem diamondGraph_satisfies_sigma_conf :
 
 /-- confTree does NOT satisfy σ_conf: b and c have no common successor. -/
 theorem confTree_not_satisfies_sigma_conf :
-    ¬ satisfiesSequent' (cm Ruliology.confTree) sigma_conf := by
+    ¬ satisfiesSequent' (cm RTS.confTree) sigma_conf := by
   rw [satisfiesSequent'_sigma_conf_iff]
   push_neg
   refine ⟨.a, .b, .c, ⟨()⟩, ⟨()⟩, ?_⟩
@@ -121,9 +121,9 @@ theorem confTree_not_satisfies_sigma_conf :
 
 /-- T_confTree does not prove σ_conf. -/
 theorem confTree_not_proves_sigma_conf :
-    ¬ Provable (theoryOfSystem Ruliology.confTree) sigma_conf := by
+    ¬ Provable (theoryOfSystem RTS.confTree) sigma_conf := by
   intro h
-  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq Ruliology.confTree)
+  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq RTS.confTree)
   exact confTree_not_satisfies_sigma_conf hsound
 
 /-!
@@ -132,7 +132,7 @@ theorem confTree_not_proves_sigma_conf :
 
 /-- selfLoop satisfies σ_loop. -/
 theorem selfLoop_satisfies_sigma_loop :
-    satisfiesSequent' (cm Ruliology.selfLoop) sigma_loop := by
+    satisfiesSequent' (cm RTS.selfLoop) sigma_loop := by
   rw [satisfiesSequent'_sigma_loop_iff]
   intro x
   match x with
@@ -140,16 +140,16 @@ theorem selfLoop_satisfies_sigma_loop :
 
 /-- twoCycle does NOT satisfy σ_loop: x has no self-loop. -/
 theorem twoCycle_not_satisfies_sigma_loop :
-    ¬ satisfiesSequent' (cm Ruliology.twoCycle) sigma_loop := by
+    ¬ satisfiesSequent' (cm RTS.twoCycle) sigma_loop := by
   rw [satisfiesSequent'_sigma_loop_iff]
   push_neg
   exact ⟨.x, fun h => h.elim fun s => nomatch s⟩
 
 /-- T_twoCycle does not prove σ_loop. -/
 theorem twoCycle_not_proves_sigma_loop :
-    ¬ Provable (theoryOfSystem Ruliology.twoCycle) sigma_loop := by
+    ¬ Provable (theoryOfSystem RTS.twoCycle) sigma_loop := by
   intro h
-  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq Ruliology.twoCycle)
+  have hsound := Provable.sound h _ (canonicalModel_satisfies_theorySeq RTS.twoCycle)
   exact twoCycle_not_satisfies_sigma_loop hsound
 
 end GeometricLogic

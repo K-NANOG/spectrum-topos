@@ -38,7 +38,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: SubtoposEnumeration Structure
@@ -411,4 +411,4 @@ theorem unnamed_exceed_named :
 ### Theorem count: 15
 -/
 
-end Ruliology
+end RTS

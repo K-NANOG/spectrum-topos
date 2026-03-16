@@ -52,7 +52,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 open PresheafTopos
 
@@ -614,4 +614,4 @@ theorem energy_test_objects_summary {L : Type} [Fintype L] [DecidableEq L] :
 ### Total axiom budget: 276 + 5 = 281 (within ≤ 8 target)
 -/
 
-end Ruliology
+end RTS

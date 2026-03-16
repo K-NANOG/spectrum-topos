@@ -70,7 +70,7 @@ universe u
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: Trivial and Discrete Topologies
@@ -322,4 +322,4 @@ This gives rise to a richer lattice of Grothendieck topologies, each correspondi
 to a different level of process observation. This is the subject of Phase 101.
 -/
 
-end Ruliology
+end RTS

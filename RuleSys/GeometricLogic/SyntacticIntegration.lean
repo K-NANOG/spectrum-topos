@@ -5,7 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 # Syntactic Integration: Propositional ↔ First-Order Bridge
 
 Connects the concrete propositional infrastructure (LindenbaumAlgebra, syntacticGrothendieck,
-propClassifyingTopos) to the first-order SyntacticCategory framework. For multiway system
+propClassifyingTopos) to the first-order SyntacticCategory framework. For rooted transition system
 theories, the syntactic category is equivalent to the propositional Lindenbaum algebra,
 and the classifying toposes agree.
 
@@ -31,7 +31,7 @@ theories have syntactic categories equivalent to their Lindenbaum algebras.
 
 ## Mathematical Background
 
-For multiway system theories T_M, the geometric theory is propositional: formulas are
+For rooted transition system theories T_M, the geometric theory is propositional: formulas are
 boolean combinations of relational atoms R(s₁, s₂) where R ∈ {step, reach, pathEquiv}
 and s₁, s₂ ∈ M.State (finite). The syntactic category SynCat(T_M) is a thin category
 whose objects are formulas-in-context quotiented by provable equivalence. For propositional
@@ -55,9 +55,9 @@ universe u
 namespace GeometricLogic.Integration
 
 /-- Encodes extraction of a propositional geometric theory from a first-order
-geometric theory over MultiwayLanguage.
+geometric theory over RTSLanguage.
 
-For multiway system theories, all formulas are propositional: the language has
+For rooted transition system theories, all formulas are propositional: the language has
 only relational symbols (step, reach, pathEquiv) and no function symbols beyond
 the nullary init constant. The propositional translation maps each binary
 relational atom R(x, y) to a propositional variable indexed by (R, x, y) where
@@ -68,13 +68,13 @@ The translation requires inspecting GeoFormula constructors and converting them
 to PropFormula constructors across the first-order/propositional type boundary.
 
 Ref: Caramello TST, Ch. 2 (propositional geometric theories are a special case). -/
-axiom toPropGeoTheory (T : GeometricTheory MultiwayLanguage) :
+axiom toPropGeoTheory (T : GeometricTheory RTSLanguage) :
     Propositional.PropGeoTheory.{0}
 
-/-- Encodes that the syntactic category of a multiway system theory is equivalent
+/-- Encodes that the syntactic category of a rooted transition system theory is equivalent
 as a category to the Lindenbaum algebra of its propositional translation.
 
-For T_M where M is a multiway system, SynCat(T_M) is a preorder category
+For T_M where M is a rooted transition system, SynCat(T_M) is a preorder category
 whose objects are formulas-in-context quotiented by provable equivalence.
 For propositional theories, this is exactly the Lindenbaum algebra:
 - Objects: propositional formulas / provable equivalence
@@ -87,7 +87,7 @@ propositional type boundary. The equivalence itself is standard for
 propositional geometric theories.
 
 Ref: Caramello TST, Ch. 2 (syntactic categories of propositional theories). -/
-axiom syntacticCategory_lindenbaum_equiv (M : Ruliology.MultiwaySystem) :
+axiom syntacticCategory_lindenbaum_equiv (M : RTS.RootedTS) :
     Nonempty (SyntacticCategory (theoryOfSystem M) ≌
               LindenbaumAlgebra (toPropGeoTheory (theoryOfSystem M)))
 
@@ -106,7 +106,7 @@ sieves, which depends on the equivalence functor from
 `syntacticCategory_lindenbaum_equiv`.
 
 Ref: Johnstone, "Sketches of an Elephant" (2002), D1.4. -/
-axiom syntacticCategory_lindenbaum_topology (M : Ruliology.MultiwaySystem) :
+axiom syntacticCategory_lindenbaum_topology (M : RTS.RootedTS) :
     let E := (syntacticCategory_lindenbaum_equiv M).some
     E.functor.IsCocontinuous
       (syntacticTopology (theoryOfSystem M))
@@ -116,7 +116,7 @@ axiom syntacticCategory_lindenbaum_topology (M : Ruliology.MultiwaySystem) :
       (syntacticTopology (theoryOfSystem M))
 
 /-- Encodes that the first-order classifying topos and propositional classifying
-topos are equivalent for multiway system theories.
+topos are equivalent for rooted transition system theories.
 
 This follows from the equivalence of syntactic sites:
   (SynCat(T_M), syntacticTopology) ≌ (LindenbaumAlgebra, syntacticGrothendieck)
@@ -130,7 +130,7 @@ compile would require additional `letI` ceremony that complicates the type.
 
 Ref: Mac Lane & Moerdijk, "Sheaves in Geometry and Logic" (1992),
 Ch. VII (Comparison Lemma); Caramello TST, Theorem 2.3.23. -/
-axiom classifyingTopos_equiv_propClassifyingTopos (M : Ruliology.MultiwaySystem) :
+axiom classifyingTopos_equiv_propClassifyingTopos (M : RTS.RootedTS) :
     Nonempty (ClassifyingTopos (theoryOfSystem M) ≌
               propClassifyingTopos (toPropGeoTheory (theoryOfSystem M)))
 
@@ -143,7 +143,7 @@ first-order setting via the classifying topos equivalence.
 **Proved** (not axiomatized) by composing:
 1. `classifyingTopos_equiv_propClassifyingTopos` (equivalence of toposes)
 2. `propositional_bridge` (non-isomorphic algebras → non-equivalent prop toposes) -/
-theorem firstOrder_propositional_bridge (M₁ M₂ : Ruliology.MultiwaySystem)
+theorem firstOrder_propositional_bridge (M₁ M₂ : RTS.RootedTS)
     (h : ¬ Nonempty (LindenbaumAlgebra (toPropGeoTheory (theoryOfSystem M₁)) ≃o
                      LindenbaumAlgebra (toPropGeoTheory (theoryOfSystem M₂)))) :
     ¬ Nonempty (ClassifyingTopos (theoryOfSystem M₁) ≌
@@ -155,7 +155,7 @@ theorem firstOrder_propositional_bridge (M₁ M₂ : Ruliology.MultiwaySystem)
 
 /-- Convenient API: different Lindenbaum algebra cardinalities imply
 non-equivalent first-order classifying toposes. -/
-theorem firstOrder_cardinality_bridge (M₁ M₂ : Ruliology.MultiwaySystem)
+theorem firstOrder_cardinality_bridge (M₁ M₂ : RTS.RootedTS)
     (h : Fintype.card (LindenbaumAlgebra (toPropGeoTheory (theoryOfSystem M₁))) ≠
          Fintype.card (LindenbaumAlgebra (toPropGeoTheory (theoryOfSystem M₂)))) :
     ¬ Nonempty (ClassifyingTopos (theoryOfSystem M₁) ≌

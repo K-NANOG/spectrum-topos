@@ -35,7 +35,7 @@ import Mathlib.Data.Fintype.Vector
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -446,4 +446,4 @@ theorem treeProjection_back (G : FinLTS L) (v : G.Vertex) (d : ℕ)
   · show q.endpoint = w
     exact TreeVertex.extend_endpoint p a w hedge hlen
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

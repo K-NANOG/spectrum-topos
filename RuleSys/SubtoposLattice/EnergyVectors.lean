@@ -40,7 +40,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Named Equivalence Inductive
@@ -432,4 +432,4 @@ S ∦ F, S ∦ IF, PF ∦ RT, PF ∦ RS, IF ∦ FT
 ### Theorem count: 30+
 -/
 
-end Ruliology
+end RTS

@@ -2,7 +2,7 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# Kernel Dichotomy for Connected Reachable Multiway Systems
+# Kernel Dichotomy for Connected Reachable Rooted Transition Systems
 
 This file proves the kernel dichotomy theorem: for connected reachable multiway
 systems, the kernel of the symmetry homomorphism phi: Aut(graph) -> Aut(Lind) is
@@ -48,7 +48,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Reachability Infrastructure
@@ -68,7 +68,7 @@ inductive ReachableFrom {S : Type} (hasEdge : S → S → Bool) (init : S) : S �
 
 /-- A system is connected reachable if every state is reachable from the initial state.
 
-This is the natural connectivity condition for multiway systems with a
+This is the natural connectivity condition for rooted transition systems with a
 distinguished initial state: the system has no "orphan" states unreachable
 from the starting configuration. -/
 def IsConnectedReachable {S : Type} (hasEdge : S → S → Bool) (init : S) : Prop :=
@@ -241,7 +241,7 @@ hypothesis is only needed for the nondeterministic branch (it enables the LCA
 lemma). The deterministic branch holds without connectivity.
 -/
 
-/-- **Kernel dichotomy theorem**: for connected reachable multiway systems, the
+/-- **Kernel dichotomy theorem**: for connected reachable rooted transition systems, the
 kernel of phi: Aut(graph) -> Aut(Lind) is either trivial or maximal.
 
 - **Nondeterministic case**: if any state has >= 2 successors, then ker(phi) = {id}
@@ -263,4 +263,4 @@ theorem kernel_dichotomy
   ⟨fun hnd σ v => kernel_trivial_of_nondeterministic S hasEdge init hconn hnd σ v,
    fun hdet σ => kernel_maximal_of_deterministic S hasEdge hdet σ⟩
 
-end Ruliology
+end RTS

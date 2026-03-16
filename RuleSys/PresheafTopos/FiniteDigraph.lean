@@ -58,7 +58,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Finite Directed Graphs and Graph Homomorphisms
@@ -318,4 +318,4 @@ theorem fpLTS1_hom_not_bisim :
       ¬∃ (b : BisimHom G H), b.toDigraphHom = f :=
   ⟨arrowDigraph, loopVertex, arrow_to_loop, arrow_to_loop_not_bisim⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

@@ -2,17 +2,17 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# Theory of Multiway Systems
+# Theory of Rooted Transition Systems
 
-This file defines the geometric theory T_M for multiway systems, establishing
+This file defines the geometric theory T_M for rooted transition systems, establishing
 the logical characterization needed for the Caramello framework resolution
 of Conjecture E (bisimulation ↔ bi-interpretability).
 
 ## Main Definitions
 
 - `MultiwayRel`: Binary relation symbols (step, reach, pathEquiv)
-- `MultiwayLanguage`: First-order language with init constant and binary relations
-- `theoryOfSystem`: The geometric theory T_M for a multiway system M
+- `RTSLanguage`: First-order language with init constant and binary relations
+- `theoryOfSystem`: The geometric theory T_M for a rooted transition system M
 
 ## Implementation Notes
 
@@ -25,7 +25,7 @@ The language has:
   - `pathEquiv(x, y)`: x and y are mutually reachable
 
 The `step` relation and `init` constant capture the primitive structure
-of multiway systems, enabling model-theoretic extraction of simulations
+of rooted transition systems, enabling model-theoretic extraction of simulations
 from interpretations.
 
 ## References
@@ -44,7 +44,7 @@ universe u v
 namespace GeometricLogic
 
 /-!
-## Task 1: MultiwayLanguage and Relation Constructors
+## Task 1: RTSLanguage and Relation Constructors
 -/
 
 /-- Binary relation symbols in the multiway language.
@@ -57,7 +57,7 @@ inductive MultiwayRel : Type
   | pathEquiv -- x and y are mutually reachable
   deriving DecidableEq, Repr
 
-/-- The first-order language for multiway system theories.
+/-- The first-order language for rooted transition system theories.
 
     **Structure:**
     - One 0-ary function: `init` (the initial state constant)
@@ -65,9 +65,9 @@ inductive MultiwayRel : Type
 
     This is a single-sorted language where all variables range over states.
     The `init` constant and `step` relation capture the primitive structure
-    of multiway systems, while `reach` and `pathEquiv` are derived notions
+    of rooted transition systems, while `reach` and `pathEquiv` are derived notions
     axiomatized in the theory. -/
-def MultiwayLanguage : Language.{0, 0} where
+def RTSLanguage : Language.{0, 0} where
   Functions := fun
     | 0 => Unit   -- init : S (the initial state constant)
     | _ => Empty
@@ -75,8 +75,8 @@ def MultiwayLanguage : Language.{0, 0} where
     | 2 => MultiwayRel
     | _ => Empty
 
-/-- The init constant symbol in MultiwayLanguage -/
-def initSymbol : MultiwayLanguage.Functions 0 := ()
+/-- The init constant symbol in RTSLanguage -/
+def initSymbol : RTSLanguage.Functions 0 := ()
 
 /-- The single sort representing states in T_M.
     In geometric logic, we work with a single-sorted theory. -/
@@ -91,57 +91,57 @@ section TermsAndFormulas
 variable {α : Type*} {n : ℕ}
 
 /-- Create a free variable term -/
-def varTerm (a : α) : MultiwayLanguage.Term (α ⊕ Fin n) :=
+def varTerm (a : α) : RTSLanguage.Term (α ⊕ Fin n) :=
   Term.var (Sum.inl a)
 
 /-- Create a bound variable term -/
-def boundTerm (i : Fin n) : MultiwayLanguage.Term (α ⊕ Fin n) :=
+def boundTerm (i : Fin n) : RTSLanguage.Term (α ⊕ Fin n) :=
   Term.var (Sum.inr i)
 
 /-- Coercion from MultiwayRel to the language's binary relations -/
-def MultiwayRel.toRel (r : MultiwayRel) : MultiwayLanguage.Relations 2 := r
+def MultiwayRel.toRel (r : MultiwayRel) : RTSLanguage.Relations 2 := r
 
 /-- The step relation applied to two terms: step(t₁, t₂).
     This means there is a one-step transition from t₁ to t₂. -/
-def stepRel (t₁ t₂ : MultiwayLanguage.Term (α ⊕ Fin n)) :
-    GeoFormula MultiwayLanguage α n :=
+def stepRel (t₁ t₂ : RTSLanguage.Term (α ⊕ Fin n)) :
+    GeoFormula RTSLanguage α n :=
   .rel (MultiwayRel.step.toRel) ![t₁, t₂]
 
 /-- The reach relation applied to two terms: reach(t₁, t₂).
-    In MultiwayLanguage, this means t₂ is reachable from t₁. -/
-def reachRel (t₁ t₂ : MultiwayLanguage.Term (α ⊕ Fin n)) :
-    GeoFormula MultiwayLanguage α n :=
+    In RTSLanguage, this means t₂ is reachable from t₁. -/
+def reachRel (t₁ t₂ : RTSLanguage.Term (α ⊕ Fin n)) :
+    GeoFormula RTSLanguage α n :=
   .rel (MultiwayRel.reach.toRel) ![t₁, t₂]
 
 /-- The pathEquiv relation applied to two terms: pathEquiv(t₁, t₂).
     This means t₁ and t₂ are mutually reachable. -/
-def pathEquivRel (t₁ t₂ : MultiwayLanguage.Term (α ⊕ Fin n)) :
-    GeoFormula MultiwayLanguage α n :=
+def pathEquivRel (t₁ t₂ : RTSLanguage.Term (α ⊕ Fin n)) :
+    GeoFormula RTSLanguage α n :=
   .rel (MultiwayRel.pathEquiv.toRel) ![t₁, t₂]
 
 /-- step(x, y) where x, y are free variables indexed by α -/
-def stepVars (x y : α) : GeoFormula MultiwayLanguage α 0 :=
+def stepVars (x y : α) : GeoFormula RTSLanguage α 0 :=
   stepRel (varTerm x) (varTerm y)
 
 /-- reach(x, y) where x, y are free variables indexed by α -/
-def reachVars (x y : α) : GeoFormula MultiwayLanguage α 0 :=
+def reachVars (x y : α) : GeoFormula RTSLanguage α 0 :=
   reachRel (varTerm x) (varTerm y)
 
 /-- pathEquiv(x, y) where x, y are free variables indexed by α -/
-def pathEquivVars (x y : α) : GeoFormula MultiwayLanguage α 0 :=
+def pathEquivVars (x y : α) : GeoFormula RTSLanguage α 0 :=
   pathEquivRel (varTerm x) (varTerm y)
 
 /-- The init constant as a term (0-ary function application) -/
-def initTerm : MultiwayLanguage.Term (α ⊕ Fin n) :=
+def initTerm : RTSLanguage.Term (α ⊕ Fin n) :=
   Term.func initSymbol ![]
 
 /-- Equality formula: t₁ = t₂ -/
-def eqTerms (t₁ t₂ : MultiwayLanguage.Term (α ⊕ Fin n)) :
-    GeoFormula MultiwayLanguage α n :=
+def eqTerms (t₁ t₂ : RTSLanguage.Term (α ⊕ Fin n)) :
+    GeoFormula RTSLanguage α n :=
   .equal t₁ t₂
 
 /-- Formula expressing x = init (x is the initial state) -/
-def isInitVar (x : α) : GeoFormula MultiwayLanguage α 0 :=
+def isInitVar (x : α) : GeoFormula RTSLanguage α 0 :=
   eqTerms (varTerm x) initTerm
 
 end TermsAndFormulas
@@ -165,41 +165,41 @@ abbrev Ctx3 := Fin 3
     This connects the primitive step relation to derived reachability.
     Combined with reflexivity and transitivity of reach, this says
     reach is the reflexive-transitive closure of step. -/
-def axiomStepImpliesReach : GeoSequent MultiwayLanguage Ctx2 :=
+def axiomStepImpliesReach : GeoSequent RTSLanguage Ctx2 :=
   { antecedent := stepVars 0 1
     consequent := reachVars 0 1 }
 
 /-- Axiom: Reachability is reflexive.
     ⊤ ⊢_x reach(x, x) -/
-def axiomReachRefl : GeoSequent MultiwayLanguage Ctx1 :=
+def axiomReachRefl : GeoSequent RTSLanguage Ctx1 :=
   { antecedent := .top
     consequent := reachVars 0 0 }
 
 /-- Axiom: Reachability is transitive.
     reach(x, y) ∧ reach(y, z) ⊢_{x,y,z} reach(x, z) -/
-def axiomReachTrans : GeoSequent MultiwayLanguage Ctx3 :=
+def axiomReachTrans : GeoSequent RTSLanguage Ctx3 :=
   { antecedent := .conj (reachVars 0 1) (reachVars 1 2)
     consequent := reachVars 0 2 }
 
 /-- Axiom: Path equivalence is defined by bidirectional reachability.
     reach(x, y) ∧ reach(y, x) ⊢_{x,y} pathEquiv(x, y) -/
-def axiomPathEquivDef : GeoSequent MultiwayLanguage Ctx2 :=
+def axiomPathEquivDef : GeoSequent RTSLanguage Ctx2 :=
   { antecedent := .conj (reachVars 0 1) (reachVars 1 0)
     consequent := pathEquivVars 0 1 }
 
 /-- Axiom: Path equivalence is symmetric.
     pathEquiv(x, y) ⊢_{x,y} pathEquiv(y, x) -/
-def axiomPathEquivSymm : GeoSequent MultiwayLanguage Ctx2 :=
+def axiomPathEquivSymm : GeoSequent RTSLanguage Ctx2 :=
   { antecedent := pathEquivVars 0 1
     consequent := pathEquivVars 1 0 }
 
 /-- Axiom: Path equivalence implies bidirectional reachability (converse of definition).
     pathEquiv(x, y) ⊢_{x,y} reach(x, y) -/
-def axiomPathEquivToReach : GeoSequent MultiwayLanguage Ctx2 :=
+def axiomPathEquivToReach : GeoSequent RTSLanguage Ctx2 :=
   { antecedent := pathEquivVars 0 1
     consequent := reachVars 0 1 }
 
-/-- The core geometric theory of multiway systems.
+/-- The core geometric theory of rooted transition systems.
 
     **Axioms:**
     1. `step(x,y) ⊢ reach(x,y)` - steps imply reachability
@@ -210,16 +210,16 @@ def axiomPathEquivToReach : GeoSequent MultiwayLanguage Ctx2 :=
     6. `pathEquiv(x,y) ⊢ reach(x,y)` - path equivalence implies reachability
 
     Together with the `init` constant, this theory captures the full structure
-    of multiway systems. System-specific behavior is in the models. -/
-def multiwayTheory : GeometricTheory MultiwayLanguage :=
+    of rooted transition systems. System-specific behavior is in the models. -/
+def rtsTheory : GeometricTheory RTSLanguage :=
   ({ GeometricTheory.package axiomStepImpliesReach,
      GeometricTheory.package axiomReachRefl,
      GeometricTheory.package axiomReachTrans,
      GeometricTheory.package axiomPathEquivDef,
      GeometricTheory.package axiomPathEquivSymm,
-     GeometricTheory.package axiomPathEquivToReach } : Set (PackagedSequent MultiwayLanguage))
+     GeometricTheory.package axiomPathEquivToReach } : Set (PackagedSequent RTSLanguage))
 
-/-- System-specific axioms for a multiway system M.
+/-- System-specific axioms for a rooted transition system M.
 
     These capture the concrete transition structure of M as geometric sequents:
 
@@ -232,17 +232,17 @@ def multiwayTheory : GeometricTheory MultiwayLanguage :=
 
     These are geometric sequents (using only ∧, ∨, ∃, =, ⊤ on the right).
 
-    Axiomatized: encoding M's states as MultiwayLanguage terms requires a
-    naming function `M.State → MultiwayLanguage.Term`, which depends on a
+    Axiomatized: encoding M's states as RTSLanguage terms requires a
+    naming function `M.State → RTSLanguage.Term`, which depends on a
     finite enumeration of states. The type signature captures the contract
     that each system produces a well-defined set of geometric axioms. -/
-axiom systemSpecificAxioms (M : Ruliology.MultiwaySystem) :
-    GeometricTheory MultiwayLanguage
+axiom systemSpecificAxioms (M : RTS.RootedTS) :
+    GeometricTheory RTSLanguage
 
-/-- The syntactic geometric theory of a multiway system M.
+/-- The syntactic geometric theory of a rooted transition system M.
 
     Defined as the union of:
-    - `multiwayTheory`: 6 structural axioms (step→reach, reflexivity,
+    - `rtsTheory`: 6 structural axioms (step→reach, reflexivity,
       transitivity, pathEquiv definition/symmetry/reach)
     - `systemSpecificAxioms M`: axioms encoding M's specific transitions
 
@@ -250,16 +250,16 @@ axiom systemSpecificAxioms (M : Ruliology.MultiwaySystem) :
     from which provability is non-trivial. The classifying topos
     Sh(C_{T_M}, J_{T_M}) reflects the specific transition structure of M,
     not just semantic truth. -/
-def syntacticTheoryOfSystem (M : Ruliology.MultiwaySystem) : GeometricTheory MultiwayLanguage :=
-  GeometricTheory.union multiwayTheory (systemSpecificAxioms M)
+def syntacticTheoryOfSystem (M : RTS.RootedTS) : GeometricTheory RTSLanguage :=
+  GeometricTheory.union rtsTheory (systemSpecificAxioms M)
 
 end TheoryAxioms
 
 /-!
-## Models of MultiwayLanguage
+## Models of RTSLanguage
 
 A model interprets the language symbols into a carrier set.
-For multiway systems, the canonical model interprets:
+For rooted transition systems, the canonical model interprets:
 - init → M.init
 - step(x,y) → Nonempty (M.Step x y)
 - reach(x,y) → M.reach x y
@@ -268,7 +268,7 @@ For multiway systems, the canonical model interprets:
 
 section Models
 
-/-- A model of MultiwayLanguage in Set.
+/-- A model of RTSLanguage in Set.
 
     A model interprets:
     - The carrier type (states)
@@ -279,7 +279,7 @@ section Models
 
     For the model to satisfy theoryOfSystem, the interpretations must
     satisfy the theory's axioms. -/
-structure MultiwayModel where
+structure RTSModel where
   /-- The carrier set (states) -/
   carrier : Type*
   /-- Interpretation of the init constant -/
@@ -291,9 +291,9 @@ structure MultiwayModel where
   /-- Interpretation of the pathEquiv relation -/
   pathEquiv : carrier → carrier → Prop
 
-namespace MultiwayModel
+namespace RTSModel
 
-variable (M : MultiwayModel)
+variable (M : RTSModel)
 
 /-- A model satisfies the step-implies-reach axiom -/
 def satisfies_stepReach : Prop :=
@@ -319,7 +319,7 @@ def satisfies_pathEquivSymm : Prop :=
 def satisfies_pathEquivReach : Prop :=
   ∀ x y, M.pathEquiv x y → M.reach x y
 
-/-- A model satisfies all axioms of multiwayTheory -/
+/-- A model satisfies all axioms of rtsTheory -/
 def satisfiesTheory : Prop :=
   M.satisfies_stepReach ∧
   M.satisfies_reachRefl ∧
@@ -328,23 +328,23 @@ def satisfiesTheory : Prop :=
   M.satisfies_pathEquivSymm ∧
   M.satisfies_pathEquivReach
 
-end MultiwayModel
+end RTSModel
 
 end Models
 
 end GeometricLogic
 
 /-!
-## Canonical Model of a Multiway System
+## Canonical Model of a Rooted Transition System
 
-Every multiway system gives rise to a canonical model of MultiwayLanguage.
+Every rooted transition system gives rise to a canonical model of RTSLanguage.
 -/
 
-namespace Ruliology.MultiwaySystem
+namespace RTS.RootedTS
 
-variable (M : Ruliology.MultiwaySystem)
+variable (M : RTS.RootedTS)
 
-/-- Reachability relation on a multiway system.
+/-- Reachability relation on a rooted transition system.
     `reach M s t` holds if there exists a path from `s` to `t`. -/
 def reach (s t : M.State) : Prop :=
   Nonempty (M.Path s t)
@@ -356,7 +356,7 @@ def pathEquiv (s t : M.State) : Prop :=
 
 /-- Reachability is reflexive -/
 theorem reach_refl (s : M.State) : M.reach s s :=
-  ⟨MultiwaySystem.Path.nil s⟩
+  ⟨RootedTS.Path.nil s⟩
 
 /-- Reachability is transitive -/
 theorem reach_trans {s t u : M.State} (h1 : M.reach s t) (h2 : M.reach t u) :
@@ -367,9 +367,9 @@ theorem reach_trans {s t u : M.State} (h1 : M.reach s t) (h2 : M.reach t u) :
 
 open GeometricLogic
 
-/-- The canonical model of a multiway system.
+/-- The canonical model of a rooted transition system.
 
-    This interprets MultiwayLanguage in the "intended" way:
+    This interprets RTSLanguage in the "intended" way:
     - carrier = M.State
     - init = M.init
     - step(x,y) = Nonempty (M.Step x y)
@@ -377,7 +377,7 @@ open GeometricLogic
     - pathEquiv(x,y) = M.pathEquiv x y
 
     The canonical model satisfies theoryOfSystem M. -/
-def canonicalModel (M : Ruliology.MultiwaySystem) : MultiwayModel where
+def canonicalModel (M : RTS.RootedTS) : RTSModel where
   carrier := M.State
   init := M.init
   step := fun x y => Nonempty (M.Step x y)
@@ -385,15 +385,15 @@ def canonicalModel (M : Ruliology.MultiwaySystem) : MultiwayModel where
   pathEquiv := M.pathEquiv
 
 /-- The canonical model satisfies the multiway theory -/
-theorem canonicalModel_satisfies (M : Ruliology.MultiwaySystem) :
+theorem canonicalModel_satisfies (M : RTS.RootedTS) :
     M.canonicalModel.satisfiesTheory := by
-  unfold MultiwayModel.satisfiesTheory
-  unfold MultiwayModel.satisfies_stepReach
-  unfold MultiwayModel.satisfies_reachRefl
-  unfold MultiwayModel.satisfies_reachTrans
-  unfold MultiwayModel.satisfies_pathEquivDef
-  unfold MultiwayModel.satisfies_pathEquivSymm
-  unfold MultiwayModel.satisfies_pathEquivReach
+  unfold RTSModel.satisfiesTheory
+  unfold RTSModel.satisfies_stepReach
+  unfold RTSModel.satisfies_reachRefl
+  unfold RTSModel.satisfies_reachTrans
+  unfold RTSModel.satisfies_pathEquivDef
+  unfold RTSModel.satisfies_pathEquivSymm
+  unfold RTSModel.satisfies_pathEquivReach
   simp only [canonicalModel]
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- step implies reach: step(x,y) → reach(x,y)
@@ -418,7 +418,7 @@ Caramello's hypotheses for Morita equivalence of toposes.
 
 ### Hypothesis 1: Coherent Language
 
-`MultiwayLanguage` is a coherent first-order language:
+`RTSLanguage` is a coherent first-order language:
 - **Single sort:** All variables range over State
 - **Finite relation arities:** step (2), reach (2), pathEquiv (2)
 - **Constants as 0-ary functions:** init is a 0-ary function symbol
@@ -473,9 +473,9 @@ Given these hypotheses:
 3. This equivalence is a Morita equivalence (preserves geometric properties)
 
 Therefore `bisimilar_iff_biInterpretable` correctly characterizes when
-multiway systems have Morita-equivalent classifying toposes.
+rooted transition systems have Morita-equivalent classifying toposes.
 
 **Reference:** Caramello, "Theories, Sites, Toposes" (2017), Theorem 2.1.14
 -/
 
-end Ruliology.MultiwaySystem
+end RTS.RootedTS

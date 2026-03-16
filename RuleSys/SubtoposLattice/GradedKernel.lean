@@ -52,7 +52,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Graded Kernel Predicate
@@ -313,4 +313,4 @@ theorem symmetric_example_aligned_at_all_depths :
     (∀ d, ¬inGradedKernel VGSymState TwoLabelAlphabet vgSym_hasEdge vgSym_swapAut d) :=
   ⟨vgSym_swap_nontrivial, vgSym_graded_kernel_trivial⟩
 
-end Ruliology
+end RTS

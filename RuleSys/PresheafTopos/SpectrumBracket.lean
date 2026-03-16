@@ -43,7 +43,7 @@ import RuleSys.PresheafTopos.BisimSeparation
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Observation Classes and Parametric Covering
@@ -254,4 +254,4 @@ theorem spectrum_bracket_summary :
    spectrum_collapse_unlabeled.1,
    spectrum_collapse_unlabeled.2⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

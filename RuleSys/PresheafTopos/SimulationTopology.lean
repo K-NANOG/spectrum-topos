@@ -85,7 +85,7 @@ import RuleSys.PresheafTopos.LabeledBisimTopology
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Labeled Simulation Definition
@@ -849,4 +849,4 @@ theorem simulation_topology_summary :
    fun _ _ _ _ _ => bisimCovering_implies_simCovering,
    fun _ _ _ _ _ => simCovering_implies_traceCovering⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

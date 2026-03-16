@@ -2,7 +2,7 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# Regime Classification: Three-Regime Taxonomy for Multiway Systems
+# Regime Classification: Three-Regime Taxonomy for Rooted Transition Systems
 
 This file formalizes the three-regime taxonomy for connected reachable multiway
 systems based on the kernel/image/cokernel structure of the symmetry homomorphism
@@ -10,7 +10,7 @@ phi: Aut(graph) -> Aut(Lind).
 
 ## The Three Regimes
 
-Every connected reachable multiway system falls into exactly one of three
+Every connected reachable rooted transition system falls into exactly one of three
 symmetry regimes, classified by the kernel and cokernel of phi:
 
 1. **Deterministic regime**: ker = Aut(graph), coker = 1.
@@ -68,19 +68,19 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Symmetry Regime Type
 
-The three-regime taxonomy classifies multiway systems by the kernel/cokernel
+The three-regime taxonomy classifies rooted transition systems by the kernel/cokernel
 structure of the symmetry homomorphism phi: Aut(graph) -> Aut(Lind).
 
 The regimes are mutually exclusive and (for connected reachable systems)
 exhaustive by the kernel dichotomy theorem.
 -/
 
-/-- The three symmetry regimes for multiway systems.
+/-- The three symmetry regimes for rooted transition systems.
 
 Each regime describes a qualitatively different relationship between graph-level
 symmetry (Aut(graph)) and topos-level symmetry (Aut(Lind)):
@@ -224,7 +224,7 @@ for all three benchmark systems.
 -/
 
 /-- **Three-regime table**: complete kernel/image/cokernel data and regime
-classification for the three benchmark multiway systems.
+classification for the three benchmark rooted transition systems.
 
 | System             | ker | im | coker | Regime        |
 |--------------------|-----|----|-------|---------------|
@@ -302,4 +302,4 @@ theorem regime_exhaustive
       ∀ σ : GraphAut S hasEdge, symmetryHomomorphism S hasEdge σ = OrderIso.refl _) :=
   kernel_dichotomy S hasEdge init hconn
 
-end Ruliology
+end RTS

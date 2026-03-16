@@ -44,7 +44,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Unable Atom Status
@@ -396,4 +396,4 @@ that the unable atoms don't change the topos-theoretic content.
 ### Theorem count: 14
 -/
 
-end Ruliology
+end RTS

@@ -48,7 +48,7 @@ set_option linter.constructorNameAsVariable false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: TwoLabel Discrimination
@@ -291,4 +291,4 @@ theorem geometric_himp_four_regimes (G : FinLTS TwoLabel) (v : G.Vertex) :
    himp_depth_increasing G v,
    himp_entailment G v⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

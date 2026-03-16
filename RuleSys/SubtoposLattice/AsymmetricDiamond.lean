@@ -65,7 +65,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: State Type and System Definition
@@ -83,11 +83,11 @@ instance : Fintype AsymDiamondState where
   elems := {.a, .b, .c, .d}
   complete := fun x => by cases x <;> simp
 
-/-- The asymmetric diamond multiway system: a→b, a→c, b→d.
+/-- The asymmetric diamond rooted transition system: a→b, a→c, b→d.
 State a is nondeterministic (two outgoing transitions).
 State b is deterministic (one successor: d).
 States c and d are sinks (no outgoing transitions). -/
-def asymDiamond : MultiwaySystem.{0, 0} where
+def asymDiamond : RootedTS.{0, 0} where
   State := AsymDiamondState
   Step := fun s t => match s, t with
     | .a, .b => Unit  -- a → b (nondeterministic branch 1)
@@ -283,4 +283,4 @@ theorem topos_creates_symmetry :
     Fintype.card (LindenbaumAut asymDiamondTransTheory) = 2 :=
   ⟨asymDiamond_graphAut_card, asymDiamond_aut_card⟩
 
-end Ruliology
+end RTS

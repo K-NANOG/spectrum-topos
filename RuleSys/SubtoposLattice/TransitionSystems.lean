@@ -51,7 +51,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Generic Transition Theory Construction
@@ -254,4 +254,4 @@ theorem deterministic_transition_uniformity :
   ⟨by rw [singleLoopTrans_algebra_card, toggleTrans_algebra_card],
    by rw [toggleTrans_algebra_card, chain3Trans_algebra_card]⟩
 
-end Ruliology
+end RTS

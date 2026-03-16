@@ -43,7 +43,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 namespace SpectrumElement
 
@@ -415,4 +415,4 @@ theorem spectrum_structural_assessment :
 
 end SpectrumElement
 
-end Ruliology
+end RTS

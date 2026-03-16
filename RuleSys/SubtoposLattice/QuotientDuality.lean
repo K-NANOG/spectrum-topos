@@ -48,7 +48,7 @@ universe u
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: PropQuotientTheory Definition
@@ -256,4 +256,4 @@ theorem quotient_separation {T : PropGeoTheory.{u}}
     ¬ Q₁.DeductivelyEquiv Q₂ :=
   fun ⟨e⟩ => h (Fintype.card_congr e.toEquiv)
 
-end Ruliology
+end RTS

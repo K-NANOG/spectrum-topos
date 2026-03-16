@@ -55,7 +55,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Depth-1 Enriched Theories
@@ -200,4 +200,4 @@ theorem branching_blindness_cured :
     Fintype.card (LindenbaumAlgebra vgTraceB_depth1Theory) :=
   ⟨base_does_not_separate_vgTrace, depth1_separates_vgTrace⟩
 
-end Ruliology
+end RTS

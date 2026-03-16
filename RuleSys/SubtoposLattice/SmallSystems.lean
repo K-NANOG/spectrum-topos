@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 # Small Concrete Transition Systems
 
-This file defines three small multiway systems with known Lindenbaum algebra
+This file defines three small rooted transition systems with known Lindenbaum algebra
 structure, providing concrete test cases for the subtopos enumeration framework.
 
 ## Systems
@@ -38,7 +38,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Concrete Transition Systems
@@ -57,10 +57,10 @@ instance : Fintype SingleLoopState where
   complete := fun x => by cases x; simp
 
 set_option linter.constructorNameAsVariable false in
-/-- singleLoop: The simplest nontrivial multiway system.
+/-- singleLoop: The simplest nontrivial rooted transition system.
     One state `s` with a single self-loop s → s.
     This is the prototypical "trivial dynamics" system. -/
-def singleLoop : MultiwaySystem.{0, 0} where
+def singleLoop : RootedTS.{0, 0} where
   State := SingleLoopState
   Step := fun _ _ => Unit
   init := .s
@@ -78,7 +78,7 @@ instance : Fintype ToggleState where
 /-- toggle: A two-state bidirectional system.
     States {a, b} with transitions a → b and b → a.
     This is the simplest non-trivial reversible system. -/
-def toggle : MultiwaySystem.{0, 0} where
+def toggle : RootedTS.{0, 0} where
   State := ToggleState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -100,7 +100,7 @@ instance : Fintype Chain3State where
 /-- chain3: A three-state linear chain system.
     States {a, b, c} with transitions a → b → c.
     This is the simplest "directed path" system with 3 distinct states. -/
-def chain3 : MultiwaySystem.{0, 0} where
+def chain3 : RootedTS.{0, 0} where
   State := Chain3State
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -128,11 +128,11 @@ instance chain3_step_decidableEq (s t : Chain3State) :
   cases s <;> cases t <;> first | exact inferInstanceAs (DecidableEq Unit)
                                  | exact inferInstanceAs (DecidableEq Empty)
 
-end Ruliology
+end RTS
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 2: Propositional Geometric Theories
@@ -247,4 +247,4 @@ theorem chain3_algebra_card :
   obtain ⟨e⟩ := chain3_algebra_iso
   exact Fintype.card_eq.mpr ⟨e.toEquiv⟩
 
-end Ruliology
+end RTS

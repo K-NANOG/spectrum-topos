@@ -35,7 +35,7 @@ import RuleSys.PresheafTopos.PathDigraph
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Bisimulation Definition
@@ -398,4 +398,4 @@ theorem bisim_refines_trace_summary :
    looplessVertex_not_bisimEquiv_loopVertex,
    loopVertex_not_bisimEquiv_arrow_false⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

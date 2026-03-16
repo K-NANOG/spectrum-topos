@@ -74,7 +74,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: State Type and Edge Predicate
@@ -406,4 +406,4 @@ theorem symmetric_vs_asymmetric_aut :
       σ.1 = Equiv.refl _) :=
   ⟨vgTraceA_labeled_aut_trivial, vgTraceB_labeled_aut_trivial, vgSym_aut_nontrivial⟩
 
-end Ruliology
+end RTS

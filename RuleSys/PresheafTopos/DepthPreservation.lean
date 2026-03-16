@@ -34,7 +34,7 @@ import RuleSys.PresheafTopos.TreeUnraveling
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -314,4 +314,4 @@ theorem hml_depth_preservation (G : FinLTS L) (v : G.Vertex) (d : ℕ)
       TreeVertex.rootPath_endpoint G v d
     exact hep ▸ hml_forward G v d (TreeVertex.rootPath G v d) φ h
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

@@ -52,7 +52,7 @@ import RuleSys.PresheafTopos.GeometricVanBenthemDefs
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -468,4 +468,4 @@ theorem geo_dBisim_invariant_new (φ : LTSGeoFormula L 1)
   exact geo_transfer_via_tree' φ d G H v w hdb
     (geo_backward_transfer_constructive φ hbi d hd G v hsat)
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

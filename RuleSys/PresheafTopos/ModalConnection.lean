@@ -65,7 +65,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: The Diamond Subfunctor
@@ -248,4 +248,4 @@ def modalGeometric : ModalGeometricCorrespondence where
   diamond_loop_true := diamond_loop
   diamond_loopless_false := diamond_loopless
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

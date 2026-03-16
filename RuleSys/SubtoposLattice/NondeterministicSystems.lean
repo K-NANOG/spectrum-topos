@@ -49,7 +49,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Hub-Spokes System
@@ -73,9 +73,9 @@ instance : Fintype HubSpokesState where
   elems := {.a, .b, .c}
   complete := fun x => by cases x <;> simp
 
-/-- Hub-spokes multiway system: a→b, a→c, b→a, c→a.
+/-- Hub-spokes rooted transition system: a→b, a→c, b→a, c→a.
 State a is nondeterministic (two outgoing transitions). -/
-def hubSpokes : MultiwaySystem.{0, 0} where
+def hubSpokes : RootedTS.{0, 0} where
   State := HubSpokesState
   Step := fun s t => match s, t with
     | .a, .b => Unit  -- a → b
@@ -112,9 +112,9 @@ to the toggle system from SmallSystems.lean. Both states are deterministic
 (unique successors), so the transition-enriched Lindenbaum algebra is Bool.
 -/
 
-/-- The two-cycle multiway system is the toggle system under a different name.
+/-- The two-cycle rooted transition system is the toggle system under a different name.
 Both have states {a, b} with bidirectional transitions a ↔ b. -/
-def twoCycle : MultiwaySystem.{0, 0} := toggle
+def twoCycle : RootedTS.{0, 0} := toggle
 
 /-- The two-cycle transition-enriched theory is identical to toggleTransTheory.
 Both have states {a, b} with bidirectional transitions a ↔ b.
@@ -260,4 +260,4 @@ This demonstrates that nondeterminism enriches the subtopos lattice, providing
 more refined levels of process observation.
 -/
 
-end Ruliology
+end RTS

@@ -44,7 +44,7 @@ import RuleSys.PresheafTopos.FreeExtension
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -144,4 +144,4 @@ theorem hmlPos_bisimInvariant
     phi.satisfies H w :=
   HMLPos.sim_invariant G H R hR.1 v w hvw phi hsat
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

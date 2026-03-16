@@ -6,7 +6,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 This file defines Hennessy-Milner Logic with per-action diamond modalities and
 classical negation, for labeled transition systems. Unlike the diamond-only HML
-in `HML.lean` (which operates on unlabeled `MultiwaySystem`), this version:
+in `HML.lean` (which operates on unlabeled `RootedTS`), this version:
 
 1. Parameterizes diamond by an action label: `<a>phi` checks for an a-labeled successor
 2. Includes negation: `neg phi` gives classical negation
@@ -46,7 +46,7 @@ import RuleSys.SubtoposLattice.SpectrumEmbedding
 
 set_option autoImplicit false
 
-namespace Ruliology
+namespace RTS
 
 universe u v
 
@@ -458,4 +458,4 @@ theorem labeled_bisim_implies_all_spectrum_equiv {Label : Type*}
     (phi.satisfiedAt M s ↔ phi.satisfiedAt N t) :=
   fun _ phi _ => LabeledHML.labeled_bisim_invariant hR phi hst
 
-end Ruliology
+end RTS

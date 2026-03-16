@@ -41,7 +41,7 @@ import RuleSys.PresheafTopos.AxiomElimination
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -123,4 +123,4 @@ theorem geometric_van_benthem_nat (φ : LTSGeoFormula L 1)
     φ.satisfies G (fun _ => v) ↔ φ.satisfies H (fun _ => w) :=
   geometric_van_benthem φ hbi φ.existDepth (le_refl _) G H v w hdb
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

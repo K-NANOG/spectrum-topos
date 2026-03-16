@@ -43,7 +43,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Subfunctor Ordering and Meet
@@ -353,4 +353,4 @@ collapses -- this is the subfunctor-level Heyting gap, analogous to the sieve-le
 gap proved in Phase 160 (HeytingImplication.lean).
 -/
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

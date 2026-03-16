@@ -10,7 +10,7 @@ establishing the categorical foundation for classifying toposes.
 ## Main Definitions
 
 - `FormulaInContext`: Objects of the syntactic category (formulas with their context)
-- `IsFunctional`: Semantic predicate for functional relations (MultiwayLanguage)
+- `IsFunctional`: Semantic predicate for functional relations (RTSLanguage)
 - `ProvEquiv`: Provable equivalence of functional formulas
 - `SyntacticCategory`: The syntactic category of a geometric theory
 - `syntacticTopology`: The Grothendieck topology on the syntactic category
@@ -229,9 +229,9 @@ noncomputable def compRelation {L : Language.{0, 0}} (_ : GeometricTheory L)
 
     Ref: Caramello TST, Definition 2.1.3 (morphisms as functional relations). -/
 axiom simulationRelation
-    (M N : Ruliology.MultiwaySystem)
-    (_ : Ruliology.Simulation M N) :
-    GeoFormula MultiwayLanguage (M.State ⊕ N.State) 0
+    (M N : RTS.RootedTS)
+    (_ : RTS.Simulation M N) :
+    GeoFormula RTSLanguage (M.State ⊕ N.State) 0
 
 /-- Encodes the unit natural isomorphism component φ → G(F(φ)) = ⟨M.State, ⊤⟩
     as a functional relation in the disjoint-union context φ.ctx ⊕ M.State.
@@ -242,9 +242,9 @@ axiom simulationRelation
     embedding φ.ctx → M.State, which depends on the specific theory T_M.
 
     Ref: Caramello TST, §2.3 (natural isomorphisms in syntactic categories). -/
-axiom unitIsoRelation (M : Ruliology.MultiwaySystem)
-    (φ : FormulaInContext MultiwayLanguage) :
-    GeoFormula MultiwayLanguage (φ.ctx ⊕ M.State) 0
+axiom unitIsoRelation (M : RTS.RootedTS)
+    (φ : FormulaInContext RTSLanguage) :
+    GeoFormula RTSLanguage (φ.ctx ⊕ M.State) 0
 
 /-- Encodes the inverse of the unit isomorphism component G(F(φ)) = ⟨M.State, ⊤⟩ → φ
     as a functional relation in the disjoint-union context M.State ⊕ φ.ctx.
@@ -254,9 +254,9 @@ axiom unitIsoRelation (M : Ruliology.MultiwaySystem)
     of the canonical embedding between formula contexts and state types).
 
     Ref: Caramello TST, §2.3 (natural isomorphisms in syntactic categories). -/
-axiom unitIsoInvRelation (M : Ruliology.MultiwaySystem)
-    (φ : FormulaInContext MultiwayLanguage) :
-    GeoFormula MultiwayLanguage (M.State ⊕ φ.ctx) 0
+axiom unitIsoInvRelation (M : RTS.RootedTS)
+    (φ : FormulaInContext RTSLanguage) :
+    GeoFormula RTSLanguage (M.State ⊕ φ.ctx) 0
 
 /-!
 ### Functional Formulas (Morphisms)
@@ -267,7 +267,7 @@ A morphism in the syntactic category from φ to ψ is a "functional formula"
 
 /-- Semantic predicate: θ(x,y) is functional from φ to ψ in T.
 
-    Defined semantically over MultiwayLanguage using `satisfiesFormula`:
+    Defined semantically over RTSLanguage using `satisfiesFormula`:
     1. **Totality**: every element satisfying φ has an image under θ
     2. **Functionality**: the image is unique
     3. **Codomain**: the image satisfies ψ
@@ -277,12 +277,12 @@ A morphism in the syntactic category from φ to ψ is a "functional formula"
     needed for proving ProvEquiv.id_comp (backward direction: f ⊢ comp(id,f)
     requires φ(x) from f(x,y)).
 
-    All uses in the codebase are over MultiwayLanguage. The semantic definition
+    All uses in the codebase are over RTSLanguage. The semantic definition
     enables concrete proofs of `IsFunctional.identity` and `.comp`. -/
-def IsFunctional (T : GeometricTheory MultiwayLanguage)
-    (φ ψ : FormulaInContext MultiwayLanguage)
-    (θ : GeoFormula MultiwayLanguage (φ.ctx ⊕ ψ.ctx) 0) : Prop :=
-  ∀ m : MultiwayModel.{0}, satisfiesTheorySeq m T →
+def IsFunctional (T : GeometricTheory RTSLanguage)
+    (φ ψ : FormulaInContext RTSLanguage)
+    (θ : GeoFormula RTSLanguage (φ.ctx ⊕ ψ.ctx) 0) : Prop :=
+  ∀ m : RTSModel.{0}, satisfiesTheorySeq m T →
     -- Totality
     (∀ val_φ : φ.ctx → m.carrier,
       satisfiesFormula m val_φ Fin.elim0 φ.formula →
@@ -313,8 +313,8 @@ def IsFunctional (T : GeometricTheory MultiwayLanguage)
     `identityRelation` formula, which involves `relabelFree` and
     `equalityConjunction`. This is correct but depends on formula
     evaluation lemmas not yet formalized. -/
-theorem IsFunctional.identity {T : GeometricTheory MultiwayLanguage}
-    (φ : FormulaInContext MultiwayLanguage) [Fintype φ.ctx] :
+theorem IsFunctional.identity {T : GeometricTheory RTSLanguage}
+    (φ : FormulaInContext RTSLanguage) [Fintype φ.ctx] :
     IsFunctional T φ φ (identityRelation T φ) := by
   intro m _hT
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -364,11 +364,11 @@ theorem IsFunctional.identity {T : GeometricTheory MultiwayLanguage}
     3. Chaining with `satisfiesFormula_iteratedExist` and `satisfiesFormula_relabelFree`
 
     Ref: Caramello TST, Definition 2.1.3 (composition of functional formulas). -/
-private axiom satisfiesFormula_compRelation {m : MultiwayModel.{0}}
-    {T : GeometricTheory MultiwayLanguage}
-    {φ ψ χ : FormulaInContext MultiwayLanguage} [Fintype ψ.ctx]
-    {f : GeoFormula MultiwayLanguage (φ.ctx ⊕ ψ.ctx) 0}
-    {g : GeoFormula MultiwayLanguage (ψ.ctx ⊕ χ.ctx) 0}
+private axiom satisfiesFormula_compRelation {m : RTSModel.{0}}
+    {T : GeometricTheory RTSLanguage}
+    {φ ψ χ : FormulaInContext RTSLanguage} [Fintype ψ.ctx]
+    {f : GeoFormula RTSLanguage (φ.ctx ⊕ ψ.ctx) 0}
+    {g : GeoFormula RTSLanguage (ψ.ctx ⊕ χ.ctx) 0}
     (val : (φ.ctx ⊕ χ.ctx) → m.carrier) :
     satisfiesFormula m val Fin.elim0 (compRelation T f g) ↔
     ∃ val_ψ : ψ.ctx → m.carrier,
@@ -386,11 +386,11 @@ private axiom satisfiesFormula_compRelation {m : MultiwayModel.{0}}
     - Codomain: from codomain of θ₂
 
     Uses `satisfiesFormula_compRelation` helper for formula evaluation. -/
-theorem IsFunctional.comp {T : GeometricTheory MultiwayLanguage}
-    {φ ψ χ : FormulaInContext MultiwayLanguage}
+theorem IsFunctional.comp {T : GeometricTheory RTSLanguage}
+    {φ ψ χ : FormulaInContext RTSLanguage}
     [Fintype ψ.ctx]
-    {θ₁ : GeoFormula MultiwayLanguage (φ.ctx ⊕ ψ.ctx) 0}
-    {θ₂ : GeoFormula MultiwayLanguage (ψ.ctx ⊕ χ.ctx) 0}
+    {θ₁ : GeoFormula RTSLanguage (φ.ctx ⊕ ψ.ctx) 0}
+    {θ₂ : GeoFormula RTSLanguage (ψ.ctx ⊕ χ.ctx) 0}
     (h₁ : IsFunctional T φ ψ θ₁) (h₂ : IsFunctional T ψ χ θ₂) :
     IsFunctional T φ χ (compRelation T θ₁ θ₂) := by
   intro m hT
@@ -438,20 +438,20 @@ theorem IsFunctional.comp {T : GeometricTheory MultiwayLanguage}
     - T ⊢ θ(x,y) → ψ(y)               (codomain)
 
     The `IsFunctional` predicate encodes these three conditions semantically
-    for MultiwayLanguage. -/
-structure FunctionalFormula (T : GeometricTheory MultiwayLanguage)
-    (φ ψ : FormulaInContext MultiwayLanguage) where
+    for RTSLanguage. -/
+structure FunctionalFormula (T : GeometricTheory RTSLanguage)
+    (φ ψ : FormulaInContext RTSLanguage) where
   /-- The formula θ(x,y) relating elements of φ-context to ψ-context -/
-  relation : GeoFormula MultiwayLanguage (φ.ctx ⊕ ψ.ctx) 0
+  relation : GeoFormula RTSLanguage (φ.ctx ⊕ ψ.ctx) 0
   /-- Proof that θ satisfies totality, functionality, and codomain conditions -/
   is_functional : IsFunctional T φ ψ relation
 
 namespace FunctionalFormula
 
-variable {T : GeometricTheory MultiwayLanguage}
+variable {T : GeometricTheory RTSLanguage}
 
 /-- Identity functional formula: the diagonal relation δ(x,y) := (φ(x) ∧ x = y). -/
-noncomputable def identity (φ : FormulaInContext MultiwayLanguage) [Fintype φ.ctx] :
+noncomputable def identity (φ : FormulaInContext RTSLanguage) [Fintype φ.ctx] :
     FunctionalFormula T φ φ where
   relation := identityRelation T φ
   is_functional := IsFunctional.identity φ
@@ -460,7 +460,7 @@ noncomputable def identity (φ : FormulaInContext MultiwayLanguage) [Fintype φ.
 
     Given θ : φ → ψ and θ' : ψ → χ, the composition is
     (∃y. θ(x,y) ∧ θ'(y,z)) : φ → χ. -/
-noncomputable def comp {φ ψ χ : FormulaInContext MultiwayLanguage}
+noncomputable def comp {φ ψ χ : FormulaInContext RTSLanguage}
     [Fintype ψ.ctx]
     (f : FunctionalFormula T φ ψ) (g : FunctionalFormula T ψ χ) :
     FunctionalFormula T φ χ where
@@ -476,29 +476,29 @@ noncomputable def comp {φ ψ χ : FormulaInContext MultiwayLanguage}
     This is a DEFINITION (not axiom), constructed from the `Provable`
     relation in Sequent.lean. The equivalence properties (refl, symm, trans)
     follow from `Provable.identity` and `Provable.cut`. -/
-def ProvEquiv {φ ψ : FormulaInContext MultiwayLanguage}
+def ProvEquiv {φ ψ : FormulaInContext RTSLanguage}
     (f g : FunctionalFormula T φ ψ) : Prop :=
   Provable T ⟨f.relation, g.relation⟩ ∧ Provable T ⟨g.relation, f.relation⟩
 
-theorem ProvEquiv.refl {φ ψ : FormulaInContext MultiwayLanguage}
+theorem ProvEquiv.refl {φ ψ : FormulaInContext RTSLanguage}
     (f : FunctionalFormula T φ ψ) : ProvEquiv f f :=
   ⟨Provable.identity f.relation, Provable.identity f.relation⟩
 
-theorem ProvEquiv.symm {φ ψ : FormulaInContext MultiwayLanguage}
+theorem ProvEquiv.symm {φ ψ : FormulaInContext RTSLanguage}
     {f g : FunctionalFormula T φ ψ} :
     ProvEquiv f g → ProvEquiv g f :=
   fun ⟨h₁, h₂⟩ => ⟨h₂, h₁⟩
 
-theorem ProvEquiv.trans {φ ψ : FormulaInContext MultiwayLanguage}
+theorem ProvEquiv.trans {φ ψ : FormulaInContext RTSLanguage}
     {f g h : FunctionalFormula T φ ψ} :
     ProvEquiv f g → ProvEquiv g h → ProvEquiv f h :=
   fun ⟨fg₁, fg₂⟩ ⟨gh₁, gh₂⟩ => ⟨Provable.cut fg₁ gh₁, Provable.cut gh₂ fg₂⟩
 
 /-- **Geometric completeness (Barr's theorem).**
 
-    Encodes: if a geometric sequent holds in all MultiwayModels satisfying
-    theory T, then it is provable from T. Since MultiwayModel captures all
-    Set-models of MultiwayLanguage (a type with a constant and three binary
+    Encodes: if a geometric sequent holds in all RTSModels satisfying
+    theory T, then it is provable from T. Since RTSModel captures all
+    Set-models of RTSLanguage (a type with a constant and three binary
     relations), this is the instance of Barr's completeness theorem for our
     language.
 
@@ -506,9 +506,9 @@ theorem ProvEquiv.trans {φ ψ : FormulaInContext MultiwayLanguage}
     Proving it in Lean would require formalizing Barr's covering theorem
     (Boolean-valued models or Deligne's theorem on coherent toposes), which
     is deep Mathlib infrastructure not yet available. -/
-axiom geometric_completeness {α : Type} {T : GeometricTheory MultiwayLanguage}
-    {s : GeoSequent MultiwayLanguage α} :
-    (∀ m : MultiwayModel.{0}, satisfiesTheorySeq m T → satisfiesSequent' m s) → Provable T s
+axiom geometric_completeness {α : Type} {T : GeometricTheory RTSLanguage}
+    {s : GeoSequent RTSLanguage α} :
+    (∀ m : RTSModel.{0}, satisfiesTheorySeq m T → satisfiesSequent' m s) → Provable T s
 
 /-- Encodes generic soundness of geometric logic: provable sequents are valid
     in all models.
@@ -521,9 +521,9 @@ axiom geometric_completeness {α : Type} {T : GeometricTheory MultiwayLanguage}
 
     Ref: Caramello TST, Proposition 2.1.8 (soundness of geometric sequent
     calculus). -/
-private axiom generic_soundness {α : Type} {T : GeometricTheory MultiwayLanguage}
-    {s : GeoSequent MultiwayLanguage α} :
-    Provable T s → ∀ m : MultiwayModel.{0}, satisfiesTheorySeq m T → satisfiesSequent' m s
+private axiom generic_soundness {α : Type} {T : GeometricTheory RTSLanguage}
+    {s : GeoSequent RTSLanguage α} :
+    Provable T s → ∀ m : RTSModel.{0}, satisfiesTheorySeq m T → satisfiesSequent' m s
 
 /-- Composition of identity with f is provably equivalent to f.
 
@@ -532,7 +532,7 @@ private axiom generic_soundness {α : Type} {T : GeometricTheory MultiwayLanguag
     from φ implies f(x,z) → φ(x)). Both directions are valid in all models,
     hence provable by completeness. -/
 theorem ProvEquiv.id_comp
-    {φ ψ : FormulaInContext MultiwayLanguage}
+    {φ ψ : FormulaInContext RTSLanguage}
     [Fintype φ.ctx]
     (f : FunctionalFormula T φ ψ) :
     ProvEquiv (FunctionalFormula.comp (FunctionalFormula.identity φ) f) f := by
@@ -573,7 +573,7 @@ theorem ProvEquiv.id_comp
 
 /-- Composition of f with identity is provably equivalent to f. -/
 theorem ProvEquiv.comp_id
-    {φ ψ : FormulaInContext MultiwayLanguage}
+    {φ ψ : FormulaInContext RTSLanguage}
     [Fintype ψ.ctx]
     (f : FunctionalFormula T φ ψ) :
     ProvEquiv (FunctionalFormula.comp f (FunctionalFormula.identity ψ)) f := by
@@ -615,7 +615,7 @@ theorem ProvEquiv.comp_id
     Both comp(comp(f,g),h) and comp(f,comp(g,h)) evaluate to
     ∃y,z. f(x,y) ∧ g(y,z) ∧ h(z,w), differing only in existential grouping. -/
 theorem ProvEquiv.assoc
-    {φ ψ χ ω : FormulaInContext MultiwayLanguage}
+    {φ ψ χ ω : FormulaInContext RTSLanguage}
     [Fintype ψ.ctx] [Fintype χ.ctx]
     (f : FunctionalFormula T φ ψ) (g : FunctionalFormula T ψ χ)
     (hh : FunctionalFormula T χ ω) :
@@ -676,7 +676,7 @@ theorem ProvEquiv.assoc
     If f₁ ≡ f₂ and g₁ ≡ g₂ (provably equivalent), then
     comp(f₁,g₁) ≡ comp(f₂,g₂). Uses Provable.cut on concrete relations. -/
 theorem ProvEquiv.comp_congr
-    {φ ψ χ : FormulaInContext MultiwayLanguage}
+    {φ ψ χ : FormulaInContext RTSLanguage}
     [Fintype ψ.ctx]
     {f₁ f₂ : FunctionalFormula T φ ψ} {g₁ g₂ : FunctionalFormula T ψ χ} :
     ProvEquiv f₁ f₂ → ProvEquiv g₁ g₂ →
@@ -707,14 +707,14 @@ theorem ProvEquiv.comp_congr
       generic_soundness hg₂₁ m hT _ hg₂⟩
 
 /-- Provable equivalence is an equivalence relation -/
-theorem provEquiv_equivalence {φ ψ : FormulaInContext MultiwayLanguage} :
+theorem provEquiv_equivalence {φ ψ : FormulaInContext RTSLanguage} :
     Equivalence (@ProvEquiv T φ ψ) where
   refl := ProvEquiv.refl
   symm := ProvEquiv.symm
   trans := ProvEquiv.trans
 
 /-- Setoid for provable equivalence -/
-@[reducible] def provEquivSetoid (φ ψ : FormulaInContext MultiwayLanguage) :
+@[reducible] def provEquivSetoid (φ ψ : FormulaInContext RTSLanguage) :
     Setoid (FunctionalFormula T φ ψ) where
   r := ProvEquiv
   iseqv := provEquiv_equivalence
@@ -739,26 +739,26 @@ def SyntacticCategory {L : Language.{0, 0}} (_ : GeometricTheory L) := FormulaIn
 
 namespace SyntacticCategory
 
-variable (T : GeometricTheory MultiwayLanguage)
+variable (T : GeometricTheory RTSLanguage)
 
 /-- Morphisms are quotients of functional formulas by provable equivalence -/
 def Hom (φ ψ : SyntacticCategory T) : Type _ :=
   @Quotient (FunctionalFormula T φ ψ) (FunctionalFormula.provEquivSetoid φ ψ)
 
-/-- Encodes that all formula contexts in MultiwayLanguage are finite types.
+/-- Encodes that all formula contexts in RTSLanguage are finite types.
 
-    Axiomatized: encodes published result (all multiway system contexts are finite).
+    Axiomatized: encodes published result (all rooted transition system contexts are finite).
     Would be eliminated by adding `[Fintype ctx]` as a field on `FormulaInContext`,
     but `systemToFormulaObj` uses `N.State` which has no `Fintype` instance in
-    general (MultiwaySystem.State is `Type`, not `Type*` with Fintype). Providing
+    general (RootedTS.State is `Type`, not `Type*` with Fintype). Providing
     this as a field would require threading Fintype constraints throughout.
 
-    Ref: Standard -- multiway systems have finite state spaces by definition. -/
-private axiom nonempty_fintypeCtx (φ : FormulaInContext MultiwayLanguage) :
+    Ref: Standard -- rooted transition systems have finite state spaces by definition. -/
+private axiom nonempty_fintypeCtx (φ : FormulaInContext RTSLanguage) :
     Nonempty (Fintype φ.ctx)
 
 /-- Fintype instance for formula contexts, provided via choice. -/
-private noncomputable def fintypeCtx (φ : FormulaInContext MultiwayLanguage) : Fintype φ.ctx :=
+private noncomputable def fintypeCtx (φ : FormulaInContext RTSLanguage) : Fintype φ.ctx :=
   Classical.choice (nonempty_fintypeCtx φ)
 
 /-- Identity morphism. -/
@@ -913,17 +913,17 @@ is equivalent to the simulation category over M.
 
 /-- A category structure for simulations over a fixed system.
 
-    Objects: Multiway systems (or state types)
+    Objects: Rooted transition systems (or state types)
     Morphisms: Simulations preserving reachability
 
     This captures the computational structure that corresponds to
     the logical structure in SyntacticCategory. -/
-def SimulationCategoryOver (_M : Ruliology.MultiwaySystem) := Ruliology.MultiwaySystem
+def SimulationCategoryOver (_M : RTS.RootedTS) := RTS.RootedTS
 
-instance (M : Ruliology.MultiwaySystem) : Category (SimulationCategoryOver M) where
-  Hom N P := Ruliology.Simulation N P
-  id N := Ruliology.Simulation.id N
-  comp f g := Ruliology.Simulation.comp g f  -- Note: comp is g ∘ f order
+instance (M : RTS.RootedTS) : Category (SimulationCategoryOver M) where
+  Hom N P := RTS.Simulation N P
+  id N := RTS.Simulation.id N
+  comp f g := RTS.Simulation.comp g f  -- Note: comp is g ∘ f order
   id_comp := by intros; rfl
   comp_id := by intros; rfl
   assoc := by intros; rfl
@@ -953,12 +953,12 @@ the equivalence now references `⊕`-based relation types throughout.
 
 namespace EquivalenceFunctors
 
-/-- Map a formula-in-context to a multiway system.
+/-- Map a formula-in-context to a rooted transition system.
 
     In the full theory, each formula φ(x₁,...,xₙ) defines a "subtype" of the
-    universal model. For multiway systems with theoryOfSystem M, all formulas
+    universal model. For rooted transition systems with theoryOfSystem M, all formulas
     are interpreted in M, so we map everything to M. -/
-def formulaToSystemObj (M : Ruliology.MultiwaySystem) :
+def formulaToSystemObj (M : RTS.RootedTS) :
     SyntacticCategory (theoryOfSystem M) → SimulationCategoryOver M :=
   fun _ => M
 
@@ -967,24 +967,24 @@ def formulaToSystemObj (M : Ruliology.MultiwaySystem) :
     Since formulaToSystemObj maps all objects to M, all morphisms map to
     endomorphisms of M. We map to identity; the content is that the
     functional formula is "trivially realized" in the single-system model. -/
-def formulaToSystemMap (M : Ruliology.MultiwaySystem)
+def formulaToSystemMap (M : RTS.RootedTS)
     {φ ψ : SyntacticCategory (theoryOfSystem M)} (_ : φ ⟶ ψ) :
     (formulaToSystemObj M φ) ⟶ (formulaToSystemObj M ψ) :=
-  Ruliology.Simulation.id M
+  RTS.Simulation.id M
 
 /-- The FormulaToSystem functor: SynCat_{T_M} → SimCat_M -/
-def formulaToSystem (M : Ruliology.MultiwaySystem) :
+def formulaToSystem (M : RTS.RootedTS) :
     SyntacticCategory (theoryOfSystem M) ⥤ SimulationCategoryOver M where
   obj := formulaToSystemObj M
   map := formulaToSystemMap M
   map_id := fun _ => rfl
   map_comp := fun _ _ => rfl
 
-/-- Map a multiway system to a formula-in-context.
+/-- Map a rooted transition system to a formula-in-context.
 
     Each system N is mapped to a formula representing "existence in N".
     The context is N.State, and the formula is ⊤ (trivially satisfied). -/
-def systemToFormulaObj (M : Ruliology.MultiwaySystem) :
+def systemToFormulaObj (M : RTS.RootedTS) :
     SimulationCategoryOver M → SyntacticCategory (theoryOfSystem M) :=
   fun N => {
     ctx := N.State
@@ -1001,8 +1001,8 @@ def systemToFormulaObj (M : Ruliology.MultiwaySystem) :
     compose `simulationRelation` with the semantic definition of `IsFunctional`.
 
     Ref: Caramello TST, Definition 2.1.3 (functoriality of interpretation). -/
-axiom simulation_induces_functional (M : Ruliology.MultiwaySystem)
-    {N P : Ruliology.MultiwaySystem} (sim : Ruliology.Simulation N P) :
+axiom simulation_induces_functional (M : RTS.RootedTS)
+    {N P : RTS.RootedTS} (sim : RTS.Simulation N P) :
     IsFunctional (theoryOfSystem M) (⟨N.State, GeoFormula.top⟩ : FormulaInContext _)
       (⟨P.State, GeoFormula.top⟩ : FormulaInContext _)
       (simulationRelation N P sim)
@@ -1011,7 +1011,7 @@ axiom simulation_induces_functional (M : Ruliology.MultiwaySystem)
 
     The simulation f : N → P induces a functional relation that is
     provably functional in theoryOfSystem M. -/
-noncomputable def systemToFormulaMap (M : Ruliology.MultiwaySystem)
+noncomputable def systemToFormulaMap (M : RTS.RootedTS)
     {N P : SimulationCategoryOver M} (f : N ⟶ P) :
     (systemToFormulaObj M N) ⟶ (systemToFormulaObj M P) :=
   @Quotient.mk _ (FunctionalFormula.provEquivSetoid
@@ -1031,7 +1031,7 @@ noncomputable def systemToFormulaMap (M : Ruliology.MultiwaySystem)
     formula is provably equivalent to `identityRelation`.
 
     Ref: Caramello TST, §2.1 (functoriality of syntactic category construction). -/
-private axiom simulation_map_id_provEquiv (M : Ruliology.MultiwaySystem)
+private axiom simulation_map_id_provEquiv (M : RTS.RootedTS)
     (N : SimulationCategoryOver M) :
     FunctionalFormula.ProvEquiv
       (T := theoryOfSystem M)
@@ -1052,7 +1052,7 @@ private axiom simulation_map_id_provEquiv (M : Ruliology.MultiwaySystem)
     against the concrete `compRelation` definition.
 
     Ref: Caramello TST, §2.1 (functoriality of syntactic category construction). -/
-private axiom simulation_map_comp_provEquiv (M : Ruliology.MultiwaySystem)
+private axiom simulation_map_comp_provEquiv (M : RTS.RootedTS)
     {N P Q : SimulationCategoryOver M} (f : N ⟶ P) (g : P ⟶ Q) :
     FunctionalFormula.ProvEquiv
       (T := theoryOfSystem M)
@@ -1071,7 +1071,7 @@ private axiom simulation_map_comp_provEquiv (M : Ruliology.MultiwaySystem)
     Functoriality (map_id, map_comp) follows from the fact that simulation
     identity maps to the identity functional formula, and simulation composition
     maps to functional formula composition. -/
-noncomputable def systemToFormula (M : Ruliology.MultiwaySystem) :
+noncomputable def systemToFormula (M : RTS.RootedTS) :
     SimulationCategoryOver M ⥤ SyntacticCategory (theoryOfSystem M) where
   obj := systemToFormulaObj M
   map := systemToFormulaMap M
@@ -1099,12 +1099,12 @@ noncomputable def systemToFormula (M : Ruliology.MultiwaySystem) :
     unitIso_naturality). Consolidated into one.
 
     Ref: Caramello TST, §2-3 (Morita equivalence between T_M and SimCat_M). -/
-axiom syncat_simcat_equivalence_axiom (M : Ruliology.MultiwaySystem) :
+axiom syncat_simcat_equivalence_axiom (M : RTS.RootedTS) :
     𝟭 (SyntacticCategory (theoryOfSystem M)) ≅
     formulaToSystem M ⋙ systemToFormula M
 
 /-- Unit isomorphism: 𝟭 ≅ formulaToSystem ⋙ systemToFormula -/
-noncomputable def unitIso (M : Ruliology.MultiwaySystem) :
+noncomputable def unitIso (M : RTS.RootedTS) :
     𝟭 (SyntacticCategory (theoryOfSystem M)) ≅
     formulaToSystem M ⋙ systemToFormula M :=
   syncat_simcat_equivalence_axiom M
@@ -1119,15 +1119,15 @@ noncomputable def unitIso (M : Ruliology.MultiwaySystem) :
     action of G ⋙ F on SimCat objects.
 
     Ref: Caramello TST, §2-3 (Morita equivalence, counit of adjunction). -/
-axiom counitIso_exists (M : Ruliology.MultiwaySystem) :
+axiom counitIso_exists (M : RTS.RootedTS) :
     systemToFormula M ⋙ formulaToSystem M ≅ 𝟭 (SimulationCategoryOver M)
 
-noncomputable def counitIso (M : Ruliology.MultiwaySystem) :
+noncomputable def counitIso (M : RTS.RootedTS) :
     systemToFormula M ⋙ formulaToSystem M ≅ 𝟭 (SimulationCategoryOver M) :=
   counitIso_exists M
 
 /-- The category equivalence SynCat_{T_M} ≃ SimCat_M -/
-noncomputable def equivalence (M : Ruliology.MultiwaySystem) :
+noncomputable def equivalence (M : RTS.RootedTS) :
     SyntacticCategory (theoryOfSystem M) ≌ SimulationCategoryOver M :=
   CategoryTheory.Equivalence.mk
     (formulaToSystem M)
@@ -1138,7 +1138,7 @@ noncomputable def equivalence (M : Ruliology.MultiwaySystem) :
 end EquivalenceFunctors
 
 /-- The constructive equivalence at fixed universe levels. -/
-noncomputable def syntacticCategory_equiv_simCategory' (M : Ruliology.MultiwaySystem) :
+noncomputable def syntacticCategory_equiv_simCategory' (M : RTS.RootedTS) :
     SyntacticCategory (theoryOfSystem M) ≌ SimulationCategoryOver M :=
   EquivalenceFunctors.equivalence M
 
@@ -1153,10 +1153,10 @@ noncomputable def syntacticCategory_equiv_simCategory' (M : Ruliology.MultiwaySy
 
     Ref: Caramello TST, §2-3 (existence of syntactic/simulation equivalence). -/
 private axiom syntacticCategory_equiv_simCategory_axiom
-    (M : Ruliology.MultiwaySystem) :
+    (M : RTS.RootedTS) :
     Nonempty (SyntacticCategory (theoryOfSystem M) ≌ SimulationCategoryOver M)
 
-theorem syntacticCategory_equiv_simCategory (M : Ruliology.MultiwaySystem) :
+theorem syntacticCategory_equiv_simCategory (M : RTS.RootedTS) :
     Nonempty (SyntacticCategory (theoryOfSystem M) ≌ SimulationCategoryOver M) :=
   syntacticCategory_equiv_simCategory_axiom M
 
@@ -1168,36 +1168,36 @@ theorem syntacticCategory_equiv_simCategory (M : Ruliology.MultiwaySystem) :
     The proof requires showing that geometric covering sieves in SynCat(T_M)
     map to covering families in SimCat_M under formulaToSystem, and vice versa.
     This depends on IsGeometricCovering (axiom) and classifyingTopology (defined
-    in Ruliad.lean), creating a cross-module dependency.
+    in RTSTopos.lean), creating a cross-module dependency.
 
     Ref: Caramello TST, Theorem 2.3.23 (Morita equivalence preserves topologies). -/
-private axiom topology_correspondence_axiom (M : Ruliology.MultiwaySystem) :
+private axiom topology_correspondence_axiom (M : RTS.RootedTS) :
     TopologyCorrespondsUnder
       (syntacticTopology (theoryOfSystem M))
-      (Ruliology.classifyingTopology M)
+      (RTS.classifyingTopology M)
       (syntacticCategory_equiv_simCategory M).some
 
-theorem topology_correspondence (M : Ruliology.MultiwaySystem) :
+theorem topology_correspondence (M : RTS.RootedTS) :
     TopologyCorrespondsUnder
       (syntacticTopology (theoryOfSystem M))
-      (Ruliology.classifyingTopology M)
+      (RTS.classifyingTopology M)
       (syntacticCategory_equiv_simCategory M).some :=
   topology_correspondence_axiom M
 
 /-!
 ## Per-Theory Classifying Topos
 
-The proper Caramello-style classifying topos for a multiway system M is
+The proper Caramello-style classifying topos for a rooted transition system M is
 Sh(C_{T_M}, J_{T_M}) — the sheaf topos on the syntactic site of M's theory.
 -/
 
-/-- The classifying topos of a multiway system M, defined as the sheaf topos
+/-- The classifying topos of a rooted transition system M, defined as the sheaf topos
     of the syntactic site of M's geometric theory.
 
     This is the proper Caramello-style construction: Sh(C_{T_M}, J_{T_M}).
     It classifies T_M-models: geometric morphisms E → classifyingToposOf M
     correspond to T_M-models in E. -/
-abbrev classifyingToposOf (M : Ruliology.MultiwaySystem) :=
+abbrev classifyingToposOf (M : RTS.RootedTS) :=
   ClassifyingTopos (theoryOfSystem M)
 
 /-!
@@ -1214,7 +1214,7 @@ preservation.
     This is Caramello's notion of bi-interpretation (TST, Ch. 4): mutual functors
     between syntactic categories with unit/counit natural isomorphisms that
     preserve the Grothendieck topology. -/
-structure SyntacticBiInterpretation (M N : Ruliology.MultiwaySystem) where
+structure SyntacticBiInterpretation (M N : RTS.RootedTS) where
   /-- Forward functor between syntactic categories -/
   forward : SyntacticCategory (theoryOfSystem M) ⥤ SyntacticCategory (theoryOfSystem N)
   /-- Backward functor between syntactic categories -/
@@ -1235,7 +1235,7 @@ structure SyntacticBiInterpretation (M N : Ruliology.MultiwaySystem) where
 namespace SyntacticBiInterpretation
 
 /-- Symmetric syntactic bi-interpretation: swap forward and backward -/
-def symm {M N : Ruliology.MultiwaySystem} (B : SyntacticBiInterpretation M N) :
+def symm {M N : RTS.RootedTS} (B : SyntacticBiInterpretation M N) :
     SyntacticBiInterpretation N M where
   forward := B.backward
   backward := B.forward
@@ -1257,12 +1257,12 @@ end SyntacticBiInterpretation
     implies model equivalence.
 
     Ref: Caramello TST, Ch. 4 (bi-interpretations and Morita equivalence). -/
-axiom syntactic_to_biInterpretation (M N : Ruliology.MultiwaySystem) :
-    SyntacticBiInterpretation M N → Ruliology.BiInterpretable M N
+axiom syntactic_to_biInterpretation (M N : RTS.RootedTS) :
+    SyntacticBiInterpretation M N → RTS.BiInterpretable M N
 
 /-- Helper: extract the categorical equivalence from a SyntacticBiInterpretation. -/
 noncomputable def SyntacticBiInterpretation.toEquivalence
-    {M N : Ruliology.MultiwaySystem} (B : SyntacticBiInterpretation M N) :
+    {M N : RTS.RootedTS} (B : SyntacticBiInterpretation M N) :
     SyntacticCategory (theoryOfSystem M) ≌ SyntacticCategory (theoryOfSystem N) :=
   CategoryTheory.Equivalence.mk B.forward B.backward B.unit B.counit
 
@@ -1271,7 +1271,7 @@ noncomputable def SyntacticBiInterpretation.toEquivalence
     This is the core of Caramello's Morita equivalence theorem (TST, Theorem 2.3.23).
     Proved using Mathlib's `Equivalence.sheafCongr`. -/
 noncomputable def syntacticBiInterpretation_implies_toposEquiv
-    (M N : Ruliology.MultiwaySystem)
+    (M N : RTS.RootedTS)
     (B : SyntacticBiInterpretation M N) :
     Nonempty (classifyingToposOf M ≌ classifyingToposOf N) := by
   -- Build the categorical equivalence from the bi-interpretation data

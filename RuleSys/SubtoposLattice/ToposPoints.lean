@@ -62,7 +62,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: ToposPoint Structure
@@ -361,4 +361,4 @@ theorem galois_distinguishes_systems :
          Fintype.card (ToposPoint twoCycleTransTheory)
     rw [twoCycle_orbits_card, twoCycle_points_card]
 
-end Ruliology
+end RTS

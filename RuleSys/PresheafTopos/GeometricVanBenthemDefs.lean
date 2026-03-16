@@ -25,7 +25,7 @@ import RuleSys.PresheafTopos.EqualityElimination
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -106,4 +106,4 @@ theorem tree_dBisimilar (G : FinLTS L) (v : G.Vertex) (d : ℕ) :
     dBisimilar G v (treeUnravelLTS G v d) (TreeVertex.rootPath G v d) d :=
   fun ψ hd => hml_depth_preservation G v d ψ hd
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

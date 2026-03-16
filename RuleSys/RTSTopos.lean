@@ -2,26 +2,25 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# The Ruliad as a Presheaf Topos
+# The Multiway Topos: Presheaf Topos on RuleSys
 
 This file constructs:
-1. The Ruliad as the presheaf topos [RuleSysᵒᵖ, Type]
-2. The Yoneda embedding よ : RuleSys → Ruliad
+1. The multiway topos as the presheaf topos [RuleSysᵒᵖ, Type]
+2. The Yoneda embedding よ : RuleSys → RTSTopos
 3. Flat functors on RuleSys
-4. The correspondence between flat functors and points of Ruliad
+4. The correspondence between flat functors and points of the multiway topos
 
 ## Mathematical Content
 
-The Ruliad is the "entangled limit of all computations" in Wolfram's framework.
-We model it as the presheaf topos on RuleSys:
+The multiway topos is the presheaf topos on RuleSys:
 
-  Ruliad := [RuleSysᵒᵖ, Type]
+  RTSTopos := [RuleSysᵒᵖ, Type]
 
 This is a Grothendieck topos classifying flat functors on RuleSys.
-Points of Ruliad (geometric morphisms Set → Ruliad) correspond to:
+Points (geometric morphisms Set → RTSTopos) correspond to:
 - Flat functors RuleSys → Type
 - Models of the "theory of computations"
-- Observers sampling the Ruliad
+- Observers sampling the multiway topos
 
 ## References
 - Caramello, "Theories, Sites, Toposes"
@@ -44,30 +43,30 @@ open CategoryTheory.Limits
 
 universe u v w
 
-namespace Ruliology
+namespace RTS
 
 /-!
-## Task 5: The Ruliad as Presheaf Topos
+## The Multiway Topos as Presheaf Topos
 
-The Ruliad is defined as the functor category [RuleSysᵒᵖ, Type].
+The multiway topos is defined as the functor category [RuleSysᵒᵖ, Type].
 This is the category of presheaves on RuleSys.
 -/
 
-/-- The Ruliad: presheaf topos on RuleSys.
+/-- The RTSTopos: presheaf topos on RuleSys.
     Objects are functors RuleSysᵒᵖ → Type (presheaves).
     Morphisms are natural transformations. -/
-def Ruliad : Type (max (u + 1) (v + 1)) :=
-  (MultiwaySystem.{u, v})ᵒᵖ ⥤ Type (max u v)
+def RTSTopos : Type (max (u + 1) (v + 1)) :=
+  (RootedTS.{u, v})ᵒᵖ ⥤ Type (max u v)
 
-/-- Ruliad forms a category (inherited from functor category) -/
-instance : Category Ruliad.{u, v} :=
-  inferInstanceAs (Category ((MultiwaySystem.{u, v})ᵒᵖ ⥤ Type (max u v)))
+/-- RTSTopos forms a category (inherited from functor category) -/
+instance : Category RTSTopos.{u, v} :=
+  inferInstanceAs (Category ((RootedTS.{u, v})ᵒᵖ ⥤ Type (max u v)))
 
-namespace Ruliad
+namespace RTSTopos
 
-/-- The Yoneda embedding: よ : RuleSys → Ruliad
-    Sends each multiway system M to its presheaf of simulations into M -/
-def yoneda : MultiwaySystem.{u, v} ⥤ Ruliad.{u, v} :=
+/-- The Yoneda embedding: よ : RuleSys → RTSTopos
+    Sends each rooted transition system M to its presheaf of simulations into M -/
+def yoneda : RootedTS.{u, v} ⥤ RTSTopos.{u, v} :=
   CategoryTheory.yoneda
 
 /-- Notation for the Yoneda embedding -/
@@ -78,15 +77,15 @@ def yoneda_fullyFaithful : yoneda.{u, v}.FullyFaithful :=
   CategoryTheory.Yoneda.fullyFaithful
 
 /-- The Yoneda lemma: natural transformations from よ(M) to P correspond to P(M) -/
-def yoneda_lemma (M : MultiwaySystem.{u, v}) (P : Ruliad.{u, v}) :
+def yoneda_lemma (M : RootedTS.{u, v}) (P : RTSTopos.{u, v}) :
     (よ M ⟶ P) ≃ P.obj (Opposite.op M) :=
   CategoryTheory.yonedaEquiv
 
 /-- Representable presheaves are those isomorphic to some よ(M) -/
-def IsRepresentable (P : Ruliad.{u, v}) : Prop :=
-  ∃ M : MultiwaySystem.{u, v}, Nonempty (よ M ≅ P)
+def IsRepresentable (P : RTSTopos.{u, v}) : Prop :=
+  ∃ M : RootedTS.{u, v}, Nonempty (よ M ≅ P)
 
-end Ruliad
+end RTSTopos
 
 /-!
 ## Task 6: Flat Functors
@@ -94,24 +93,24 @@ end Ruliad
 A functor F : C → D is flat if it preserves all finite limits.
 For RuleSys, flat functors F : RuleSys → Type correspond to:
 - "Consistent families of computations"
-- Points of the Ruliad (geometric morphisms Set → Ruliad)
+- Points of the RTSTopos (geometric morphisms Set → RTSTopos)
 
 This is a fundamental result in topos theory: for a presheaf topos [Cᵒᵖ, Set],
 the points are precisely the flat functors C → Set.
 -/
 
 /-- A flat functor on RuleSys: preserves all finite limits -/
-class FlatFunctor (F : MultiwaySystem.{u, v} ⥤ Type w) where
+class FlatFunctor (F : RootedTS.{u, v} ⥤ Type w) where
   /-- F preserves finite limits -/
   preservesFiniteLimits : PreservesFiniteLimits F
 
 /-- The type of flat functors from RuleSys to Type -/
 def FlatFunctorCat : Type (max (u + 1) (v + 1) (w + 1)) :=
-  { F : MultiwaySystem.{u, v} ⥤ Type w // Nonempty (FlatFunctor F) }
+  { F : RootedTS.{u, v} ⥤ Type w // Nonempty (FlatFunctor F) }
 
 namespace FlatFunctor
 
-variable {F : MultiwaySystem.{u, v} ⥤ Type w} [ff : FlatFunctor F]
+variable {F : RootedTS.{u, v} ⥤ Type w} [ff : FlatFunctor F]
 
 /-- Extract the PreservesFiniteLimits instance from a FlatFunctor -/
 def toPreservesFiniteLimits : PreservesFiniteLimits F :=
@@ -120,7 +119,7 @@ def toPreservesFiniteLimits : PreservesFiniteLimits F :=
 end FlatFunctor
 
 /-!
-## Points of Ruliad
+## Points of RTSTopos
 
 A point of a topos E is a geometric morphism Set → E.
 For a presheaf topos [Cᵒᵖ, Set], points correspond to flat functors C → Set.
@@ -128,35 +127,35 @@ For a presheaf topos [Cᵒᵖ, Set], points correspond to flat functors C → Se
 We define the notion of a point and state the correspondence theorem.
 -/
 
-/-- A point of the Ruliad is modeled as a flat functor RuleSys → Type.
-    This corresponds to a geometric morphism Set → Ruliad. -/
-structure RuliadPoint where
+/-- A point of the RTSTopos is modeled as a flat functor RuleSys → Type.
+    This corresponds to a geometric morphism Set → RTSTopos. -/
+structure RTSToposPoint where
   /-- The underlying functor -/
-  functor : MultiwaySystem.{u, v} ⥤ Type (max u v)
+  functor : RootedTS.{u, v} ⥤ Type (max u v)
   /-- The functor is flat -/
   isFlat : FlatFunctor functor
 
-namespace RuliadPoint
+namespace RTSToposPoint
 
 /-- Two points are equivalent if their functors are naturally isomorphic -/
-def Equiv (p q : RuliadPoint.{u, v}) : Prop :=
+def Equiv (p q : RTSToposPoint.{u, v}) : Prop :=
   Nonempty (p.functor ≅ q.functor)
 
-/-- The evaluation of a point at a multiway system -/
-def eval (p : RuliadPoint.{u, v}) (M : MultiwaySystem.{u, v}) : Type (max u v) :=
+/-- The evaluation of a point at a rooted transition system -/
+def eval (p : RTSToposPoint.{u, v}) (M : RootedTS.{u, v}) : Type (max u v) :=
   p.functor.obj M
 
 /-- Points can be evaluated on morphisms (simulations) -/
-def evalMap (p : RuliadPoint.{u, v}) {M N : MultiwaySystem.{u, v}} (f : M ⟶ N) :
+def evalMap (p : RTSToposPoint.{u, v}) {M N : RootedTS.{u, v}} (f : M ⟶ N) :
     p.eval M → p.eval N :=
   p.functor.map f
 
-end RuliadPoint
+end RTSToposPoint
 
 /-!
 ## The Correspondence Theorem
 
-The fundamental result: flat functors RuleSys → Type correspond to points of Ruliad.
+The fundamental result: flat functors RuleSys → Type correspond to points of RTSTopos.
 This is a special case of Diaconescu's theorem for presheaf toposes.
 
 For a presheaf topos [Cᵒᵖ, Set]:
@@ -171,18 +170,16 @@ developing the theory of geometric morphisms.
 /-- The correspondence between flat functors and points (stated axiomatically).
     A complete proof requires the theory of geometric morphisms and Kan extensions. -/
 axiom flatFunctor_point_correspondence :
-  FlatFunctorCat.{u, v, max u v} ≃ RuliadPoint.{u, v}
+  FlatFunctorCat.{u, v, max u v} ≃ RTSToposPoint.{u, v}
 
 /-!
 ## Computational Interpretation
 
-In the context of ruliology:
-
-1. **Ruliad as universal space**: The Ruliad [RuleSysᵒᵖ, Type] contains all possible
+1. **RTSTopos as universal space**: [RuleSysᵒᵖ, Type] contains all possible
    computational descriptions as presheaves.
 
 2. **Points as observers**: Each flat functor / point corresponds to an "observer"
-   who consistently assigns computational content to each multiway system.
+   who consistently assigns computational content to each rooted transition system.
 
 3. **Yoneda as representability**: The Yoneda embedding よ(M) gives the "canonical view"
    of system M — all ways other systems can simulate M.
@@ -191,15 +188,15 @@ In the context of ruliology:
    assignments respect the compositional structure of computation.
 -/
 
-/-- An observer is a point of the Ruliad -/
-abbrev Observer := RuliadPoint
+/-- An observer is a point of the RTSTopos -/
+abbrev Observer := RTSToposPoint
 
-/-- The observer's view of a multiway system M is the evaluation at M -/
-def Observer.view (O : Observer.{u, v}) (M : MultiwaySystem.{u, v}) : Type (max u v) :=
+/-- The observer's view of a rooted transition system M is the evaluation at M -/
+def Observer.view (O : Observer.{u, v}) (M : RootedTS.{u, v}) : Type (max u v) :=
   O.eval M
 
 /-- Two observers may see the same system differently -/
-example (O₁ O₂ : Observer.{u, v}) (M : MultiwaySystem.{u, v}) :
+example (O₁ O₂ : Observer.{u, v}) (M : RootedTS.{u, v}) :
     O₁.view M → O₂.view M → Prop :=
   fun _ _ => True  -- They may or may not be related
 
@@ -211,7 +208,7 @@ are sheaves for the classifying topology, enabling extraction of simulations
 from Morita equivalence.
 -/
 
-namespace Ruliad
+namespace RTSTopos
 
 /-- Representable presheaves are sheaves for any subcanonical topology.
 
@@ -226,32 +223,32 @@ namespace Ruliad
     The Mathlib API for this result (`Functor.IsSheaf` / subcanonical topologies)
     does not directly provide the theorem in the form needed here. The mathematical
     content is sound but the API translation is non-trivial. -/
-axiom yoneda_isSheaf (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
-    (N : MultiwaySystem.{0, 0}) :
+axiom yoneda_isSheaf (J : GrothendieckTopology (RootedTS.{0, 0}))
+    (N : RootedTS.{0, 0}) :
     Presheaf.IsSheaf J (よ N)
 
 /-- Construct a sheaf from a representable presheaf.
 
     Given that representable presheaves satisfy the sheaf condition,
     we can lift them to the sheaf category. -/
-def yonedaSheaf (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
-    (N : MultiwaySystem.{0, 0}) : Sheaf J Type :=
+def yonedaSheaf (J : GrothendieckTopology (RootedTS.{0, 0}))
+    (N : RootedTS.{0, 0}) : Sheaf J Type :=
   ⟨よ N, yoneda_isSheaf J N⟩
 
 /-- A sheaf is representable if it's isomorphic to some yonedaSheaf. -/
-def IsRepresentableSheaf {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
+def IsRepresentableSheaf {J : GrothendieckTopology (RootedTS.{0, 0})}
     (F : Sheaf J Type) : Prop :=
-  ∃ N : MultiwaySystem.{0, 0}, Nonempty (F ≅ yonedaSheaf J N)
+  ∃ N : RootedTS.{0, 0}, Nonempty (F ≅ yonedaSheaf J N)
 
 /-- Extract the representing object from a proof of representability.
 
     Uses Classical.choice since IsRepresentableSheaf is a Prop with existential. -/
-noncomputable def representingObject {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
-    (F : Sheaf J Type) (h : IsRepresentableSheaf F) : MultiwaySystem.{0, 0} :=
+noncomputable def representingObject {J : GrothendieckTopology (RootedTS.{0, 0})}
+    (F : Sheaf J Type) (h : IsRepresentableSheaf F) : RootedTS.{0, 0} :=
   Classical.choose h
 
 /-- The isomorphism witnessing representability. -/
-noncomputable def representingIso {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
+noncomputable def representingIso {J : GrothendieckTopology (RootedTS.{0, 0})}
     (F : Sheaf J Type) (h : IsRepresentableSheaf F) :
     F ≅ yonedaSheaf J (representingObject F h) :=
   Classical.choice (Classical.choose_spec h)
@@ -272,8 +269,8 @@ This is crucial for extracting simulations from sheaf morphisms.
     **Key insight:** A sheaf morphism (yonedaSheaf J M ⟶ yonedaSheaf J N) is
     a natural transformation between the underlying presheaves よ(M) → よ(N),
     which by Yoneda corresponds to a simulation M → N. -/
-def yonedaSheaf_homEquiv (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
-    (M N : MultiwaySystem.{0, 0}) :
+def yonedaSheaf_homEquiv (J : GrothendieckTopology (RootedTS.{0, 0}))
+    (M N : RootedTS.{0, 0}) :
     (yonedaSheaf J M ⟶ yonedaSheaf J N) ≃ (M ⟶ N) where
   toFun f := yoneda_fullyFaithful.preimage f.val
   invFun g := ⟨yoneda.map g⟩
@@ -284,26 +281,26 @@ def yonedaSheaf_homEquiv (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
   right_inv g := yoneda_fullyFaithful.preimage_map g
 
 /-- Extract a simulation from a morphism between representable sheaves. -/
-def simulation_from_sheafHom {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
-    {M N : MultiwaySystem.{0, 0}}
+def simulation_from_sheafHom {J : GrothendieckTopology (RootedTS.{0, 0})}
+    {M N : RootedTS.{0, 0}}
     (f : yonedaSheaf J M ⟶ yonedaSheaf J N) : Simulation M N :=
   (yonedaSheaf_homEquiv J M N) f
 
 /-- Construct a sheaf morphism from a simulation. -/
-def sheafHom_from_simulation {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
-    {M N : MultiwaySystem.{0, 0}}
+def sheafHom_from_simulation {J : GrothendieckTopology (RootedTS.{0, 0})}
+    {M N : RootedTS.{0, 0}}
     (f : Simulation M N) : yonedaSheaf J M ⟶ yonedaSheaf J N :=
   (yonedaSheaf_homEquiv J M N).symm f
 
 /-- simulation_from_sheafHom and sheafHom_from_simulation are inverses. -/
-theorem simulation_sheafHom_roundtrip (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
-    (M N : MultiwaySystem.{0, 0}) (f : Simulation M N) :
+theorem simulation_sheafHom_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0}))
+    (M N : RootedTS.{0, 0}) (f : Simulation M N) :
     simulation_from_sheafHom (J := J) (sheafHom_from_simulation (J := J) f) = f := by
   unfold simulation_from_sheafHom sheafHom_from_simulation
   exact (yonedaSheaf_homEquiv J M N).apply_symm_apply f
 
-theorem sheafHom_simulation_roundtrip (J : GrothendieckTopology (MultiwaySystem.{0, 0}))
-    (M N : MultiwaySystem.{0, 0}) (f : yonedaSheaf J M ⟶ yonedaSheaf J N) :
+theorem sheafHom_simulation_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0}))
+    (M N : RootedTS.{0, 0}) (f : yonedaSheaf J M ⟶ yonedaSheaf J N) :
     sheafHom_from_simulation (simulation_from_sheafHom f) = f := by
   unfold simulation_from_sheafHom sheafHom_from_simulation
   exact (yonedaSheaf_homEquiv J M N).symm_apply_apply f
@@ -328,7 +325,7 @@ preservation in our setting.
 
 /-- Two sheaves with the same underlying presheaf are isomorphic.
     This is because IsSheaf is a Prop, so the cond field is irrelevant. -/
-def sheafIsoOfValEq {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
+def sheafIsoOfValEq {J : GrothendieckTopology (RootedTS.{0, 0})}
     (F G : Sheaf J Type) (h : F.val = G.val) : F ≅ G where
   hom := ⟨eqToHom h⟩
   inv := ⟨eqToHom h.symm⟩
@@ -348,7 +345,7 @@ def sheafIsoOfValEq {J : GrothendieckTopology (MultiwaySystem.{0, 0})}
     preserving the underlying presheaf. For such equivalences, if F ≅ yonedaSheaf J N,
     then E.functor.obj F is also representable (by the same N!). -/
 theorem equiv_preserves_representable_of_val_eq
-    {J J' : GrothendieckTopology (MultiwaySystem.{0, 0})}
+    {J J' : GrothendieckTopology (RootedTS.{0, 0})}
     (E : Sheaf J Type ≌ Sheaf J' Type)
     (hE : ∀ F : Sheaf J Type, (E.functor.obj F).val = F.val)
     (F : Sheaf J Type) (hF : IsRepresentableSheaf F) :
@@ -392,7 +389,7 @@ theorem equiv_preserves_representable_of_val_eq
     - The general result requires the interpretation functor machinery connecting
       classifying topologies to geometric theories. -/
 axiom equiv_preserves_representable
-    {J J' : GrothendieckTopology (MultiwaySystem.{0, 0})}
+    {J J' : GrothendieckTopology (RootedTS.{0, 0})}
     (E : Sheaf J Type ≌ Sheaf J' Type)
     (F : Sheaf J Type) (hF : IsRepresentableSheaf F) :
     IsRepresentableSheaf (E.functor.obj F)
@@ -406,11 +403,11 @@ axiom equiv_preserves_representable
     viewed at the level of representing objects. For classifying topologies, this
     corresponds to the interpretation of the generic M-model as an N-model. -/
 noncomputable def representingObject_image
-    {J J' : GrothendieckTopology (MultiwaySystem.{0, 0})}
+    {J J' : GrothendieckTopology (RootedTS.{0, 0})}
     (E : Sheaf J Type ≌ Sheaf J' Type)
-    (N : MultiwaySystem.{0, 0})
+    (N : RootedTS.{0, 0})
     (h : IsRepresentableSheaf (E.functor.obj (yonedaSheaf J N))) :
-    MultiwaySystem.{0, 0} :=
+    RootedTS.{0, 0} :=
   representingObject _ h
 
 /-!
@@ -440,8 +437,8 @@ key construction for the backward direction of Conjecture E.
     data (interpretation functors) rather than bare categorical equivalence.
     See `equiv_preserves_representable_of_val_eq` for the presheaf-preserving case. -/
 axiom simFromMoritaForward
-    {J_M J_N : GrothendieckTopology (MultiwaySystem.{0, 0})}
-    (M N : MultiwaySystem.{0, 0})
+    {J_M J_N : GrothendieckTopology (RootedTS.{0, 0})}
+    (M N : RootedTS.{0, 0})
     (E : Sheaf J_M Type ≌ Sheaf J_N Type) :
     Simulation M N
 
@@ -451,8 +448,8 @@ axiom simFromMoritaForward
     See `simFromMoritaForward` documentation for the fundamental issues with
     this extraction. -/
 axiom simFromMoritaBackward
-    {J_M J_N : GrothendieckTopology (MultiwaySystem.{0, 0})}
-    (M N : MultiwaySystem.{0, 0})
+    {J_M J_N : GrothendieckTopology (RootedTS.{0, 0})}
+    (M N : RootedTS.{0, 0})
     (E : Sheaf J_M Type ≌ Sheaf J_N Type) :
     Simulation N M
 
@@ -525,6 +522,6 @@ extract explicit simulations from the equivalence structure.
 4. **Axiom:** Accept simulation existence as an axiom for Morita-equivalent topologies
 -/
 
-end Ruliad
+end RTSTopos
 
-end Ruliology
+end RTS

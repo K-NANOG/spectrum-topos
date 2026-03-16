@@ -33,7 +33,7 @@ import RuleSys.PresheafTopos.BackwardTransfer
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -128,4 +128,4 @@ theorem geometric_van_benthem_proved (φ : LTSGeoFormula L 1) (hbi : FinLTSBisim
   ⟨geo_dBisim_invariant_proved φ hbi d hd G H v w hdb,
    geo_dBisim_invariant_proved φ hbi d hd H G w v (dBisimilar_symm hdb)⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

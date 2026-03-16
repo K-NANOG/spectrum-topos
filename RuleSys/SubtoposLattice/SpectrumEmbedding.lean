@@ -54,7 +54,7 @@ set_option autoImplicit false
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 universe u v
 
@@ -172,12 +172,12 @@ sublanguage L. The `SpectrumLevel.sublanguage` function maps each level to
 its corresponding predicate on HML formulas.
 -/
 
-/-- L-equivalence: two states in a multiway system agree on all formulas
+/-- L-equivalence: two states in a rooted transition system agree on all formulas
     in the sublanguage L.
 
     `HMLEquiv L M s t` holds when for every HML formula `φ` with `L φ = true`,
     `φ` is satisfied at `s` iff it is satisfied at `t`. -/
-def HMLEquiv (L : HML → Bool) (M : MultiwaySystem.{u, v}) (s t : M.State) : Prop :=
+def HMLEquiv (L : HML → Bool) (M : RootedTS.{u, v}) (s t : M.State) : Prop :=
   ∀ φ : HML, L φ = true → (φ.satisfiedAt M s ↔ φ.satisfiedAt M t)
 
 /-- Map each spectrum level to its HML sublanguage predicate. -/
@@ -208,7 +208,7 @@ theorem trace_sub_sim : ∀ φ : HML, φ.isTraceFormula = true → φ.isSimFormu
     This is the core structural lemma for spectrum monotonicity. -/
 theorem sublanguage_monotone {L₁ L₂ : HML → Bool}
     (h : ∀ φ, L₁ φ = true → L₂ φ = true)
-    {M : MultiwaySystem.{u, v}} {s t : M.State}
+    {M : RootedTS.{u, v}} {s t : M.State}
     (heq : HMLEquiv L₂ M s t) : HMLEquiv L₁ M s t :=
   fun φ hφ => heq φ (h φ hφ)
 
@@ -242,7 +242,7 @@ private theorem sublanguage_incl (ℓ₁ ℓ₂ : SpectrumLevel) (hle : ℓ₁ �
   | .bisimulation, .readySimulation => exact absurd hle (by show ¬(3 ≤ 2); omega)
 
 theorem spectrum_monotone {ℓ₁ ℓ₂ : SpectrumLevel} (hle : ℓ₁ ≤ ℓ₂)
-    {M : MultiwaySystem.{u, v}} {s t : M.State}
+    {M : RootedTS.{u, v}} {s t : M.State}
     (heq : HMLEquiv ℓ₂.sublanguage M s t) : HMLEquiv ℓ₁.sublanguage M s t :=
   sublanguage_monotone (sublanguage_incl ℓ₁ ℓ₂ hle) heq
 
@@ -265,7 +265,7 @@ L-equivalent at every spectrum level.
     states agree on ALL HML formulas. Since every sublanguage is a subset of
     all HML formulas, L-equivalence follows immediately. -/
 theorem bisim_implies_all_spectrum_equiv
-    {M N : MultiwaySystem.{u, v}} {R : M.State → N.State → Prop}
+    {M N : RootedTS.{u, v}} {R : M.State → N.State → Prop}
     (hR : RelationalBisimulation M N R)
     {s : M.State} {t : N.State} (hst : R s t) :
     ∀ ℓ : SpectrumLevel, ∀ φ : HML, ℓ.sublanguage φ = true →
@@ -312,7 +312,7 @@ theorem readySim_eq_bisim_sublanguage :
 
 /-- Simulation, ready-simulation, and bisimulation induce the same equivalence
     in the diamond-only fragment. -/
-theorem upper_spectrum_collapse (M : MultiwaySystem.{u, v}) (s t : M.State) :
+theorem upper_spectrum_collapse (M : RootedTS.{u, v}) (s t : M.State) :
     HMLEquiv SpectrumLevel.simulation.sublanguage M s t ↔
     HMLEquiv SpectrumLevel.bisimulation.sublanguage M s t := by
   constructor
@@ -392,7 +392,7 @@ theorem traceTopology_le_bisimTopology (T : PropGeoTheory.{u}) :
 
 For deterministic systems, all process equivalences collapse: every pair of
 spectrum levels gives deductively equivalent quotient theories. We axiomatize
-this per-system since the connection between `Deterministic` (on MultiwaySystem)
+this per-system since the connection between `Deterministic` (on RootedTS)
 and `PropGeoTheory` requires the standard translation infrastructure.
 -/
 
@@ -465,4 +465,4 @@ and Grothendieck topology lattice (monotone) of any propositional geometric theo
   quotient theories and distinct subtoposes
 -/
 
-end Ruliology
+end RTS

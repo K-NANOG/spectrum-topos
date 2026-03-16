@@ -44,7 +44,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Componentwise Meet and Join for Energy Budgets
@@ -243,4 +243,4 @@ energy characterizations that have no classical name.
 ### Theorem count: 14
 -/
 
-end Ruliology
+end RTS

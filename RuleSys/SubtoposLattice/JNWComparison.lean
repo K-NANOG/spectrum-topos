@@ -46,7 +46,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Branch Category
@@ -477,4 +477,4 @@ theorem jnw_comparison_novel :
 ### Theorem count: 6
 -/
 
-end Ruliology
+end RTS

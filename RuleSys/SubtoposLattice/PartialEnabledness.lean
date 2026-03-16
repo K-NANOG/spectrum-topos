@@ -61,7 +61,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: LTS Definition
@@ -401,4 +401,4 @@ The pe system `a.(b.0 + c.0) + b.0` provides a labeled transition system with:
 ### Theorem count: 17
 -/
 
-end Ruliology
+end RTS

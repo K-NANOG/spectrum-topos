@@ -41,7 +41,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 namespace SpectrumElement
 
@@ -391,4 +391,4 @@ theorem birkhoffSdiff_self :
 
 end SpectrumElement
 
-end Ruliology
+end RTS

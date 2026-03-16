@@ -42,7 +42,7 @@ import RuleSys.PresheafTopos.SubobjectClassifier
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Sieve Operations
@@ -219,4 +219,4 @@ theorem negation_collapse_with_informative_implication :
   ⟨fun _G S h H f => negation_of_nonempty_is_empty S h H f,
    heyting_gap⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

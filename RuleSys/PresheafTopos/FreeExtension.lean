@@ -43,7 +43,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Positive Existential HML (HMLPos)
@@ -482,4 +482,4 @@ theorem freeExtensionLemma {L : Type} [Fintype L] [DecidableEq L]
     exists (H : FinLTS L) (h : LTSHom G H), phi.satisfies H (h.toFun v) :=
   ⟨ExtensionLTS G v phi, extensionInj G v phi, witness_satisfies_at_root G v phi⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

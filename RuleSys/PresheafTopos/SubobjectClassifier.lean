@@ -37,7 +37,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Sieves on Finite Directed Graphs
@@ -278,4 +278,4 @@ theorem omega_unique_atom_and_consequences :
   ⟨fun G S H f hf => sieve_nonempty_contains_initial G S H f hf,
    fun _G S => double_negation_covering_iff_nonempty S⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

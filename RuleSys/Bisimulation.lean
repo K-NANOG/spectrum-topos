@@ -5,13 +5,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 # Bisimulation and Morita Equivalence (Forward Direction)
 
 This file formalizes the relationship between:
-- **Computational equivalence** (bisimulation of multiway systems)
+- **Computational equivalence** (bisimulation of rooted transition systems)
 - **Topos-theoretic equivalence** (Morita equivalence of classifying toposes)
 
 ## Main Results
 
-1. `Bisimulation` — mutual simulation structure between multiway systems
-2. `GeometricTheoryOf` — construct geometric theory T_M from multiway system M
+1. `Bisimulation` — mutual simulation structure between rooted transition systems
+2. `GeometricTheoryOf` — construct geometric theory T_M from rooted transition system M
 3. `classifyingTopology` — the Grothendieck topology presenting Set[T_M]
 4. `bisimulation_implies_morita` — Bisimulation → Morita Equivalence (forward only)
 
@@ -39,7 +39,7 @@ open CategoryTheory
 
 universe u v
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: State Equivalence and Path Equivalence
@@ -49,12 +49,12 @@ Before defining bisimulation, we need notions of when states are
 -/
 
 /-- Two states are path-equivalent if they have the same reachability structure -/
-def PathEquivalent (M : MultiwaySystem.{u, v}) (s t : M.State) : Prop :=
+def PathEquivalent (M : RootedTS.{u, v}) (s t : M.State) : Prop :=
   (∀ u, Nonempty (M.Path s u) ↔ Nonempty (M.Path t u)) ∧
   (∀ u, Nonempty (M.Path u s) ↔ Nonempty (M.Path u t))
 
 /-- PathEquivalent is an equivalence relation -/
-theorem pathEquivalent_equivalence (M : MultiwaySystem.{u, v}) :
+theorem pathEquivalent_equivalence (M : RootedTS.{u, v}) :
     Equivalence (PathEquivalent M) where
   refl := fun s => ⟨fun _ => Iff.rfl, fun _ => Iff.rfl⟩
   symm := fun ⟨h1, h2⟩ => ⟨fun u => (h1 u).symm, fun u => (h2 u).symm⟩
@@ -62,7 +62,7 @@ theorem pathEquivalent_equivalence (M : MultiwaySystem.{u, v}) :
     ⟨fun u => (h1a u).trans (h2a u), fun u => (h1b u).trans (h2b u)⟩
 
 /-- The setoid of path-equivalent states -/
-def pathEquivalentSetoid (M : MultiwaySystem.{u, v}) : Setoid M.State where
+def pathEquivalentSetoid (M : RootedTS.{u, v}) : Setoid M.State where
   r := PathEquivalent M
   iseqv := pathEquivalent_equivalence M
 
@@ -78,11 +78,11 @@ halting states) might be weaker than full path-equivalence to all states.
 -/
 
 /-- Two states are mutually reachable if each can reach the other -/
-def MutuallyReachable (M : MultiwaySystem.{u, v}) (s t : M.State) : Prop :=
+def MutuallyReachable (M : RootedTS.{u, v}) (s t : M.State) : Prop :=
   Nonempty (M.Path s t) ∧ Nonempty (M.Path t s)
 
 /-- Mutual reachability is symmetric -/
-theorem mutuallyReachable_symm {M : MultiwaySystem.{u, v}} {s t : M.State}
+theorem mutuallyReachable_symm {M : RootedTS.{u, v}} {s t : M.State}
     (h : MutuallyReachable M s t) : MutuallyReachable M t s :=
   ⟨h.2, h.1⟩
 
@@ -97,7 +97,7 @@ theorem mutuallyReachable_symm {M : MultiwaySystem.{u, v}} {s t : M.State}
     - Forward: reach(s, u) ∧ reach(t, s) ⟹ reach(t, u)
     - Backward: reach(t, u) ∧ reach(s, t) ⟹ reach(s, u)
     - (and symmetrically for reachability TO states) -/
-theorem mutuallyReachable_implies_pathEquivalent {M : MultiwaySystem.{u, v}}
+theorem mutuallyReachable_implies_pathEquivalent {M : RootedTS.{u, v}}
     {s t : M.State} (h : MutuallyReachable M s t) : PathEquivalent M s t := by
   obtain ⟨⟨p_st⟩, ⟨p_ts⟩⟩ := h
   constructor
@@ -119,22 +119,22 @@ theorem mutuallyReachable_implies_pathEquivalent {M : MultiwaySystem.{u, v}}
 /-!
 ## Part 1c: Image-Finiteness and Relational Bisimulation
 
-A multiway system is image-finite if each state has finitely many successor
+A rooted transition system is image-finite if each state has finitely many successor
 states. For image-finite systems, the functional bisimulation defined in Part 2
 coincides with the classical relational bisimulation of Park and Milner.
 -/
 
-/-- A multiway system is image-finite if each state has finitely many
+/-- A rooted transition system is image-finite if each state has finitely many
     successor states (states reachable in one step). Formally: for each state s,
     the successors can be enumerated by a finite list. -/
-def ImageFinite (M : MultiwaySystem.{u, v}) : Prop :=
+def ImageFinite (M : RootedTS.{u, v}) : Prop :=
   ∀ s : M.State, ∃ (succs : List M.State),
     ∀ t, Nonempty (M.Step s t) → t ∈ succs
 
 /-- A relational bisimulation between M and N (Park-Milner definition):
     a relation R on states with the back-and-forth lifting property.
     This is the standard definition from concurrency theory. -/
-def RelationalBisimulation (M N : MultiwaySystem.{u, v})
+def RelationalBisimulation (M N : RootedTS.{u, v})
     (R : M.State → N.State → Prop) : Prop :=
   (∀ s t, R s t → ∀ s', Nonempty (M.Step s s') →
     ∃ t', Nonempty (N.Step t t') ∧ R s' t') ∧
@@ -143,7 +143,7 @@ def RelationalBisimulation (M N : MultiwaySystem.{u, v})
 
 /-- Two systems are relationally bisimilar (Park-Milner) if there exists a
     relational bisimulation relating their initial states. -/
-def RelationallyBisimilar (M N : MultiwaySystem.{u, v}) : Prop :=
+def RelationallyBisimilar (M N : RootedTS.{u, v}) : Prop :=
   ∃ R : M.State → N.State → Prop,
     RelationalBisimulation M N R ∧ R M.init N.init
 
@@ -162,7 +162,7 @@ The name "functional" distinguishes this from `RelationalBisimulation` (Part 1c)
     as opposed to the relational `RelationalBisimulation` (Park-Milner) definition above.
     Functional bisimilarity implies relational bisimilarity (`functional_implies_relational_bisimilarity`)
     but NOT vice versa — see `functional_strictly_stronger_than_relational`. -/
-structure FunctionalBisimulation (M N : MultiwaySystem.{u, v}) where
+structure FunctionalBisimulation (M N : RootedTS.{u, v}) where
   /-- Forward simulation from M to N -/
   forward : Simulation M N
   /-- Backward simulation from N to M -/
@@ -177,7 +177,7 @@ structure FunctionalBisimulation (M N : MultiwaySystem.{u, v}) where
 /-- Corollary of the Lifting Lemma: For weak bisimulations, verifying mutual reachability
     of round-trip states suffices for full path-equivalence. This simplifies coherence proofs. -/
 def functionalBisimulation_from_mutualReachability
-    {M N : MultiwaySystem.{u, v}}
+    {M N : RootedTS.{u, v}}
     (forward : Simulation M N)
     (backward : Simulation N M)
     (left_mutual : ∀ s : M.State, MutuallyReachable M (backward.stateMap (forward.stateMap s)) s)
@@ -189,7 +189,7 @@ def functionalBisimulation_from_mutualReachability
   rightInverse := fun t => mutuallyReachable_implies_pathEquivalent (right_mutual t)
 
 /-- A strong bisimulation: mutual simulations that are actual inverses on states -/
-structure StrongBisimulation (M N : MultiwaySystem.{u, v}) where
+structure StrongBisimulation (M N : RootedTS.{u, v}) where
   /-- Forward simulation from M to N -/
   forward : Simulation M N
   /-- Backward simulation from N to M -/
@@ -216,7 +216,7 @@ structure StrongBisimulation (M N : MultiwaySystem.{u, v}) where
     backward maps that loop back to (say) s₁.
     State-level: backward ∘ forward = id ✓
     Step-level: backward.stepMap(forward.stepMap(s₂)) = s₁ ≠ s₂ ✗ -/
-structure IsoBisimulation (M N : MultiwaySystem.{u, v}) where
+structure IsoBisimulation (M N : RootedTS.{u, v}) where
   /-- Forward simulation from M to N -/
   forward : Simulation M N
   /-- Backward simulation from N to M -/
@@ -227,7 +227,7 @@ structure IsoBisimulation (M N : MultiwaySystem.{u, v}) where
   rightInverse : forward ≫ₛ backward = Simulation.id N
 
 /-- IsoBisimulation implies StrongBisimulation -/
-def IsoBisimulation.toStrong {M N : MultiwaySystem.{u, v}}
+def IsoBisimulation.toStrong {M N : RootedTS.{u, v}}
     (b : IsoBisimulation M N) : StrongBisimulation M N where
   forward := b.forward
   backward := b.backward
@@ -241,7 +241,7 @@ def IsoBisimulation.toStrong {M N : MultiwaySystem.{u, v}}
     exact h
 
 /-- Strong bisimulation implies weak bisimulation -/
-def StrongBisimulation.toWeak {M N : MultiwaySystem.{u, v}}
+def StrongBisimulation.toWeak {M N : RootedTS.{u, v}}
     (b : StrongBisimulation M N) : FunctionalBisimulation M N where
   forward := b.forward
   backward := b.backward
@@ -255,18 +255,18 @@ def StrongBisimulation.toWeak {M N : MultiwaySystem.{u, v}}
 /-!
 ## Part 3: Bisimulation as an Equivalence Relation on Systems
 
-We show that bisimulation defines an equivalence relation on multiway systems.
+We show that bisimulation defines an equivalence relation on rooted transition systems.
 -/
 
 /-- Identity bisimulation -/
-def FunctionalBisimulation.refl (M : MultiwaySystem.{u, v}) : FunctionalBisimulation M M where
+def FunctionalBisimulation.refl (M : RootedTS.{u, v}) : FunctionalBisimulation M M where
   forward := Simulation.id M
   backward := Simulation.id M
   leftInverse := fun s => (pathEquivalent_equivalence M).refl s
   rightInverse := fun s => (pathEquivalent_equivalence M).refl s
 
 /-- Symmetric bisimulation -/
-def FunctionalBisimulation.symm {M N : MultiwaySystem.{u, v}}
+def FunctionalBisimulation.symm {M N : RootedTS.{u, v}}
     (b : FunctionalBisimulation M N) : FunctionalBisimulation N M where
   forward := b.backward
   backward := b.forward
@@ -275,7 +275,7 @@ def FunctionalBisimulation.symm {M N : MultiwaySystem.{u, v}}
 
 /-- Bisimulations preserve path equivalence through their backward simulation.
     This is the key lemma for proving transitivity of bisimulation. -/
-theorem FunctionalBisimulation.backward_preserves_pathEquivalent {M N : MultiwaySystem.{u, v}}
+theorem FunctionalBisimulation.backward_preserves_pathEquivalent {M N : RootedTS.{u, v}}
     (b : FunctionalBisimulation M N) {s t : N.State} (h : PathEquivalent N s t) :
     PathEquivalent M (b.backward.stateMap s) (b.backward.stateMap t) := by
   constructor
@@ -360,13 +360,13 @@ theorem FunctionalBisimulation.backward_preserves_pathEquivalent {M N : Multiway
       exact (b.leftInverse u).1 (b.backward.stateMap s) |>.mp ⟨q6⟩
 
 /-- Bisimulations preserve path equivalence through their forward simulation. -/
-theorem FunctionalBisimulation.forward_preserves_pathEquivalent {M N : MultiwaySystem.{u, v}}
+theorem FunctionalBisimulation.forward_preserves_pathEquivalent {M N : RootedTS.{u, v}}
     (b : FunctionalBisimulation M N) {s t : M.State} (h : PathEquivalent M s t) :
     PathEquivalent N (b.forward.stateMap s) (b.forward.stateMap t) :=
   b.symm.backward_preserves_pathEquivalent h
 
 /-- Transitive bisimulation (composition) -/
-def FunctionalBisimulation.trans {M N P : MultiwaySystem.{u, v}}
+def FunctionalBisimulation.trans {M N P : RootedTS.{u, v}}
     (b1 : FunctionalBisimulation M N) (b2 : FunctionalBisimulation N P) : FunctionalBisimulation M P where
   forward := b2.forward ≫ₛ b1.forward
   backward := b1.backward ≫ₛ b2.backward
@@ -390,27 +390,27 @@ def FunctionalBisimulation.trans {M N P : MultiwaySystem.{u, v}}
     exact (pathEquivalent_equivalence P).trans h3 h1
 
 /-- Bisimilar systems: there exists a weak bisimulation between them -/
-def Bisimilar (M N : MultiwaySystem.{u, v}) : Prop :=
+def Bisimilar (M N : RootedTS.{u, v}) : Prop :=
   Nonempty (FunctionalBisimulation M N)
 
 /-- Bisimilarity is reflexive -/
-theorem bisimilar_refl (M : MultiwaySystem.{u, v}) : Bisimilar M M :=
+theorem bisimilar_refl (M : RootedTS.{u, v}) : Bisimilar M M :=
   ⟨FunctionalBisimulation.refl M⟩
 
 /-- Bisimilarity is symmetric -/
-theorem bisimilar_symm {M N : MultiwaySystem.{u, v}} (h : Bisimilar M N) : Bisimilar N M := by
+theorem bisimilar_symm {M N : RootedTS.{u, v}} (h : Bisimilar M N) : Bisimilar N M := by
   obtain ⟨b⟩ := h
   exact ⟨b.symm⟩
 
 /-- Bisimilarity is transitive -/
-theorem bisimilar_trans {M N P : MultiwaySystem.{u, v}}
+theorem bisimilar_trans {M N P : RootedTS.{u, v}}
     (h1 : Bisimilar M N) (h2 : Bisimilar N P) : Bisimilar M P := by
   obtain ⟨b1⟩ := h1
   obtain ⟨b2⟩ := h2
   exact ⟨b1.trans b2⟩
 
 /-- Bisimilarity is an equivalence relation -/
-theorem bisimilar_equivalence : Equivalence (α := MultiwaySystem.{u, v}) Bisimilar where
+theorem bisimilar_equivalence : Equivalence (α := RootedTS.{u, v}) Bisimilar where
   refl := bisimilar_refl
   symm := bisimilar_symm
   trans := bisimilar_trans
@@ -430,22 +430,22 @@ theorem bisimilar_equivalence : Equivalence (α := MultiwaySystem.{u, v}) Bisimi
     stateMap () = .x, but twoCycle has no self-loop at .x).
     See `functional_strictly_stronger_than_relational` in HMLSeparation.lean. -/
 axiom functional_implies_relational_bisimilarity
-    (M N : MultiwaySystem.{0, 0}) :
+    (M N : RootedTS.{0, 0}) :
     Bisimilar M N → RelationallyBisimilar M N
 
 /-!
-## Part 4: Geometric Theory of a Multiway System
+## Part 4: Geometric Theory of a Rooted Transition System
 
-Each multiway system M determines a geometric theory T_M whose models
+Each rooted transition system M determines a geometric theory T_M whose models
 are "computations in the style of M."
 -/
 
-/-- The geometric theory associated to a specific multiway system.
+/-- The geometric theory associated to a specific rooted transition system.
     This theory has:
     - A sort for states (instantiated to M.State)
     - A sort for steps (instantiated to M.Step)
     - Axioms encoding the transition structure -/
-def GeometricTheoryOf (M : MultiwaySystem.{0, 0}) : GeometricTheory where
+def GeometricTheoryOf (M : RootedTS.{0, 0}) : GeometricTheory where
   sorts := [CompSort.State, CompSort.Step, CompSort.Path]
   functions := [CompFunction.init, CompFunction.source, CompFunction.target,
                 CompFunction.pathSource, CompFunction.pathTarget, CompFunction.compose]
@@ -461,22 +461,22 @@ def TheoryEquivalent (T₁ T₂ : GeometricTheory) : Prop :=
 /-!
 ## Part 5: Classifying Topology
 
-For each multiway system M, we construct a Grothendieck topology J_M
+For each rooted transition system M, we construct a Grothendieck topology J_M
 such that Sh(RuleSys, J_M) ≃ Set[T_M].
 -/
 
 /-- The syntactic category of a geometric theory (simplified) -/
 def SyntacticCategory (T : GeometricTheory) : Type := Unit  -- Placeholder
 
-/-- The classifying topology for a multiway system.
+/-- The classifying topology for a rooted transition system.
     This is the Grothendieck topology on RuleSys such that sheaves for J_M
     correspond to models of the geometric theory T_M. -/
-def classifyingTopology (M : MultiwaySystem.{0, 0}) :
-    GrothendieckTopology (MultiwaySystem.{0, 0}) where
+def classifyingTopology (M : RootedTS.{0, 0}) :
+    GrothendieckTopology (RootedTS.{0, 0}) where
   sieves := fun N S =>
     -- A sieve S on N covers iff simulations in S "cover" all computational
     -- behavior that M can distinguish
-    ∀ (f : Simulation M N), ∃ (P : MultiwaySystem.{0, 0}) (g : Simulation P N)
+    ∀ (f : Simulation M N), ∃ (P : RootedTS.{0, 0}) (g : Simulation P N)
       (h : Simulation M P), S.arrows g ∧ f = g ≫ₛ h
   top_mem' := fun N f => ⟨N, 𝟙 N, f, trivial, (Simulation.id_comp f).symm⟩
   pullback_stable' := fun {N₁ N₂} {S} f hS => by
@@ -532,7 +532,7 @@ def classifyingTopology (M : MultiwaySystem.{0, 0}) :
 /-!
 ## Part 6: CONJECTURE E — The Main Theorem
 
-Two multiway systems are bisimilar if and only if their classifying
+Two rooted transition systems are bisimilar if and only if their classifying
 topologies are Morita equivalent (yield equivalent sheaf categories).
 -/
 
@@ -548,8 +548,8 @@ bisimulation simulations.
 /-- A simulation induces a functor on presheaf categories via precomposition.
     Given f : Simulation M N (morphism M → N in RuleSys), this pulls back
     presheaves on N to presheaves on M. -/
-def Simulation.presheafPullback {M N : MultiwaySystem.{0, 0}} (f : Simulation M N) :
-    (MultiwaySystem.{0, 0}ᵒᵖ ⥤ Type) ⥤ (MultiwaySystem.{0, 0}ᵒᵖ ⥤ Type) where
+def Simulation.presheafPullback {M N : RootedTS.{0, 0}} (f : Simulation M N) :
+    (RootedTS.{0, 0}ᵒᵖ ⥤ Type) ⥤ (RootedTS.{0, 0}ᵒᵖ ⥤ Type) where
   obj := fun P => {
     obj := fun X => P.obj X
     map := fun g => P.map g
@@ -575,8 +575,8 @@ def Simulation.presheafPullback {M N : MultiwaySystem.{0, 0}} (f : Simulation M 
               = f' ≫ₛ b.forward = (g ≫ₛ h) ≫ₛ b.forward
               = g ≫ₛ (h ≫ₛ b.forward)  [by associativity]
     5. Setting h' := h ≫ₛ b.forward : M → Q, we have f = g ≫ₛ h' with S.arrows g ✓ -/
-theorem IsoBisimulation.forward_preserves_covering {M N : MultiwaySystem.{0, 0}}
-    (b : IsoBisimulation M N) {P : MultiwaySystem.{0, 0}} (S : Sieve P)
+theorem IsoBisimulation.forward_preserves_covering {M N : RootedTS.{0, 0}}
+    (b : IsoBisimulation M N) {P : RootedTS.{0, 0}} (S : Sieve P)
     (hS : (classifyingTopology N).sieves P S) :
     (classifyingTopology M).sieves P S := by
   intro f
@@ -603,14 +603,14 @@ theorem IsoBisimulation.forward_preserves_covering {M N : MultiwaySystem.{0, 0}}
       _ = g ≫ₛ h' := rfl
 
 /-- IsoBisimulation induces topology ordering -/
-theorem IsoBisimulation.topology_le {M N : MultiwaySystem.{0, 0}}
+theorem IsoBisimulation.topology_le {M N : RootedTS.{0, 0}}
     (b : IsoBisimulation M N) :
     classifyingTopology N ≤ classifyingTopology M := by
   intro P S hS
   exact b.forward_preserves_covering S hS
 
 /-- IsoBisimulation is symmetric -/
-def IsoBisimulation.symm {M N : MultiwaySystem.{u, v}}
+def IsoBisimulation.symm {M N : RootedTS.{u, v}}
     (b : IsoBisimulation M N) : IsoBisimulation N M where
   forward := b.backward
   backward := b.forward
@@ -619,7 +619,7 @@ def IsoBisimulation.symm {M N : MultiwaySystem.{u, v}}
 
 /-- The presheaf pullback restricts to sheaves when induced by an iso bisimulation.
     This is because the iso bisimulation preserves covering sieves. -/
-def IsoBisimulation.sheafFunctor {M N : MultiwaySystem.{0, 0}}
+def IsoBisimulation.sheafFunctor {M N : RootedTS.{0, 0}}
     (b : IsoBisimulation M N) :
     Sheaf (classifyingTopology M) Type ⥤ Sheaf (classifyingTopology N) Type where
   obj := fun F => {
@@ -633,7 +633,7 @@ def IsoBisimulation.sheafFunctor {M N : MultiwaySystem.{0, 0}}
   map_comp := fun _ _ => rfl
 
 /-- The inverse functor uses the symmetric iso bisimulation -/
-def IsoBisimulation.sheafFunctorInverse {M N : MultiwaySystem.{0, 0}}
+def IsoBisimulation.sheafFunctorInverse {M N : RootedTS.{0, 0}}
     (b : IsoBisimulation M N) :
     Sheaf (classifyingTopology N) Type ⥤ Sheaf (classifyingTopology M) Type :=
   b.symm.sheafFunctor
@@ -642,7 +642,7 @@ def IsoBisimulation.sheafFunctorInverse {M N : MultiwaySystem.{0, 0}}
     This is fully constructive — no sorry needed.
     The key insight: both functors are identity on underlying presheaves,
     and IsSheaf is a Prop, so unit/counit are definitional identities. -/
-def IsoBisimulation.sheafEquivalence {M N : MultiwaySystem.{0, 0}}
+def IsoBisimulation.sheafEquivalence {M N : RootedTS.{0, 0}}
     (b : IsoBisimulation M N) :
     Sheaf (classifyingTopology M) Type ≌ Sheaf (classifyingTopology N) Type where
   functor := b.sheafFunctor
@@ -653,25 +653,25 @@ def IsoBisimulation.sheafEquivalence {M N : MultiwaySystem.{0, 0}}
     exact NatIso.ofComponents (fun F => Iso.refl F) (fun f => by simp; ext; rfl)
 
 /-- Two systems are iso-bisimilar if there exists an iso bisimulation between them -/
-def IsoBisimilar (M N : MultiwaySystem.{u, v}) : Prop :=
+def IsoBisimilar (M N : RootedTS.{u, v}) : Prop :=
   Nonempty (IsoBisimulation M N)
 
 /-- **CONJECTURE E (Forward Direction)**:
     IsoBisimulation implies Morita equivalence of classifying topologies.
     This is fully constructive — no sorry statements. -/
-theorem iso_bisimulation_implies_morita (M N : MultiwaySystem.{0, 0})
+theorem iso_bisimulation_implies_morita (M N : RootedTS.{0, 0})
     (h : IsoBisimilar M N) :
     MoritaEquivalent (classifyingTopology M) (classifyingTopology N) := by
   obtain ⟨b⟩ := h
   exact ⟨b.sheafEquivalence⟩
 
 /-- Every IsoBisimulation gives a FunctionalBisimulation (via StrongBisimulation) -/
-def IsoBisimulation.toWeak {M N : MultiwaySystem.{u, v}}
+def IsoBisimulation.toWeak {M N : RootedTS.{u, v}}
     (b : IsoBisimulation M N) : FunctionalBisimulation M N :=
   b.toStrong.toWeak
 
 /-- IsoBisimilar implies Bisimilar -/
-theorem isoBisimilar_implies_bisimilar {M N : MultiwaySystem.{u, v}}
+theorem isoBisimilar_implies_bisimilar {M N : RootedTS.{u, v}}
     (h : IsoBisimilar M N) : Bisimilar M N :=
   h.elim (fun b => ⟨b.toWeak⟩)
 
@@ -695,7 +695,7 @@ theorem isoBisimilar_implies_bisimilar {M N : MultiwaySystem.{u, v}}
     branching systems, the strengthening may fail. Used only by
     `bisimulation_implies_morita` (path-based classifyingTopology). -/
 axiom functional_bisim_to_iso :
-  ∀ (M N : MultiwaySystem.{0, 0}), FunctionalBisimulation M N → IsoBisimilar M N
+  ∀ (M N : RootedTS.{0, 0}), FunctionalBisimulation M N → IsoBisimilar M N
 
 /-- Bisimulation implies Morita equivalence for the PATH-BASED classifyingTopology.
 
@@ -704,7 +704,7 @@ axiom functional_bisim_to_iso :
 
     **IMPORTANT: This is about `classifyingTopology`, NOT `classifyingToposOf`.**
     - `classifyingTopology M` (defined below): Grothendieck topology on the fixed
-      MultiwaySystem category, capturing simulation-level covering structure.
+      RootedTS category, capturing simulation-level covering structure.
       This is invariant under bisimulation.
     - `classifyingToposOf M` (SyntacticCategory.lean): `ClassifyingTopos (theoryOfSystem M)`,
       the per-theory Caramello construction capturing ALL geometric sequents.
@@ -717,7 +717,7 @@ axiom functional_bisim_to_iso :
 
     The false bridge axiom `classifying_topos_equiv_axiom` that previously connected
     these two constructions has been removed from SyntacticCategory.lean. -/
-theorem bisimulation_implies_morita (M N : MultiwaySystem.{0, 0})
+theorem bisimulation_implies_morita (M N : RootedTS.{0, 0})
     (h : Bisimilar M N) :
     MoritaEquivalent (classifyingTopology M) (classifyingTopology N) := by
   obtain ⟨b⟩ := h
@@ -769,7 +769,7 @@ These represent potential paths forward, documented for future investigation.
     formalize the interpretation structure in Lean/Mathlib.
 -/
 structure EnrichedMoritaEquivalence
-    (M N : MultiwaySystem.{0, 0}) where
+    (M N : RootedTS.{0, 0}) where
   /-- The underlying Morita equivalence -/
   morita : MoritaEquivalent (classifyingTopology M) (classifyingTopology N)
   /-- Forward interpretation: M-states in N -/
@@ -801,7 +801,7 @@ structure EnrichedMoritaEquivalence
 
     **Note:** The challenge is constructing EnrichedMoritaEquivalence from a bare
     Morita equivalence; this theorem shows the implication once we have the structure. -/
-theorem enriched_morita_implies_bisimulation (M N : MultiwaySystem.{0, 0})
+theorem enriched_morita_implies_bisimulation (M N : RootedTS.{0, 0})
     (h : EnrichedMoritaEquivalence M N) :
     Bisimilar M N := by
   -- Construct the weak bisimulation using mutual reachability helper
@@ -835,25 +835,25 @@ theorem enriched_morita_implies_bisimulation (M N : MultiwaySystem.{0, 0})
     **Advantage:** Tautologically true by definition.
     **Disadvantage:** Doesn't give concrete computational relationship.
 -/
-def ObservationallyEquivalent (M N : MultiwaySystem.{0, 0}) : Prop :=
+def ObservationallyEquivalent (M N : RootedTS.{0, 0}) : Prop :=
   MoritaEquivalent (classifyingTopology M) (classifyingTopology N)
 
 /-- Observational equivalence is reflexive -/
-theorem observationallyEquivalent_refl (M : MultiwaySystem.{0, 0}) :
+theorem observationallyEquivalent_refl (M : RootedTS.{0, 0}) :
     ObservationallyEquivalent M M := by
   -- Identity equivalence: Sheaf J Type ≌ Sheaf J Type
   unfold ObservationallyEquivalent MoritaEquivalent
   exact ⟨CategoryTheory.Functor.asEquivalence (𝟭 (Sheaf (classifyingTopology M) Type))⟩
 
 /-- Observational equivalence is symmetric -/
-theorem observationallyEquivalent_symm {M N : MultiwaySystem.{0, 0}}
+theorem observationallyEquivalent_symm {M N : RootedTS.{0, 0}}
     (h : ObservationallyEquivalent M N) :
     ObservationallyEquivalent N M := by
   obtain ⟨E⟩ := h
   exact ⟨E.symm⟩
 
 /-- Observational equivalence is transitive -/
-theorem observationallyEquivalent_trans {M N P : MultiwaySystem.{0, 0}}
+theorem observationallyEquivalent_trans {M N P : RootedTS.{0, 0}}
     (h1 : ObservationallyEquivalent M N) (h2 : ObservationallyEquivalent N P) :
     ObservationallyEquivalent M P := by
   obtain ⟨E1⟩ := h1
@@ -861,7 +861,7 @@ theorem observationallyEquivalent_trans {M N P : MultiwaySystem.{0, 0}}
   exact ⟨E1.trans E2⟩
 
 /-- Bisimilarity implies observational equivalence (forward direction works) -/
-theorem bisimilar_implies_observationally (M N : MultiwaySystem.{0, 0})
+theorem bisimilar_implies_observationally (M N : RootedTS.{0, 0})
     (h : Bisimilar M N) :
     ObservationallyEquivalent M N :=
   bisimulation_implies_morita M N h
@@ -908,7 +908,7 @@ All these are categorical properties preserved by equivalence.
     immediate by transitivity of Morita equivalence. If J₁ is Boolean via witness J',
     then J₂ is also Boolean via the same witness J' (using transitivity:
     MoritaEquivalent J₂ J₁ → MoritaEquivalent J₁ J' → MoritaEquivalent J₂ J'). -/
-theorem morita_boolean_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySystem.{0, 0})}
+theorem morita_boolean_transfer {J₁ J₂ : GrothendieckTopology (RootedTS.{0, 0})}
     (hMorita : MoritaEquivalent J₁ J₂) :
     IsBoolean J₁ ↔ IsBoolean J₂ := by
   constructor
@@ -921,7 +921,7 @@ theorem morita_boolean_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySyste
 
     With the categorical definition (Morita closure of SieveTwoValued), transfer is
     immediate by transitivity of Morita equivalence. -/
-theorem morita_twovalued_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySystem.{0, 0})}
+theorem morita_twovalued_transfer {J₁ J₂ : GrothendieckTopology (RootedTS.{0, 0})}
     (hMorita : MoritaEquivalent J₁ J₂) :
     IsTwoValued J₁ ↔ IsTwoValued J₂ := by
   constructor
@@ -934,7 +934,7 @@ theorem morita_twovalued_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySys
 
     With the categorical definition (Morita closure of SieveHasEnoughPoints), transfer is
     immediate by transitivity of Morita equivalence. -/
-theorem morita_points_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySystem.{0, 0})}
+theorem morita_points_transfer {J₁ J₂ : GrothendieckTopology (RootedTS.{0, 0})}
     (hMorita : MoritaEquivalent J₁ J₂) :
     HasEnoughPoints J₁ ↔ HasEnoughPoints J₂ := by
   constructor
@@ -946,7 +946,7 @@ theorem morita_points_transfer {J₁ J₂ : GrothendieckTopology (MultiwaySystem
 /-- Corollary: Bisimilar systems have the same topos-theoretic invariants.
 
     This follows directly from Morita equivalence preserving categorical invariants. -/
-theorem bisimilar_same_invariants (M N : MultiwaySystem.{0, 0})
+theorem bisimilar_same_invariants (M N : RootedTS.{0, 0})
     (h : Bisimilar M N) :
     -- Boolean, two-valued, enough points all transfer
     (IsBoolean (classifyingTopology M) ↔ IsBoolean (classifyingTopology N)) ∧
@@ -958,7 +958,7 @@ theorem bisimilar_same_invariants (M N : MultiwaySystem.{0, 0})
          morita_points_transfer hMorita⟩
 
 /-- Corollary: Computational properties are invariant under bisimulation -/
-theorem bisimilar_computational_invariants (M N : MultiwaySystem.{0, 0})
+theorem bisimilar_computational_invariants (M N : RootedTS.{0, 0})
     (h : Bisimilar M N) :
     -- Halting decidability transfers
     (∃ s : M.State, Nonempty (M.Path s s)) ↔
@@ -985,7 +985,7 @@ plus the classical result that all Turing-complete systems are bisimilar.
     This axiom asserts the existence of a universal computational system.
     Any concrete UTM construction (e.g., from ComputationalModels.lean)
     would satisfy this. -/
-axiom UTM : MultiwaySystem.{0, 0}
+axiom UTM : RootedTS.{0, 0}
 
 /-- Turing-completeness as bisimilarity to UTM.
 
@@ -1002,7 +1002,7 @@ axiom UTM : MultiwaySystem.{0, 0}
     and path-based Morita equivalence follow by definition. Per-theory topos
     equivalence (`classifyingToposOf`) does NOT follow from bisimulation alone —
     see the three-level hierarchy documented in SyntacticCategory.lean. -/
-def TuringComplete (M : MultiwaySystem.{0, 0}) : Prop :=
+def TuringComplete (M : RootedTS.{0, 0}) : Prop :=
   Bisimilar M UTM
 
 /-- All Turing-complete systems are bisimilar.
@@ -1014,7 +1014,7 @@ def TuringComplete (M : MultiwaySystem.{0, 0}) : Prop :=
     designate specific models as Turing-complete.
 
     Proof: M ~ UTM ~ N by transitivity (pure logic). -/
-theorem church_turing_categorical (M N : MultiwaySystem.{0, 0})
+theorem church_turing_categorical (M N : RootedTS.{0, 0})
     (hM : TuringComplete M) (hN : TuringComplete N) : Bisimilar M N :=
   bisimilar_trans hM (bisimilar_symm hN)
 
@@ -1030,7 +1030,7 @@ theorem church_turing_categorical (M N : MultiwaySystem.{0, 0})
     `classifyingToposOf M ≌ classifyingToposOf N`. That claim was removed because
     the hub-spokes/2-cycle counterexample shows bisimulation does not preserve
     the full geometric theory Th_G(M). -/
-theorem church_turing_morita (M N : MultiwaySystem.{0, 0})
+theorem church_turing_morita (M N : RootedTS.{0, 0})
     (hM : TuringComplete M) (hN : TuringComplete N) :
     MoritaEquivalent (classifyingTopology M) (classifyingTopology N) := by
   have hBisim := church_turing_categorical M N hM hN
@@ -1041,13 +1041,13 @@ theorem church_turing_morita (M N : MultiwaySystem.{0, 0})
 -/
 
 /-- The toggle system: state flips between true and false -/
-def toggleSystem : MultiwaySystem.{0, 0} where
+def toggleSystem : RootedTS.{0, 0} where
   State := Bool
   Step := fun s t => PLift (t = !s)
   init := false
 
 /-- The binary walk system: symmetric random walk on Bool -/
-def binaryWalkSystem : MultiwaySystem.{0, 0} where
+def binaryWalkSystem : RootedTS.{0, 0} where
   State := Bool
   Step := fun s t => PLift (t = !s)  -- Same structure as toggle
   init := true  -- Different initial state
@@ -1082,7 +1082,7 @@ inductive MergeState : Type
   | merged : MergeState
   deriving DecidableEq
 
-def mergeSystem : MultiwaySystem.{0, 0} where
+def mergeSystem : RootedTS.{0, 0} where
   State := MergeState
   Step := fun s t => match s, t with
     | .left, .merged => Unit
@@ -1091,7 +1091,7 @@ def mergeSystem : MultiwaySystem.{0, 0} where
   init := .left
 
 /-- The split system (opposite of merge) -/
-def splitSystem : MultiwaySystem.{0, 0} where
+def splitSystem : RootedTS.{0, 0} where
   State := MergeState
   Step := fun s t => match s, t with
     | .merged, .left => Unit
@@ -1114,7 +1114,7 @@ lemma splitSystem_right_no_step (t : MergeState) : splitSystem.Step .right t →
   fun h => nomatch h
 
 /-- Any path from a terminal state must be trivial -/
-lemma path_from_terminal {M : MultiwaySystem} {s t : M.State}
+lemma path_from_terminal {M : RootedTS} {s t : M.State}
     (h_terminal : ∀ u, M.Step s u → False) (p : M.Path s t) : s = t := by
   cases p with
   | nil => rfl
@@ -1155,7 +1155,7 @@ def splitSystem_step_merged_left : splitSystem.Step .merged .left := ()
 lemma splitSystem_left_not_equiv_merged : ¬ PathEquivalent splitSystem .left .merged := by
   intro ⟨h1, _⟩
   -- merged reaches right (one step), so left should reach right
-  have nil_right : splitSystem.Path .right .right := @MultiwaySystem.Path.nil splitSystem MergeState.right
+  have nil_right : splitSystem.Path .right .right := @RootedTS.Path.nil splitSystem MergeState.right
   have path_merged_right : Nonempty (splitSystem.Path .merged .right) :=
     ⟨.cons splitSystem_step_merged_right nil_right⟩
   have : Nonempty (splitSystem.Path .left .right) :=
@@ -1168,7 +1168,7 @@ lemma splitSystem_left_not_equiv_merged : ¬ PathEquivalent splitSystem .left .m
 lemma splitSystem_right_not_equiv_merged : ¬ PathEquivalent splitSystem .right .merged := by
   intro ⟨h1, _⟩
   -- merged reaches left (one step), so right should reach left
-  have nil_left : splitSystem.Path .left .left := @MultiwaySystem.Path.nil splitSystem MergeState.left
+  have nil_left : splitSystem.Path .left .left := @RootedTS.Path.nil splitSystem MergeState.left
   have path_merged_left : Nonempty (splitSystem.Path .merged .left) :=
     ⟨.cons splitSystem_step_merged_left nil_left⟩
   have : Nonempty (splitSystem.Path .right .left) :=
@@ -1202,7 +1202,7 @@ lemma mergeSystem_left_not_equiv_merged : ¬ PathEquivalent mergeSystem .left .m
   intro ⟨h1, _⟩
   -- left reaches left (trivially), so merged should reach left
   -- h1 .left : Path left left ↔ Path merged left, so use .mp to go from left→left to merged→left
-  have nil_left : mergeSystem.Path .left .left := @MultiwaySystem.Path.nil mergeSystem MergeState.left
+  have nil_left : mergeSystem.Path .left .left := @RootedTS.Path.nil mergeSystem MergeState.left
   have path_left_left : Nonempty (mergeSystem.Path .left .left) := ⟨nil_left⟩
   have : Nonempty (mergeSystem.Path .merged .left) := (h1 .left).mp path_left_left
   obtain ⟨p⟩ := this
@@ -1214,7 +1214,7 @@ lemma mergeSystem_right_not_equiv_merged : ¬ PathEquivalent mergeSystem .right 
   intro ⟨h1, _⟩
   -- right reaches right (trivially), so merged should reach right
   -- h1 .right : Path right right ↔ Path merged right, so use .mp
-  have nil_right : mergeSystem.Path .right .right := @MultiwaySystem.Path.nil mergeSystem MergeState.right
+  have nil_right : mergeSystem.Path .right .right := @RootedTS.Path.nil mergeSystem MergeState.right
   have path_right_right : Nonempty (mergeSystem.Path .right .right) := ⟨nil_right⟩
   have : Nonempty (mergeSystem.Path .merged .right) := (h1 .right).mp path_right_right
   obtain ⟨p⟩ := this
@@ -1300,7 +1300,7 @@ theorem merge_split_not_bisimilar : ¬ Bisimilar mergeSystem splitSystem := by
 /-!
 ## Summary: Conjecture E and its Implications
 
-**Conjecture E** states that bisimulation of multiway systems corresponds exactly
+**Conjecture E** states that bisimulation of rooted transition systems corresponds exactly
 to Morita equivalence of their classifying toposes:
 
     Bisimilar M N  ↔  MoritaEquivalent (classifyingTopology M) (classifyingTopology N)
@@ -1316,7 +1316,7 @@ to Morita equivalence of their classifying toposes:
 2. **For Invariants**: Topos-theoretic invariants (Boolean, two-valued, points)
    are preserved under bisimulation, giving new computational invariants.
 
-3. **For the Ruliad**: The Ruliad as universal presheaf topos is the "maximal"
+3. **For the RTSTopos**: The RTSTopos as universal presheaf topos is the "maximal"
    classifying topos — all specific systems embed into it via geometric morphisms.
 
 **Status** (updated 2026-01-20):
@@ -1398,4 +1398,4 @@ The previously axiomatized `morita_implies_bisimulation_classical` has been remo
 - **Backward:** FALSE — removed
 -/
 
-end Ruliology
+end RTS

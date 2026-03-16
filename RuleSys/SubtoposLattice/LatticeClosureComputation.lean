@@ -38,7 +38,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Additional Unnamed Energy Vectors (Round 1)
@@ -353,4 +353,4 @@ The spectrum's branching structure decomposes into orthogonal dimensions:
 ### Theorem count: 18
 -/
 
-end Ruliology
+end RTS

@@ -57,7 +57,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Right Ore Condition
@@ -288,4 +288,4 @@ being non-Boolean (non-classical). De Morgan is the strongest intermediate logic
 principle that Set[T_LTS] satisfies.
 -/
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

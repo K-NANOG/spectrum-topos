@@ -2,7 +2,7 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# Fiber Products (Pullbacks) of Multiway Systems
+# Fiber Products (Pullbacks) of Rooted Transition Systems
 
 This file defines:
 1. FiberProduct - the pullback of two simulations with common target
@@ -12,7 +12,7 @@ This file defines:
 ## Mathematical Content
 
 Given simulations f : M ⟶ N and g : P ⟶ N, the fiber product M ×_N P is the
-multiway system whose:
+rooted transition system whose:
 - States are pairs (m, p) where f.stateMap m = g.stateMap p
 - Steps are compatible pairs of steps
 - Initial state is (M.init, P.init)
@@ -33,14 +33,14 @@ open CategoryTheory.Limits
 
 universe u v
 
-namespace Ruliology
+namespace RTS
 
 /-- Helper: HEq of products from HEq of components (same universe for simplicity) -/
 theorem Prod.ext_heq {α₁ α₂ : Type u} {β₁ β₂ : Type v} {a₁ : α₁} {a₂ : α₂} {b₁ : β₁} {b₂ : β₂}
     (ha : HEq a₁ a₂) (hb : HEq b₁ b₂) : HEq (a₁, b₁) (a₂, b₂) := by
   cases ha; cases hb; rfl
 
-variable {M N P : MultiwaySystem.{u, v}} (f : M ⟶ N) (g : P ⟶ N)
+variable {M N P : RootedTS.{u, v}} (f : M ⟶ N) (g : P ⟶ N)
 
 /-!
 ## Fiber Product Structure
@@ -51,7 +51,7 @@ The fiber product M ×_N P consists of compatible pairs of states and steps.
 /-- The fiber product of two simulations with common target.
     States are pairs (m, p) with f(m) = g(p).
     Steps are pairs of steps whose images are equal (via HEq due to dependent types). -/
-def FiberProduct : MultiwaySystem.{u, v} where
+def FiberProduct : RootedTS.{u, v} where
   State := { pair : M.State × P.State // f.stateMap pair.1 = g.stateMap pair.2 }
   Step := fun s t =>
     { stepPair : M.Step s.val.1 t.val.1 × P.Step s.val.2 t.val.2 //
@@ -88,7 +88,7 @@ theorem condition : fst f g ≫ f = snd f g ≫ g := by
 
 /-- Lift morphism: given h : W → M and k : W → P with h ≫ f = k ≫ g,
     there exists a unique morphism W → FiberProduct f g -/
-def lift {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
+def lift {W : RootedTS.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
     (w : h ≫ f = k ≫ g) : W ⟶ FiberProduct f g where
   stateMap := fun s => ⟨(h.stateMap s, k.stateMap s), by
     -- Need: f.stateMap (h.stateMap s) = g.stateMap (k.stateMap s)
@@ -111,7 +111,7 @@ def lift {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
     exact ⟨h.init_preserved, k.init_preserved⟩
 
 /-- lift composed with fst gives back h -/
-theorem lift_fst {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
+theorem lift_fst {W : RootedTS.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
     (w : h ≫ f = k ≫ g) : lift f g h k w ≫ fst f g = h := by
   apply Simulation.ext
   · -- stateMap: (lift ≫ fst).stateMap s = h.stateMap s
@@ -122,7 +122,7 @@ theorem lift_fst {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
     apply HEq.rfl
 
 /-- lift composed with snd gives back k -/
-theorem lift_snd {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
+theorem lift_snd {W : RootedTS.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
     (w : h ≫ f = k ≫ g) : lift f g h k w ≫ snd f g = k := by
   apply Simulation.ext
   · funext s; rfl
@@ -155,7 +155,7 @@ theorem lift_snd {W : MultiwaySystem.{u, v}} (h : W ⟶ M) (k : W ⟶ P)
 
     A full proof would require custom injectivity lemmas for simulation composition
     that properly handle the dependent stepMap types. -/
-theorem hom_ext {W : MultiwaySystem.{u, v}} (φ ψ : W ⟶ FiberProduct f g)
+theorem hom_ext {W : RootedTS.{u, v}} (φ ψ : W ⟶ FiberProduct f g)
     (h_fst : φ ≫ fst f g = ψ ≫ fst f g)
     (h_snd : φ ≫ snd f g = ψ ≫ snd f g) : φ = ψ := by
   -- Extract stateMap equalities from projection equalities
@@ -236,7 +236,7 @@ instance hasPullback : HasPullback f g :=
   ⟨⟨FiberProduct.cone f g, FiberProduct.isLimit f g⟩⟩
 
 /-- RuleSys has all pullbacks -/
-instance hasPullbacks : HasPullbacks MultiwaySystem.{u, v} :=
+instance hasPullbacks : HasPullbacks RootedTS.{u, v} :=
   @hasPullbacks_of_hasLimit_cospan _ _ (fun {X Y Z} {f} {g} => hasPullback f g)
 
-end Ruliology
+end RTS

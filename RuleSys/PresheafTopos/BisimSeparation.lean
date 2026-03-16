@@ -46,7 +46,7 @@ import RuleSys.PresheafTopos.BisimEquivalence
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Tree-Generated Sieve and Density
@@ -398,4 +398,4 @@ theorem bisim_density_summary :
     ⟨fan2_hom_to_chain2, fan2_hom_to_chain2_root⟩,
     asymBranch_not_bisimEquiv_chain2⟩⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

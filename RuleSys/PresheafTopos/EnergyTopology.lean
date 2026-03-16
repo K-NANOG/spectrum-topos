@@ -41,7 +41,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Section 1: EnergyGrothendieckTopology Structure
@@ -103,10 +103,10 @@ Given any `NamedEquivalence` E, build a `EnergyGrothendieckTopology` using the
 This maps each of the 13 van Glabbeek equivalences to a Grothendieck topology. -/
 def energyTopology {L : Type} [Fintype L] [DecidableEq L]
     (E : NamedEquivalence) : EnergyGrothendieckTopology L where
-  covering := Ruliology.isEnergyCovering E
-  maximal := Ruliology.energyCovering_maximal E
-  stable := fun f hS => Ruliology.energyCovering_stable E f hS
-  transitive := fun hS hT => Ruliology.energyCovering_transitive E hS hT
+  covering := RTS.isEnergyCovering E
+  maximal := RTS.energyCovering_maximal E
+  stable := fun f hS => RTS.energyCovering_stable E f hS
+  transitive := fun hS hT => RTS.energyCovering_transitive E hS hT
 
 /-!
 ## Section 4: Existing Topology Wrappers
@@ -156,7 +156,7 @@ which shows `isEnergyCovering .traces G S ↔ isLabeledTraceCovering G S`. -/
 theorem energyTopology_traces_eq {L : Type} [Fintype L] [DecidableEq L] :
     @energyTopology L _ _ .traces = traceGrothendieckTopology :=
   EnergyGrothendieckTopology.ext fun G S =>
-    Ruliology.energyCovering_traces_iff G S
+    RTS.energyCovering_traces_iff G S
 
 /-- The energy topology at `.bisimulation` equals the bisim Grothendieck topology.
 
@@ -165,7 +165,7 @@ which shows `isEnergyCovering .bisimulation G S ↔ isLabeledBisimCovering G S`.
 theorem energyTopology_bisim_eq {L : Type} [Fintype L] [DecidableEq L] :
     @energyTopology L _ _ .bisimulation = bisimGrothendieckTopology :=
   EnergyGrothendieckTopology.ext fun G S =>
-    Ruliology.energyCovering_bisim_iff G S
+    RTS.energyCovering_bisim_iff G S
 
 /-!
 ## Section 6: Antitone Spectrum Embedding
@@ -185,7 +185,7 @@ So `energyTopology E₂ ≤ energyTopology E₁` (J_{E₂} has fewer covering si
 theorem energyTopology_antitone {L : Type} [Fintype L] [DecidableEq L] :
     ∀ E₁ E₂ : NamedEquivalence, E₁ ≤ E₂ →
       @energyTopology L _ _ E₂ ≤ @energyTopology L _ _ E₁ :=
-  fun E₁ E₂ hle G S hS => Ruliology.energyCovering_monotone E₁ E₂ hle G S hS
+  fun E₁ E₂ hle G S hS => RTS.energyCovering_monotone E₁ E₂ hle G S hS
 
 /-!
 ## Section 7: Topology Chain
@@ -291,4 +291,4 @@ All proofs follow from existing infrastructure in EnergyTestObjects.lean and
 the labeled topology files.
 -/
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

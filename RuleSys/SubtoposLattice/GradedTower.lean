@@ -44,7 +44,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: GradedLindenbaumTower Structure
@@ -212,4 +212,4 @@ theorem tower_consistent_with_algebra_cards :
   · -- vgTraceBTower.cardAt 1 = 5 = Fintype.card (LindenbaumAlgebra vgTraceB_depth1Theory)
     simp [vgTraceBTower, vgTraceB_depth1_algebra_card]
 
-end Ruliology
+end RTS

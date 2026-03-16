@@ -2,10 +2,10 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# Van Benthem Bridge: MultiwaySystem ↔ FinLTS
+# Van Benthem Bridge: RootedTS ↔ FinLTS
 
 This file bridges the geometric van Benthem theorem (proved for `FinLTS L`)
-to the `MultiwaySystem` world via the `MultiwayToLTS` functor.
+to the `RootedTS` world via the `MultiwayToLTS` functor.
 
 ## Key Results
 
@@ -15,7 +15,7 @@ to the `MultiwaySystem` world via the `MultiwayToLTS` functor.
 
 ## Architecture
 
-MultiwaySystem M ──toLTS──→ FinLTS Unit
+RootedTS M ──toLTS──→ FinLTS Unit
        │                         │
   RelationalBisim         LabeledBisimulation
        │                         │
@@ -31,13 +31,13 @@ the quantifier over labels in `LabeledBisimulation` collapses to a single case.
 - van Benthem, "Modal Logic and Classical Logic" (1976/1983)
 -/
 
-import RuleSys.MultiwayToLTS
+import RuleSys.RTSToLTS
 import RuleSys.Bisimulation
 import RuleSys.PresheafTopos.GeometricVanBenthem
 
 set_option autoImplicit false
 
-namespace Ruliology
+namespace RTS
 
 open PresheafTopos
 
@@ -45,14 +45,14 @@ open PresheafTopos
 ## Part 1: Bisimulation Bridge
 -/
 
-/-- A relational bisimulation between MultiwaySystem instances lifts to a
+/-- A relational bisimulation between RootedTS instances lifts to a
     labeled bisimulation between their FinLTS Unit images.
 
     Since `M.toLTS.edge () s t = Nonempty (M.Step s t)`, the labeled
     forward/backward conditions are exactly the unlabeled ones with
     the trivial `Unit` label quantifier collapsed. -/
 theorem RelationalBisim_to_LabeledBisim
-    {M N : MultiwaySystem.{0, 0}}
+    {M N : RootedTS.{0, 0}}
     [Fintype M.State] [DecidableEq M.State]
     [Fintype N.State] [DecidableEq N.State]
     [∀ s t, Decidable (Nonempty (M.Step s t))]
@@ -69,9 +69,9 @@ theorem RelationalBisim_to_LabeledBisim
     exact ⟨s', hs', hR'⟩
 
 /-- Inverse direction: a labeled bisimulation on FinLTS Unit images gives
-    a relational bisimulation between MultiwaySystem instances. -/
+    a relational bisimulation between RootedTS instances. -/
 theorem LabeledBisim_to_RelationalBisim
-    {M N : MultiwaySystem.{0, 0}}
+    {M N : RootedTS.{0, 0}}
     [Fintype M.State] [DecidableEq M.State]
     [Fintype N.State] [DecidableEq N.State]
     [∀ s t, Decidable (Nonempty (M.Step s t))]
@@ -88,10 +88,10 @@ theorem LabeledBisim_to_RelationalBisim
     exact ⟨s', hs', hR'⟩
 
 /-!
-## Part 2: Geometric van Benthem for MultiwaySystem
+## Part 2: Geometric van Benthem for RootedTS
 
 The geometric van Benthem theorem specialized to `L = Unit` applies directly
-to FinLTS images of MultiwaySystem instances. Combined with the bisimulation
+to FinLTS images of RootedTS instances. Combined with the bisimulation
 bridge, this gives: bisimulation-invariant geometric formulas over the
 single-label LTS signature are determined by bounded-depth HML observations.
 
@@ -102,7 +102,7 @@ geometric encodings that violate the equality/confluence/self-loop constraints
 identified in EqualityElimination.lean.
 -/
 
-/-- The geometric van Benthem theorem for single-label LTS (MultiwaySystem images).
+/-- The geometric van Benthem theorem for single-label LTS (RootedTS images).
 
     Any bisimulation-invariant geometric formula of bounded existential depth
     over the signature {step : Vertex → Vertex → Prop} (i.e., L = Unit)
@@ -115,11 +115,11 @@ theorem geometric_van_benthem_unit
     φ.satisfies G (fun _ => v) ↔ φ.satisfies H (fun _ => w) :=
   geometric_van_benthem φ hbi d hd G H v w hdb
 
-/-- Corollary: for MultiwaySystem instances related by a relational bisimulation,
+/-- Corollary: for RootedTS instances related by a relational bisimulation,
     bisimulation-invariant geometric formulas agree on related states. -/
 theorem geometric_van_benthem_multiway
     (φ : LTSGeoFormula Unit 1) (hbi : FinLTSBisimInvariant φ)
-    {M N : MultiwaySystem.{0, 0}}
+    {M N : RootedTS.{0, 0}}
     [Fintype M.State] [DecidableEq M.State]
     [Fintype N.State] [DecidableEq N.State]
     [∀ s t, Decidable (Nonempty (M.Step s t))]
@@ -130,4 +130,4 @@ theorem geometric_van_benthem_multiway
     φ.satisfies M.toLTS (fun _ => v) → φ.satisfies N.toLTS (fun _ => w) :=
   hbi M.toLTS N.toLTS R (RelationalBisim_to_LabeledBisim hR) v w hvw
 
-end Ruliology
+end RTS

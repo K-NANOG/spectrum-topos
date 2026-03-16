@@ -25,7 +25,7 @@ import RuleSys.SubtoposLattice.RegimeClassification
 
 set_option autoImplicit false
 
-namespace Ruliology
+namespace RTS
 
 open LabeledHML GeometricLogic.Propositional
 
@@ -299,4 +299,4 @@ theorem labels_break_symmetries :
       σ.1 = Equiv.refl _) :=
   labeled_aut_all_trivial
 
-end Ruliology
+end RTS

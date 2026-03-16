@@ -54,7 +54,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Energy Budget Type
@@ -476,4 +476,4 @@ The energy budget sketch establishes the bridge between:
 - Full energy game formalization deferred to v15.0+
 -/
 
-end Ruliology
+end RTS

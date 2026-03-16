@@ -35,7 +35,7 @@ Every state has at least one successor. Separates pathSys (total) from fork (c h
     The consequent ∃y. step(x, y) has:
     - x as the free variable (varTerm 0 in Ctx1)
     - y as the bound variable (boundTerm 0 in context with 1 bound var) -/
-def sigma_tot : GeoSequent MultiwayLanguage Ctx1 :=
+def sigma_tot : GeoSequent RTSLanguage Ctx1 :=
   { antecedent := .top
     consequent := .exist (stepRel (varTerm (0 : Fin 1)) (boundTerm 0)) }
 
@@ -52,7 +52,7 @@ Reuse from BranchingTopology (determinismSequent).
 
 /-- The determinism sequent: step(x,y) ∧ step(x,z) ⊢_{x,y,z} y = z.
     Context: three free variables (Ctx3 = Fin 3). -/
-def sigma_det : GeoSequent MultiwayLanguage Ctx3 :=
+def sigma_det : GeoSequent RTSLanguage Ctx3 :=
   { antecedent := .conj (stepVars 0 1) (stepVars 0 2)
     consequent := eqTerms (varTerm 1) (varTerm 2) }
 
@@ -68,7 +68,7 @@ Every pair of successors can reach a common successor.
     step(x,y) ∧ step(x,z) ⊢_{x,y,z} ∃w. step(y,w) ∧ step(z,w).
     Context: three free variables (Ctx3).
     The consequent uses one bound variable w (index 0 in Fin 1). -/
-def sigma_conf : GeoSequent MultiwayLanguage Ctx3 :=
+def sigma_conf : GeoSequent RTSLanguage Ctx3 :=
   { antecedent := .conj (stepVars 0 1) (stepVars 0 2)
     consequent := .exist (.conj
       (stepRel (varTerm (1 : Fin 3)) (boundTerm 0))
@@ -84,7 +84,7 @@ Every state has a self-loop.
 
 /-- The universal self-loop sequent: ⊤ ⊢_x step(x, x).
     Context: one free variable x (Ctx1 = Fin 1). -/
-def sigma_loop : GeoSequent MultiwayLanguage Ctx1 :=
+def sigma_loop : GeoSequent RTSLanguage Ctx1 :=
   { antecedent := .top
     consequent := stepVars 0 0 }
 

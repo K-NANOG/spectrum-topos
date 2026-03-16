@@ -48,7 +48,7 @@ open GeometricLogic.Propositional
 
 attribute [local instance] Classical.propDecidable
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: General Nucleus → Grothendieck Topology Construction
@@ -629,4 +629,4 @@ theorem hubSpokes_nucleus_card_eq_topology_card :
 ### Net axiom change: 16 eliminated - 5 new bridge = 11 net reduction
 -/
 
-end Ruliology
+end RTS

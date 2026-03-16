@@ -43,7 +43,7 @@ import RuleSys.GeometricLogic.Soundness  -- for Provable.sound, bridge lemmas, p
 
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: State Types
@@ -68,7 +68,7 @@ inductive PathState : Type
 
 /-- Fork system F: initial state a branches to self-looping b and halting c.
     Transitions: a→b, a→c, b→b. State c has no outgoing transitions. -/
-def fork : MultiwaySystem.{0, 0} where
+def fork : RootedTS.{0, 0} where
   State := ForkState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -79,7 +79,7 @@ def fork : MultiwaySystem.{0, 0} where
 
 /-- Path system P: initial state x steps to self-looping y.
     Transitions: x→y, y→y. -/
-def pathSys : MultiwaySystem.{0, 0} where
+def pathSys : RootedTS.{0, 0} where
   State := PathState
   Step := fun s t => match s, t with
     | .x, .y => Unit
@@ -255,7 +255,7 @@ theorem fork_path_not_bisimilar : ¬ Bisimilar fork pathSys := by
   rw [hfc, hgy] at hli
   -- PathEquivalent fork b c implies Path c b is nonempty (since Path b b is)
   have ⟨p⟩ : Nonempty (fork.Path .c .b) :=
-    hli.1 ForkState.b |>.mp ⟨@MultiwaySystem.Path.nil fork ForkState.b⟩
+    hli.1 ForkState.b |>.mp ⟨@RootedTS.Path.nil fork ForkState.b⟩
   -- But c has no outgoing transitions — contradiction
   exact ForkState.noConfusion (path_from_terminal (fun t step => fork_c_halting t ⟨step⟩) p)
 
@@ -267,7 +267,7 @@ theorem fork_path_not_bisimilar : ¬ Bisimilar fork pathSys := by
     Geometric sequent: ⊤ ⊢_x ∃y. step(x,y).
     This is the separating property for the First Separation:
     pathSys satisfies totality (x→y, y→y) but fork does not (c has no successor). -/
-def Total' (M : MultiwaySystem) : Prop :=
+def Total' (M : RootedTS) : Prop :=
   ∀ s : M.State, ∃ t : M.State, Nonempty (M.Step s t)
 
 /-- pathSys is total: x has successor y, y has successor y. -/
@@ -305,7 +305,7 @@ theorem pathSys_proves_sigma_tot :
 
 /-- fork's canonical model does not satisfy σ_tot (state c halts). -/
 private theorem fork_not_satisfies_sigma_tot :
-    ¬ GeometricLogic.satisfiesSequent' (MultiwaySystem.canonicalModel fork)
+    ¬ GeometricLogic.satisfiesSequent' (RootedTS.canonicalModel fork)
       GeometricLogic.sigma_tot := by
   rw [GeometricLogic.satisfiesSequent'_sigma_tot_iff]
   push_neg
@@ -341,7 +341,7 @@ theorem fork_path_topos_nonequiv :
 
 /-- **First Separation Theorem (fork/path witnesses)**
 
-    There exist multiway systems M, N such that:
+    There exist rooted transition systems M, N such that:
     1. M and N mutually simulate each other
     2. M and N are NOT relationally bisimilar
     3. Their classifying toposes are NOT equivalent
@@ -353,7 +353,7 @@ theorem fork_path_topos_nonequiv :
     Parts 1-2 are fully proved (0 axioms). Part 3 uses provability
     separation via σ_tot (1 axiom). -/
 theorem first_separation_theorem :
-    ∃ (M N : MultiwaySystem.{0, 0}),
+    ∃ (M N : RootedTS.{0, 0}),
       (Nonempty (Simulation M N) ∧ Nonempty (Simulation N M)) ∧
       ¬ RelationallyBisimilar M N ∧
       ¬ Nonempty (GeometricLogic.classifyingToposOf M ≌
@@ -363,4 +363,4 @@ theorem first_separation_theorem :
   · exact fork_path_not_relBisimilar
   · exact fork_path_topos_nonequiv
 
-end Ruliology
+end RTS

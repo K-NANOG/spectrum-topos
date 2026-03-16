@@ -48,7 +48,7 @@ universe u
 
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Fixpoint Counting Infrastructure
@@ -278,4 +278,4 @@ def vgTraceB_bridge_witness (e : NamedEquivalence) :
 ### Theorem count: 14
 -/
 
-end Ruliology
+end RTS

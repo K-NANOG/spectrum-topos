@@ -38,7 +38,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Non-Extremal Atom Predicate
@@ -318,4 +318,4 @@ theorem kernel_forward_closure
     have huniq : (Finset.univ.filter (fun t => hasEdge v t = true)).card ≤ 1 := by omega
     exact Finset.card_le_one_iff.mp huniq hσw_mem hw_mem
 
-end Ruliology
+end RTS

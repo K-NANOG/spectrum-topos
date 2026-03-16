@@ -35,7 +35,7 @@ universe u
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: Concrete Quotient Theories for singleLoop
@@ -229,4 +229,4 @@ Phase 101 will map HML (Hennessy-Milner Logic) sublanguages to quotient theories
 connecting the van Glabbeek spectrum to the quotient theory lattice via the duality.
 -/
 
-end Ruliology
+end RTS

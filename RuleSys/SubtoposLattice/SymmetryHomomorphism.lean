@@ -57,7 +57,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Formula-Level Permutation (Proved)
@@ -368,4 +368,4 @@ theorem twoCycle_homomorphism_trivial :
     Fintype.card (GraphAut ToggleState toggle_hasEdge) := by
   rw [twoCycle_kernel_card, twoCycle_graphAut_card]
 
-end Ruliology
+end RTS

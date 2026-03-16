@@ -39,7 +39,7 @@ universe u
 open GeometricLogic.Propositional
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Coframe Instance on Subtopos Order
@@ -183,4 +183,4 @@ The coframe structure on the subtopos lattice provides:
 ### Theorem count: 7
 -/
 
-end Ruliology
+end RTS

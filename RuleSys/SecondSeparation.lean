@@ -40,7 +40,7 @@ import RuleSys.GeometricLogic.Soundness
 
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: State Types
@@ -66,7 +66,7 @@ inductive TwoCycleState : Type
 /-- Hub-and-spokes system: a is the hub, b and c are spokes.
     Transitions: a→b, a→c, b→a, c→a. Initial state: a.
     This system is non-deterministic: a has two distinct successors b and c. -/
-def hubSpokes : MultiwaySystem.{0, 0} where
+def hubSpokes : RootedTS.{0, 0} where
   State := HubSpokeState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -79,7 +79,7 @@ def hubSpokes : MultiwaySystem.{0, 0} where
 /-- Two-cycle system: x and y alternate.
     Transitions: x→y, y→x. Initial state: x.
     This system is deterministic: each state has exactly one successor. -/
-def twoCycle : MultiwaySystem.{0, 0} where
+def twoCycle : RootedTS.{0, 0} where
   State := TwoCycleState
   Step := fun s t => match s, t with
     | .x, .y => Unit
@@ -190,19 +190,19 @@ def hubSpokes_step_a_c : hubSpokes.Step HubSpokeState.a HubSpokeState.c := ()
 
 /-- Path from b to a in hubSpokes (one step: b→a) -/
 def hubSpokes_path_b_a : hubSpokes.Path HubSpokeState.b HubSpokeState.a :=
-  .cons hubSpokes_step_b_a (@MultiwaySystem.Path.nil hubSpokes HubSpokeState.a)
+  .cons hubSpokes_step_b_a (@RootedTS.Path.nil hubSpokes HubSpokeState.a)
 
 /-- Path from a to b in hubSpokes (one step: a→b) -/
 def hubSpokes_path_a_b : hubSpokes.Path HubSpokeState.a HubSpokeState.b :=
-  .cons hubSpokes_step_a_b (@MultiwaySystem.Path.nil hubSpokes HubSpokeState.b)
+  .cons hubSpokes_step_a_b (@RootedTS.Path.nil hubSpokes HubSpokeState.b)
 
 /-- Path from c to a in hubSpokes (one step: c→a) -/
 def hubSpokes_path_c_a : hubSpokes.Path HubSpokeState.c HubSpokeState.a :=
-  .cons hubSpokes_step_c_a (@MultiwaySystem.Path.nil hubSpokes HubSpokeState.a)
+  .cons hubSpokes_step_c_a (@RootedTS.Path.nil hubSpokes HubSpokeState.a)
 
 /-- Path from a to c in hubSpokes (one step: a→c) -/
 def hubSpokes_path_a_c : hubSpokes.Path HubSpokeState.a HubSpokeState.c :=
-  .cons hubSpokes_step_a_c (@MultiwaySystem.Path.nil hubSpokes HubSpokeState.c)
+  .cons hubSpokes_step_a_c (@RootedTS.Path.nil hubSpokes HubSpokeState.c)
 
 /-- Path from b to c in hubSpokes (two steps: b→a→c) -/
 def hubSpokes_path_b_c : hubSpokes.Path HubSpokeState.b HubSpokeState.c :=
@@ -242,21 +242,21 @@ def hubSpokes_twoCycle_bisim : FunctionalBisimulation hubSpokes twoCycle :=
     -- leftInverse: J(I(s)) mutually reachable with s
     (fun s => match s with
       | HubSpokeState.a =>
-        ⟨⟨@MultiwaySystem.Path.nil hubSpokes HubSpokeState.a⟩,
-         ⟨@MultiwaySystem.Path.nil hubSpokes HubSpokeState.a⟩⟩
+        ⟨⟨@RootedTS.Path.nil hubSpokes HubSpokeState.a⟩,
+         ⟨@RootedTS.Path.nil hubSpokes HubSpokeState.a⟩⟩
       | HubSpokeState.b =>
-        ⟨⟨@MultiwaySystem.Path.nil hubSpokes HubSpokeState.b⟩,
-         ⟨@MultiwaySystem.Path.nil hubSpokes HubSpokeState.b⟩⟩
+        ⟨⟨@RootedTS.Path.nil hubSpokes HubSpokeState.b⟩,
+         ⟨@RootedTS.Path.nil hubSpokes HubSpokeState.b⟩⟩
       | HubSpokeState.c => -- J(I(c)) = J(y) = b, need MutuallyReachable b c
         ⟨⟨hubSpokes_path_b_c⟩, ⟨hubSpokes_path_c_b⟩⟩)
     -- rightInverse: I(J(t)) mutually reachable with t
     (fun t => match t with
       | TwoCycleState.x =>
-        ⟨⟨@MultiwaySystem.Path.nil twoCycle TwoCycleState.x⟩,
-         ⟨@MultiwaySystem.Path.nil twoCycle TwoCycleState.x⟩⟩
+        ⟨⟨@RootedTS.Path.nil twoCycle TwoCycleState.x⟩,
+         ⟨@RootedTS.Path.nil twoCycle TwoCycleState.x⟩⟩
       | TwoCycleState.y =>
-        ⟨⟨@MultiwaySystem.Path.nil twoCycle TwoCycleState.y⟩,
-         ⟨@MultiwaySystem.Path.nil twoCycle TwoCycleState.y⟩⟩)
+        ⟨⟨@RootedTS.Path.nil twoCycle TwoCycleState.y⟩,
+         ⟨@RootedTS.Path.nil twoCycle TwoCycleState.y⟩⟩)
 
 /-- hubSpokes and twoCycle are bisimilar -/
 theorem hubSpokes_twoCycle_bisimilar : Bisimilar hubSpokes twoCycle :=
@@ -279,7 +279,7 @@ theorem twoCycle_proves_sigma_det :
 
 /-- hubSpokes' canonical model does not satisfy σ_det (state a has successors b ≠ c). -/
 private theorem hubSpokes_not_satisfies_sigma_det :
-    ¬ GeometricLogic.satisfiesSequent' (MultiwaySystem.canonicalModel hubSpokes)
+    ¬ GeometricLogic.satisfiesSequent' (RootedTS.canonicalModel hubSpokes)
       GeometricLogic.sigma_det := by
   rw [GeometricLogic.satisfiesSequent'_sigma_det_iff]
   push_neg
@@ -311,7 +311,7 @@ theorem hubSpokes_twoCycle_topos_nonequiv :
 
 /-- **Second Separation Theorem**
 
-    There exist multiway systems M, N such that:
+    There exist rooted transition systems M, N such that:
     1. M and N are bisimilar (Bisimilar M N)
     2. Their classifying toposes are NOT equivalent
 
@@ -326,7 +326,7 @@ theorem hubSpokes_twoCycle_topos_nonequiv :
     - Bisimilarity is fully proved (constructive, no axioms)
     - Topos non-equivalence uses provability separation via σ_det (1 axiom) -/
 theorem second_separation_theorem :
-    ∃ (M N : MultiwaySystem.{0, 0}),
+    ∃ (M N : RootedTS.{0, 0}),
       Bisimilar M N ∧
       ¬ Nonempty (GeometricLogic.classifyingToposOf M ≌
                   GeometricLogic.classifyingToposOf N) := by
@@ -354,7 +354,7 @@ E[-] : Theory → Topos is NOT conservative on bi-interpretations.
     this is a restatement of `second_separation_theorem` making the
     bi-interpretation connection explicit. -/
 theorem biInterpretation_not_implies_topos_equiv :
-    ∃ (M N : MultiwaySystem.{0, 0}),
+    ∃ (M N : RootedTS.{0, 0}),
       -- Mutual simulation (both directions)
       (Nonempty (Simulation M N) ∧ Nonempty (Simulation N M)) ∧
       -- Functional bisimulation (≡ system bi-interpretation)
@@ -367,4 +367,4 @@ theorem biInterpretation_not_implies_topos_equiv :
   · exact hubSpokes_twoCycle_bisimilar
   · exact hubSpokes_twoCycle_topos_nonequiv
 
-end Ruliology
+end RTS

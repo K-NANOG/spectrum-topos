@@ -25,7 +25,7 @@ import RuleSys.SecondSeparation
 
 open CategoryTheory
 
-namespace Ruliology
+namespace RTS
 
 universe u v
 
@@ -36,20 +36,20 @@ universe u v
 /-- Weak confluence: every pair of successors has a common successor.
     Geometric sequent: `step(x,y) ∧ step(x,z) ⊢ ∃w. step(y,w) ∧ step(z,w)`.
     Breaks bisimulation-invariance via cyclic variable sharing. -/
-def WeakConfluence (M : MultiwaySystem.{u, v}) : Prop :=
+def WeakConfluence (M : RootedTS.{u, v}) : Prop :=
   ∀ (s t₁ t₂ : M.State), Nonempty (M.Step s t₁) → Nonempty (M.Step s t₂) →
     ∃ w : M.State, Nonempty (M.Step t₁ w) ∧ Nonempty (M.Step t₂ w)
 
 /-- Universal self-loop: every state has a self-loop.
     Geometric sequent: `⊤ ⊢_x step(x, x)`.
     Breaks bisimulation-invariance via repeated variables. -/
-def UniversalSelfLoop (M : MultiwaySystem.{u, v}) : Prop :=
+def UniversalSelfLoop (M : RootedTS.{u, v}) : Prop :=
   ∀ s : M.State, Nonempty (M.Step s s)
 
 /-- Determinism: each state has at most one successor.
     Geometric sequent: `step(x,y) ∧ step(x,z) ⊢ y=z`.
     Breaks bisimulation-invariance via consequent equality. -/
-def Deterministic (M : MultiwaySystem.{u, v}) : Prop :=
+def Deterministic (M : RootedTS.{u, v}) : Prop :=
   ∀ (s t₁ t₂ : M.State), Nonempty (M.Step s t₁) → Nonempty (M.Step s t₂) → t₁ = t₂
 
 /-!
@@ -59,7 +59,7 @@ selfLoop (one state, self-loop) ~ twoCycle (two states, no self-loops)
 -/
 
 /-- Single state with self-loop. -/
-def selfLoop : MultiwaySystem.{0, 0} where
+def selfLoop : RootedTS.{0, 0} where
   State := Unit
   Step := fun _ _ => Unit
   init := ()
@@ -160,7 +160,7 @@ inductive ConfTreeState : Type
   deriving DecidableEq
 
 /-- Diamond graph with self-loop at terminal: a→b, a→c, b→d, c→d, d→d. -/
-def diamondGraph : MultiwaySystem.{0, 0} where
+def diamondGraph : RootedTS.{0, 0} where
   State := DiamondState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -172,7 +172,7 @@ def diamondGraph : MultiwaySystem.{0, 0} where
   init := .a
 
 /-- Confluence tree with self-loops at leaves: a→b, a→c, b→dL, c→dR, dL→dL, dR→dR. -/
-def confTree : MultiwaySystem.{0, 0} where
+def confTree : RootedTS.{0, 0} where
   State := ConfTreeState
   Step := fun s t => match s, t with
     | .a, .b => Unit
@@ -311,4 +311,4 @@ theorem three_mechanism_separation :
    confluence_separation,
    selfLoop_separation⟩
 
-end Ruliology
+end RTS

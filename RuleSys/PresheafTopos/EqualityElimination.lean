@@ -29,7 +29,7 @@ import RuleSys.PresheafTopos.DepthPreservation
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -276,4 +276,4 @@ theorem tree_geo_step_confluence (G : FinLTS L) (v : G.Vertex) (d : ℕ)
     σ i = σ k ∧ a = b :=
   tree_step_unique_incoming G v d σ a b i k j h₁ h₂
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

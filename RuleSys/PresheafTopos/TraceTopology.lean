@@ -35,7 +35,7 @@ import RuleSys.PresheafTopos.SubobjectClassifier
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Pullback Sieve
@@ -198,4 +198,4 @@ theorem trace_topology_summary :
    fun _ _ _ hS hT => trace_covering_transitive hS hT,
    trace_strictly_finer_than_atomic⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

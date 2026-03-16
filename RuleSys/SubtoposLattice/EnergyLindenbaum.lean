@@ -42,7 +42,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Part 1: Energy-Indexed Lindenbaum Family
@@ -268,4 +268,4 @@ branching and refusal information are dual views of the same nondeterministic st
 ### Theorem count: 12
 -/
 
-end Ruliology
+end RTS

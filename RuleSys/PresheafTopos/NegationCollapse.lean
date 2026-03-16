@@ -47,7 +47,7 @@ set_option autoImplicit false
 
 universe u
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Subfunctor Infrastructure
@@ -213,4 +213,4 @@ theorem negation_collapse_connection {L : Type} [Fintype L] [DecidableEq L] :
    LTSSubfunctor.negation_bot_is_top,
    LTSSubfunctor.negation_top_is_bot⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

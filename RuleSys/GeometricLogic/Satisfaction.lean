@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 
 # Semantic Satisfaction of Geometric Formulas
 
-Defines semantic satisfaction of geometric formulas in `MultiwayModel`,
+Defines semantic satisfaction of geometric formulas in `RTSModel`,
 connecting the syntactic geometric logic infrastructure to concrete models.
 
 ## Main Definitions
@@ -27,33 +27,33 @@ universe u v
 
 namespace GeometricLogic
 
-/-- Evaluate a term in a MultiwayModel under a valuation for free variables
+/-- Evaluate a term in a RTSModel under a valuation for free variables
     and an assignment for bound variables.
 
-    MultiwayLanguage has:
+    RTSLanguage has:
     - One 0-ary function: `init` (mapped to m.init)
     - No higher-arity functions
     - Variables: free (Sum.inl) or bound (Sum.inr) -/
-def evalTerm (m : MultiwayModel) {α : Type*} {n : ℕ} (val : α → m.carrier)
-    (ctx : Fin n → m.carrier) : MultiwayLanguage.Term (α ⊕ Fin n) → m.carrier
+def evalTerm (m : RTSModel) {α : Type*} {n : ℕ} (val : α → m.carrier)
+    (ctx : Fin n → m.carrier) : RTSLanguage.Term (α ⊕ Fin n) → m.carrier
   | .var (Sum.inl a) => val a
   | .var (Sum.inr i) => ctx i
   | .func (l := 0) () _ => m.init
 
 /-- Interpret a binary relation symbol in the model -/
-def interpRel (m : MultiwayModel) (r : MultiwayRel) (a b : m.carrier) : Prop :=
+def interpRel (m : RTSModel) (r : MultiwayRel) (a b : m.carrier) : Prop :=
   match r with
   | .step => m.step a b
   | .reach => m.reach a b
   | .pathEquiv => m.pathEquiv a b
 
-/-- Semantic satisfaction of a geometric formula in a MultiwayModel.
+/-- Semantic satisfaction of a geometric formula in a RTSModel.
 
     Given a valuation `val` for free variables and `ctx` for bound variables,
     determines whether the formula holds in the model. -/
-def satisfiesFormula (m : MultiwayModel) {α : Type*} {n : ℕ}
+def satisfiesFormula (m : RTSModel) {α : Type*} {n : ℕ}
     (val : α → m.carrier) (ctx : Fin n → m.carrier) :
-    GeoFormula MultiwayLanguage α n → Prop
+    GeoFormula RTSLanguage α n → Prop
   | .top => True
   | .bot => False
   | .equal t₁ t₂ => evalTerm m val ctx t₁ = evalTerm m val ctx t₂
@@ -68,15 +68,15 @@ def satisfiesFormula (m : MultiwayModel) {α : Type*} {n : ℕ}
 
 /-- A model satisfies a geometric sequent if for all valuations,
     the antecedent being satisfied implies the consequent is satisfied. -/
-def satisfiesSequent' (m : MultiwayModel) {α : Type*}
-    (s : GeoSequent MultiwayLanguage α) : Prop :=
+def satisfiesSequent' (m : RTSModel) {α : Type*}
+    (s : GeoSequent RTSLanguage α) : Prop :=
   ∀ val : α → m.carrier,
     satisfiesFormula m val Fin.elim0 s.antecedent →
     satisfiesFormula m val Fin.elim0 s.consequent
 
 /-- A model satisfies a geometric theory (as a set of packaged sequents). -/
-def satisfiesTheorySeq (m : MultiwayModel) (T : GeometricTheory MultiwayLanguage) : Prop :=
-  ∀ p : PackagedSequent MultiwayLanguage, T p → satisfiesSequent' m p.2
+def satisfiesTheorySeq (m : RTSModel) (T : GeometricTheory RTSLanguage) : Prop :=
+  ∀ p : PackagedSequent RTSLanguage, T p → satisfiesSequent' m p.2
 
 /-!
 ## Formula Evaluation Lemmas
@@ -88,9 +88,9 @@ for proving `IsFunctional.identity` and `.comp` in SyntacticCategory.lean.
 
 /-- Term evaluation commutes with relabeling of free variables. -/
 @[simp]
-theorem evalTerm_relabel {m : MultiwayModel} {α β : Type*} {n : ℕ}
+theorem evalTerm_relabel {m : RTSModel} {α β : Type*} {n : ℕ}
     (val : β → m.carrier) (ctx : Fin n → m.carrier)
-    (f : α → β) (t : MultiwayLanguage.Term (α ⊕ Fin n)) :
+    (f : α → β) (t : RTSLanguage.Term (α ⊕ Fin n)) :
     evalTerm m val ctx (t.relabel (Sum.map f id)) = evalTerm m (val ∘ f) ctx t := by
   match t with
   | .var (Sum.inl _) => rfl
@@ -98,9 +98,9 @@ theorem evalTerm_relabel {m : MultiwayModel} {α β : Type*} {n : ℕ}
   | .func (l := 0) () _ => rfl
 
 /-- Formula satisfaction commutes with free variable relabeling. -/
-theorem satisfiesFormula_relabelFree {m : MultiwayModel} {α β : Type} {n : ℕ}
+theorem satisfiesFormula_relabelFree {m : RTSModel} {α β : Type} {n : ℕ}
     (val : β → m.carrier) (ctx : Fin n → m.carrier)
-    (f : α → β) (φ : GeoFormula MultiwayLanguage α n) :
+    (f : α → β) (φ : GeoFormula RTSLanguage α n) :
     satisfiesFormula m val ctx (φ.relabelFree f) ↔ satisfiesFormula m (val ∘ f) ctx φ := by
   induction φ generalizing β with
   | top => exact Iff.rfl
@@ -125,9 +125,9 @@ theorem satisfiesFormula_relabelFree {m : MultiwayModel} {α β : Type} {n : ℕ
     exact exists_congr (fun c => ih val (Fin.cons c ctx) f)
 
 /-- Satisfaction of a conjunction list ↔ all members satisfied. -/
-theorem satisfiesFormula_conjList {m : MultiwayModel} {α : Type} {n : ℕ}
+theorem satisfiesFormula_conjList {m : RTSModel} {α : Type} {n : ℕ}
     (val : α → m.carrier) (ctx : Fin n → m.carrier)
-    (φs : List (GeoFormula MultiwayLanguage α n)) :
+    (φs : List (GeoFormula RTSLanguage α n)) :
     satisfiesFormula m val ctx (GeoFormula.conjList φs) ↔
     ∀ φ ∈ φs, satisfiesFormula m val ctx φ := by
   induction φs with
@@ -147,9 +147,9 @@ theorem satisfiesFormula_conjList {m : MultiwayModel} {α : Type} {n : ℕ}
                ih.mpr (fun x hx => h x (List.Mem.tail _ hx))⟩
 
 /-- Equality conjunction gives pointwise equality of left/right context variables. -/
-theorem satisfiesFormula_equalityConjunction {m : MultiwayModel} {α : Type} [Fintype α]
+theorem satisfiesFormula_equalityConjunction {m : RTSModel} {α : Type} [Fintype α]
     (val : (α ⊕ α) → m.carrier) (ctx : Fin 0 → m.carrier) :
-    satisfiesFormula m val ctx (GeoFormula.equalityConjunction MultiwayLanguage α) ↔
+    satisfiesFormula m val ctx (GeoFormula.equalityConjunction RTSLanguage α) ↔
     ∀ a : α, val (Sum.inl a) = val (Sum.inr a) := by
   simp only [GeoFormula.equalityConjunction]
   rw [satisfiesFormula_conjList]
@@ -164,9 +164,9 @@ theorem satisfiesFormula_equalityConjunction {m : MultiwayModel} {α : Type} [Fi
     exact h a
 
 /-- Term evaluation under castLE: casting bound variables preserves evaluation. -/
-theorem evalTerm_castLE {m : MultiwayModel} {α : Type*} {n k : ℕ}
+theorem evalTerm_castLE {m : RTSModel} {α : Type*} {n k : ℕ}
     (h : n ≤ k) (val : α → m.carrier) (ctx : Fin k → m.carrier)
-    (t : MultiwayLanguage.Term (α ⊕ Fin n)) :
+    (t : RTSLanguage.Term (α ⊕ Fin n)) :
     evalTerm m val ctx (t.relabel (Sum.map id (Fin.castLE h))) =
     evalTerm m val (ctx ∘ Fin.castLE h) t := by
   match t with
@@ -175,9 +175,9 @@ theorem evalTerm_castLE {m : MultiwayModel} {α : Type*} {n k : ℕ}
   | .func (l := 0) () _ => rfl
 
 /-- Formula satisfaction under castLE: adding unused bound variable slots. -/
-theorem satisfiesFormula_castLE {m : MultiwayModel} {α : Type} {n k : ℕ}
+theorem satisfiesFormula_castLE {m : RTSModel} {α : Type} {n k : ℕ}
     (h : n ≤ k) (val : α → m.carrier) (ctx : Fin k → m.carrier)
-    (φ : GeoFormula MultiwayLanguage α n) :
+    (φ : GeoFormula RTSLanguage α n) :
     satisfiesFormula m val ctx (GeoFormula.castLE h φ) ↔
     satisfiesFormula m val (ctx ∘ Fin.castLE h) φ := by
   induction φ generalizing k with
@@ -209,9 +209,9 @@ theorem satisfiesFormula_castLE {m : MultiwayModel} {α : Type} {n k : ℕ}
       exact ⟨c, this⟩
 
 /-- Iterated existential: satisfaction ↔ existence of a full bound-variable assignment. -/
-theorem satisfiesFormula_iteratedExist {m : MultiwayModel} {α : Type} {n : ℕ}
+theorem satisfiesFormula_iteratedExist {m : RTSModel} {α : Type} {n : ℕ}
     (val : α → m.carrier) (ctx : Fin 0 → m.carrier)
-    (φ : GeoFormula MultiwayLanguage α n) :
+    (φ : GeoFormula RTSLanguage α n) :
     satisfiesFormula m val ctx (GeoFormula.iteratedExist φ) ↔
     ∃ ctx' : Fin n → m.carrier, satisfiesFormula m val ctx' φ := by
   induction n with
@@ -231,9 +231,9 @@ theorem satisfiesFormula_iteratedExist {m : MultiwayModel} {α : Type} {n : ℕ}
       exact ⟨Fin.tail ctx', ctx' 0, by rwa [Fin.cons_self_tail]⟩
 
 /-!
-## Theory of a Multiway System
+## Theory of a Rooted Transition System
 
-The geometric theory T_M is defined syntactically as `multiwayTheory ∪ systemSpecificAxioms M`.
+The geometric theory T_M is defined syntactically as `rtsTheory ∪ systemSpecificAxioms M`.
 This gives T_M genuine syntactic content: a finite axiom set from which provability
 is non-trivial. The classifying topos Sh(C_{T_M}, J_{T_M}) reflects the specific
 transition structure of M.
@@ -247,34 +247,34 @@ as `semanticTheoryOfSystem` for bridge lemmas.
     This is the set of ALL geometric sequents that hold when step/reach/pathEquiv
     are interpreted via M's structure. Useful for relating the syntactic theory
     to semantic truth via `syntactic_sub_semantic`. -/
-def semanticTheoryOfSystem (M : Ruliology.MultiwaySystem) : GeometricTheory MultiwayLanguage :=
-  fun p => satisfiesSequent' (Ruliology.MultiwaySystem.canonicalModel M) p.2
+def semanticTheoryOfSystem (M : RTS.RootedTS) : GeometricTheory RTSLanguage :=
+  fun p => satisfiesSequent' (RTS.RootedTS.canonicalModel M) p.2
 
-/-- The geometric theory associated to a multiway system M.
+/-- The geometric theory associated to a rooted transition system M.
 
-    Defined syntactically as `multiwayTheory ∪ systemSpecificAxioms M`:
-    - `multiwayTheory`: 6 structural axioms (step→reach, reflexivity,
+    Defined syntactically as `rtsTheory ∪ systemSpecificAxioms M`:
+    - `rtsTheory`: 6 structural axioms (step→reach, reflexivity,
       transitivity, pathEquiv definition/symmetry/reach)
     - `systemSpecificAxioms M`: axioms encoding M's specific transitions
 
     This gives T_M genuine syntactic content for a meaningful classifying topos.
     Completeness (semantic truth → provability) is now a non-trivial theorem
     via Barr's completeness theorem (geometric_completeness). -/
-def theoryOfSystem (M : Ruliology.MultiwaySystem) : GeometricTheory MultiwayLanguage :=
+def theoryOfSystem (M : RTS.RootedTS) : GeometricTheory RTSLanguage :=
   syntacticTheoryOfSystem M
 
 /-- The syntactic theory is a subtheory of the semantic closure.
 
-    Every axiom of `theoryOfSystem M` (= multiwayTheory ∪ systemSpecificAxioms M)
+    Every axiom of `theoryOfSystem M` (= rtsTheory ∪ systemSpecificAxioms M)
     is satisfied by M's canonical model, hence belongs to the semantic closure.
 
-    For multiwayTheory axioms, this follows from `canonicalModel_satisfies`.
+    For rtsTheory axioms, this follows from `canonicalModel_satisfies`.
     For systemSpecificAxioms, this follows from the axioms encoding actual
     transitions of M.
 
     Axiomatized: a full proof requires unfolding systemSpecificAxioms (itself
     axiomatized) and verifying each generated sequent against the canonical model. -/
-axiom syntactic_sub_semantic (M : Ruliology.MultiwaySystem) :
+axiom syntactic_sub_semantic (M : RTS.RootedTS) :
     ∀ p, theoryOfSystem M p → semanticTheoryOfSystem M p
 
 /-- Different systems have different geometric theories.

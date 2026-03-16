@@ -42,7 +42,7 @@ import RuleSys.PresheafTopos.TraceSeparation
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Reachability and Rooted Tree Infrastructure
@@ -364,4 +364,4 @@ theorem bisim_topology_summary :
    fun _ _ hS => bisim_covering_implies_trace_covering hS,
    bisim_strictly_finer_than_trace_topology⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

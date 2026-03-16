@@ -32,7 +32,7 @@ import RuleSys.PresheafTopos.FiniteDigraph
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 /-!
 ## Part 1: Path Digraph Definition
@@ -329,4 +329,4 @@ theorem path_hom_correspondence :
   ⟨fun _G _v _n p => path_implies_hom p,
    fun _G _n f => homToPath f⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

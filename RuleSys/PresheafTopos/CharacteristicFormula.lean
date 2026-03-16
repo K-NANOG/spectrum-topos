@@ -29,7 +29,7 @@ import RuleSys.PresheafTopos.EqualityElimination
 
 set_option autoImplicit false
 
-namespace Ruliology.PresheafTopos
+namespace RTS.PresheafTopos
 
 variable {L : Type} [Fintype L] [DecidableEq L]
 
@@ -501,4 +501,4 @@ theorem characteristicHML_iff (G : FinLTS L) (v : G.Vertex) (d : ℕ)
   ⟨characteristicHML_to_hom G v d H w,
    fun ⟨f, hf⟩ => hf ▸ characteristicHML_of_hom G v d H f (TreeVertex.rootPath G v d)⟩
 
-end Ruliology.PresheafTopos
+end RTS.PresheafTopos

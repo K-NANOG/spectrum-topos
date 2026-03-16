@@ -57,7 +57,7 @@ set_option autoImplicit false
 open CategoryTheory
 open GeometricLogic.Propositional
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Section 1: Hub-Spokes Spectrum Quotient Abbreviations
@@ -267,4 +267,4 @@ theorem nondeterministic_spectrum_stratifies :
       (spectrumQuotient .bisimulation twoCycleTransTheory) :=
   ⟨hubSpokes_spectrum_stratification, twoCycle_spectrum_collapse .trace .bisimulation⟩
 
-end Ruliology
+end RTS

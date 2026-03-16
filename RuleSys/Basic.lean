@@ -2,17 +2,16 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# RuleSys: Category of Multiway Systems
+# RuleSys: Category of Rooted Transition Systems
 
 This file defines:
-1. MultiwaySystem - objects of RuleSys (state type, rewrite relation, initial state)
+1. RootedTS - objects of RuleSys (state type, rewrite relation, initial state)
 2. Simulation - morphisms preserving initial state and rewrite paths
 3. Category instance for RuleSys with composition and identities
 
-This forms the foundation for constructing the Ruliad as a presheaf topos.
+This forms the foundation for constructing the classifying presheaf topos.
 
 ## References
-- Wolfram's Ruliology and the Ruliad
 - Caramello's Relative Topos Theory
 -/
 
@@ -25,12 +24,12 @@ open CategoryTheory
 
 universe u v
 
-namespace Ruliology
+namespace RTS
 
 /-!
-## Task 1 & 2: Multiway System Structure
+## Task 1 & 2: Rooted Transition System Structure
 
-A multiway system is a computational structure consisting of:
+A rooted transition system is a computational structure consisting of:
 - A type of states `State`
 - A typed rewrite relation `Step : State → State → Type*` representing computation paths
 - An initial state `init : State`
@@ -39,10 +38,10 @@ The rewrite relation is typed (not Prop-valued) to track different computational
 between the same states, capturing the multiway nature of computation.
 -/
 
-/-- A MultiwaySystem is the basic object of RuleSys.
+/-- A RootedTS is the basic object of RuleSys.
     It consists of states, typed transition/rewrite relations, and an initial state.
     The typed step relation allows multiple distinct paths between states. -/
-structure MultiwaySystem where
+structure RootedTS where
   /-- The type of states in the system -/
   State : Type u
   /-- Typed rewrite/transition relation: `Step s t` is the type of rewrites from s to t -/
@@ -50,23 +49,23 @@ structure MultiwaySystem where
   /-- The initial/starting state -/
   init : State
 
-namespace MultiwaySystem
+namespace RootedTS
 
-variable (M : MultiwaySystem.{u, v})
+variable (M : RootedTS.{u, v})
 
-/-- Rewrite paths in a multiway system: sequences of rewrites -/
+/-- Rewrite paths in a rooted transition system: sequences of rewrites -/
 inductive Path : M.State → M.State → Type (max u v)
   | nil : (s : M.State) → Path s s
   | cons : {s t u : M.State} → M.Step s t → Path t u → Path s u
 
 /-- Composition of paths -/
-def Path.comp {M : MultiwaySystem.{u, v}} {s t u : M.State} :
+def Path.comp {M : RootedTS.{u, v}} {s t u : M.State} :
     M.Path s t → M.Path t u → M.Path s u
   | .nil _, p => p
   | .cons step p₁, p₂ => .cons step (p₁.comp p₂)
 
 /-- Path composition is associative -/
-theorem Path.comp_assoc {M : MultiwaySystem.{u, v}} {s t u v : M.State}
+theorem Path.comp_assoc {M : RootedTS.{u, v}} {s t u v : M.State}
     (p₁ : M.Path s t) (p₂ : M.Path t u) (p₃ : M.Path u v) :
     (p₁.comp p₂).comp p₃ = p₁.comp (p₂.comp p₃) := by
   induction p₁ with
@@ -74,17 +73,17 @@ theorem Path.comp_assoc {M : MultiwaySystem.{u, v}} {s t u v : M.State}
   | cons step p ih => simp only [Path.comp, ih]
 
 /-- nil is left identity for path composition -/
-theorem Path.nil_comp {M : MultiwaySystem.{u, v}} {s t : M.State}
+theorem Path.nil_comp {M : RootedTS.{u, v}} {s t : M.State}
     (p : M.Path s t) : (Path.nil s).comp p = p := rfl
 
 /-- nil is right identity for path composition -/
-theorem Path.comp_nil {M : MultiwaySystem.{u, v}} {s t : M.State}
+theorem Path.comp_nil {M : RootedTS.{u, v}} {s t : M.State}
     (p : M.Path s t) : p.comp (Path.nil t) = p := by
   induction p with
   | nil _ => rfl
   | cons step p ih => simp only [Path.comp, ih]
 
-end MultiwaySystem
+end RootedTS
 
 /-!
 ## Task 3: Simulation Morphisms
@@ -97,9 +96,9 @@ A simulation from M to N is a structure-preserving map consisting of:
 This captures the notion of one computational system simulating another.
 -/
 
-/-- A Simulation is a morphism in RuleSys: a structure-preserving map between multiway systems.
+/-- A Simulation is a morphism in RuleSys: a structure-preserving map between rooted transition systems.
     It maps states to states, steps to steps (preserving endpoints), and initial to initial. -/
-structure Simulation (M N : MultiwaySystem.{u, v}) where
+structure Simulation (M N : RootedTS.{u, v}) where
   /-- The map on states -/
   stateMap : M.State → N.State
   /-- The map on steps, preserving source and target -/
@@ -109,7 +108,7 @@ structure Simulation (M N : MultiwaySystem.{u, v}) where
 
 namespace Simulation
 
-variable {M N P Q : MultiwaySystem.{u, v}}
+variable {M N P Q : RootedTS.{u, v}}
 
 /-- Simulations extend to paths: a simulation maps paths to paths -/
 def mapPath (f : Simulation M N) {s t : M.State} :
@@ -123,11 +122,11 @@ theorem mapPath_comp (f : Simulation M N) {s t u : M.State}
     f.mapPath (p₁.comp p₂) = (f.mapPath p₁).comp (f.mapPath p₂) := by
   induction p₁ with
   | nil _ => rfl
-  | cons step p ih => simp only [MultiwaySystem.Path.comp, mapPath, ih]
+  | cons step p ih => simp only [RootedTS.Path.comp, mapPath, ih]
 
 /-- mapPath preserves identity paths -/
 theorem mapPath_nil (f : Simulation M N) (s : M.State) :
-    f.mapPath (MultiwaySystem.Path.nil s) = MultiwaySystem.Path.nil (f.stateMap s) := rfl
+    f.mapPath (RootedTS.Path.nil s) = RootedTS.Path.nil (f.stateMap s) := rfl
 
 /-- Two simulations are equal if their stateMap and stepMap agree.
     This is the extensionality principle for simulations. -/
@@ -148,14 +147,14 @@ theorem ext {f g : Simulation M N}
 /-!
 ## Task 4: Category Structure
 
-We prove that MultiwaySystem with Simulation morphisms forms a category:
+We prove that RootedTS with Simulation morphisms forms a category:
 - Identity: the identity simulation on any system
 - Composition: composition of simulations
 - Associativity and unit laws
 -/
 
 /-- Identity simulation: maps everything to itself -/
-def id (M : MultiwaySystem.{u, v}) : Simulation M M where
+def id (M : RootedTS.{u, v}) : Simulation M M where
   stateMap := _root_.id
   stepMap := _root_.id
   init_preserved := rfl
@@ -210,7 +209,7 @@ simulations embed as the special case where paths map to singleton paths.
     where path maps factor through single steps.
 
     **Key property:** Reachability is preserved. If s →* t in M, then f(s) →* f(t) in N. -/
-structure ReachabilitySimulation (M N : MultiwaySystem.{u, v}) where
+structure ReachabilitySimulation (M N : RootedTS.{u, v}) where
   /-- The map on states -/
   stateMap : M.State → N.State
   /-- The reachability map: paths map to paths -/
@@ -223,7 +222,7 @@ structure ReachabilitySimulation (M N : MultiwaySystem.{u, v}) where
 
 namespace ReachabilitySimulation
 
-variable {M N P : MultiwaySystem.{u, v}}
+variable {M N P : RootedTS.{u, v}}
 
 /-- Every step-preserving Simulation embeds as a ReachabilitySimulation.
     Single steps become singleton paths. -/
@@ -244,7 +243,7 @@ def comp (g : ReachabilitySimulation N P) (f : ReachabilitySimulation M N) :
     simp only [f.reachMap_comp, g.reachMap_comp]
 
 /-- Identity reachability simulation -/
-def id (M : MultiwaySystem.{u, v}) : ReachabilitySimulation M M where
+def id (M : RootedTS.{u, v}) : ReachabilitySimulation M M where
   stateMap := _root_.id
   reachMap := _root_.id
   init_preserved := rfl
@@ -253,7 +252,7 @@ def id (M : MultiwaySystem.{u, v}) : ReachabilitySimulation M M where
 end ReachabilitySimulation
 
 /-- Lift a step-to-path map to a path-to-path map -/
-private def liftStepToPath {M N : MultiwaySystem.{u, v}}
+private def liftStepToPath {M N : RootedTS.{u, v}}
     {f : M.State → N.State}
     (stepToPath : {s t : M.State} → M.Step s t → N.Path (f s) (f t))
     {s t : M.State} : M.Path s t → N.Path (f s) (f t)
@@ -261,21 +260,21 @@ private def liftStepToPath {M N : MultiwaySystem.{u, v}}
   | .cons step rest => (stepToPath step).comp (liftStepToPath stepToPath rest)
 
 /-- The lifted step-to-path map preserves path composition -/
-private theorem liftStepToPath_comp {M N : MultiwaySystem.{u, v}}
+private theorem liftStepToPath_comp {M N : RootedTS.{u, v}}
     {f : M.State → N.State}
     (stepToPath : {s t : M.State} → M.Step s t → N.Path (f s) (f t))
     {s t u : M.State} (p₁ : M.Path s t) (p₂ : M.Path t u) :
     liftStepToPath stepToPath (p₁.comp p₂) =
       (liftStepToPath stepToPath p₁).comp (liftStepToPath stepToPath p₂) := by
   induction p₁ with
-  | nil _ => simp [liftStepToPath, MultiwaySystem.Path.nil_comp]
+  | nil _ => simp [liftStepToPath, RootedTS.Path.nil_comp]
   | cons step p ih =>
-    simp only [MultiwaySystem.Path.comp, liftStepToPath]
-    rw [ih, MultiwaySystem.Path.comp_assoc]
+    simp only [RootedTS.Path.comp, liftStepToPath]
+    rw [ih, RootedTS.Path.comp_assoc]
 
 namespace ReachabilitySimulation
 
-variable {M N P : MultiwaySystem.{u, v}}
+variable {M N P : RootedTS.{u, v}}
 
 /-- Construct a ReachabilitySimulation from a step-to-path map.
 
@@ -298,13 +297,13 @@ end ReachabilitySimulation
 /-!
 ## Category Instance
 
-We now package everything into a Category instance for MultiwaySystem,
+We now package everything into a Category instance for RootedTS,
 making it usable with mathlib's category theory library.
 -/
 
-/-- RuleSys: The category of multiway systems and simulations.
-    This is the foundational category for constructing the Ruliad. -/
-instance : Category MultiwaySystem.{u, v} where
+/-- RuleSys: The category of rooted transition systems and simulations.
+    This is the foundational category for constructing the classifying presheaf topos. -/
+instance : Category RootedTS.{u, v} where
   Hom := Simulation
   id := Simulation.id
   comp := fun f g => g ≫ₛ f  -- Note: mathlib uses f ≫ g = g ∘ f convention
@@ -312,12 +311,12 @@ instance : Category MultiwaySystem.{u, v} where
   comp_id := fun f => Simulation.id_comp f
   assoc := fun f g h => (Simulation.comp_assoc h g f).symm
 
-/-- RuleSys is the category of multiway systems -/
-abbrev RuleSys := MultiwaySystem.{u, v}
+/-- RuleSys: the category of rooted transition systems (rooted transition systems) -/
+abbrev RuleSys := RootedTS.{u, v}
 
 namespace RuleSys
 
-/-- The objects of RuleSys are multiway systems -/
+/-- The objects of RuleSys are rooted transition systems -/
 example : Type (u + 1) := RuleSys.{u, 0}
 
 /-- Morphisms in RuleSys are simulations -/
@@ -334,17 +333,17 @@ end RuleSys
 /-!
 ## Examples
 
-Some basic examples of multiway systems to demonstrate the definitions.
+Some basic examples of rooted transition systems to demonstrate the definitions.
 -/
 
-/-- The trivial multiway system with one state and no non-identity steps -/
-def trivialSystem : MultiwaySystem where
+/-- The trivial rooted transition system with one state and no non-identity steps -/
+def trivialSystem : RootedTS where
   State := Unit
   Step := fun _ _ => Empty
   init := ()
 
 /-- A simple binary counter system -/
-def binaryCounter : MultiwaySystem where
+def binaryCounter : RootedTS where
   State := Nat
   Step := fun n m => PLift (m = n + 1)  -- Can only increment
   init := 0
@@ -353,7 +352,7 @@ def binaryCounter : MultiwaySystem where
 example : trivialSystem ⟶ trivialSystem := 𝟙 trivialSystem
 
 /-- Simulation from trivial to any system (maps to initial state) -/
-def fromTrivial (M : MultiwaySystem.{0, 0}) : Simulation trivialSystem M :=
+def fromTrivial (M : RootedTS.{0, 0}) : Simulation trivialSystem M :=
   { stateMap := fun _ => M.init
     stepMap := fun e => e.elim
     init_preserved := rfl }
@@ -361,18 +360,18 @@ def fromTrivial (M : MultiwaySystem.{0, 0}) : Simulation trivialSystem M :=
 /-!
 ## Halting and Reachability
 
-Basic definitions for halting states and reachable halting in multiway systems.
+Basic definitions for halting states and reachable halting in rooted transition systems.
 These are placed here (rather than in Irreducibility) so that TuringMachine.lean
 can use them without circular imports.
 -/
 
-/-- A halting state in a multiway system: a state with no outgoing steps -/
-def isHalting (M : MultiwaySystem.{u, v}) (s : M.State) : Prop :=
+/-- A halting state in a rooted transition system: a state with no outgoing steps -/
+def isHalting (M : RootedTS.{u, v}) (s : M.State) : Prop :=
   ∀ t : M.State, IsEmpty (M.Step s t)
 
-/-- A multiway system reaches a halting configuration: there exists a reachable
+/-- A rooted transition system reaches a halting configuration: there exists a reachable
     state from init that has no outgoing transitions. -/
-def ReachesHalt (M : MultiwaySystem.{0, 0}) : Prop :=
+def ReachesHalt (M : RootedTS.{0, 0}) : Prop :=
   ∃ (s : M.State), (∃ _ : M.Path M.init s, True) ∧ isHalting M s
 
-end Ruliology
+end RTS

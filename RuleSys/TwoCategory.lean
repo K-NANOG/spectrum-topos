@@ -2,17 +2,17 @@
 Copyright (c) 2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 
-# 2-Equivalence: Observer Contexts ≃ Subtoposes of Ruliad
+# 2-Equivalence: Observer Contexts ≃ Subtoposes of RTSTopos
 
 This file defines:
 1. The 2-category ObsCtxt of observer contexts
-2. The 2-category SubTop(Ruliad) of subtoposes
+2. The 2-category SubTop(RTSTopos) of subtoposes
 3. The 2-equivalence between them
 
 ## Mathematical Content
 
-The main theorem states that observer contexts (ways of coarse-graining the Ruliad)
-correspond precisely to subtoposes of the Ruliad.
+The main theorem states that observer contexts (ways of coarse-graining the RTSTopos)
+correspond precisely to subtoposes of the RTSTopos.
 
 ## References
 - Caramello, "Theories, Sites, Toposes", Ch. 4
@@ -27,7 +27,7 @@ open CategoryTheory
 
 universe u v
 
-namespace Ruliology
+namespace RTS
 
 /-!
 ## Task 11: 2-Category of Observer Contexts
@@ -40,7 +40,7 @@ We define ObsCtxt as a category where:
 /-- A refinement from observer O₁ to O₂ witnesses that O₂ is finer than O₁ -/
 structure Refinement (O₁ O₂ : ObserverData.{u, v}) : Type (max u v) where
   /-- O₂ refines O₁: O₁-equivalence implies O₂-equivalence -/
-  refines : ∀ (M : MultiwaySystem.{u, v}) (s t : M.State),
+  refines : ∀ (M : RootedTS.{u, v}) (s t : M.State),
     O₁.stateEq M s t → O₂.stateEq M s t
 
 namespace Refinement
@@ -83,13 +83,13 @@ abbrev ObsCtxt := ObserverData.{u, v}
 /-!
 ## Task 12: 2-Category of Subtoposes
 
-A subtopos of Ruliad is given by a Grothendieck topology J on RuleSys.
+A subtopos of RTSTopos is given by a Grothendieck topology J on RuleSys.
 -/
 
-/-- A subtopos of Ruliad is determined by a Grothendieck topology -/
+/-- A subtopos of RTSTopos is determined by a Grothendieck topology -/
 structure Subtopos : Type (max (u + 1) (v + 1)) where
   /-- The Grothendieck topology -/
-  topology : GrothendieckTopology (MultiwaySystem.{u, v})
+  topology : GrothendieckTopology (RootedTS.{u, v})
 
 namespace Subtopos
 
@@ -101,8 +101,8 @@ def sheafCat (S : Subtopos.{u, v}) : Type (max (u + 1) (v + 1)) :=
 instance instCategorySheafCat (S : Subtopos.{u, v}) : Category S.sheafCat :=
   inferInstanceAs (Category (Sheaf S.topology (Type (max u v))))
 
-/-- The embedding into Ruliad -/
-def embedding (S : Subtopos.{u, v}) : S.sheafCat ⥤ Ruliad.{u, v} :=
+/-- The embedding into RTSTopos -/
+def embedding (S : Subtopos.{u, v}) : S.sheafCat ⥤ RTSTopos.{u, v} :=
   sheafToPresheaf S.topology (Type (max u v))
 
 /-- The embedding is fully faithful -/
@@ -141,7 +141,7 @@ theorem comp_id (f : SubtoposMorphism S₁ S₂) : f.comp (SubtoposMorphism.id S
 
 end SubtoposMorphism
 
-/-- The category of subtoposes of Ruliad -/
+/-- The category of subtoposes of RTSTopos -/
 instance instCategorySubtopos : Category (Subtopos.{u, v}) where
   Hom := SubtoposMorphism
   id := SubtoposMorphism.id
@@ -219,13 +219,13 @@ theorem obsCtxt_subTop_equivalence :
 /-!
 ## Computational Interpretation
 
-The equivalence ObsCtxt ≃ SubTop(Ruliad) says:
-- Every way of observing (coarse-graining) the Ruliad corresponds to a subtopos
+The equivalence ObsCtxt ≃ SubTop(RTSTopos) says:
+- Every way of observing (coarse-graining) the RTSTopos corresponds to a subtopos
 - Every subtopos arises from some observer
 - Different observers with the same "granularity" give the same subtopos
 
 This is the categorical formulation of observer-dependent physics:
-the laws you see depend on how you sample the Ruliad.
+the laws you see depend on how you sample the RTSTopos.
 -/
 
 /-- The subtopos associated to an observer -/
@@ -239,4 +239,4 @@ theorem finer_larger_subtopos {O₁ O₂ : ObserverData.{u, v}} (r : O₁ ⟶ O�
     obsCtxtToSubTop.map r
   exact h.le
 
-end Ruliology
+end RTS
