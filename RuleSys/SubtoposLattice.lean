@@ -47,6 +47,14 @@ import RuleSys.SubtoposLattice.PartialEnabledness
 import RuleSys.SubtoposLattice.CoframeStructure
 import RuleSys.SubtoposLattice.SpectrumNonSublattice
 import RuleSys.SubtoposLattice.LatticeClosureComputation
+-- Birkhoff representation of L₃₀ and its bi-Heyting structure: the Heyting
+-- implication S → F = IF, the pseudocomplements and the co-Heyting
+-- subtractions. Previously absent from this aggregator, so `import RuleSys`
+-- did not expose the paper's L₃₀ results.
+import RuleSys.SubtoposLattice.BirkhoffRepresentation
+import RuleSys.SubtoposLattice.BirkhoffDownsets
+import RuleSys.SubtoposLattice.HeytingComputation
+import RuleSys.SubtoposLattice.HubSpokesComputable
 import RuleSys.SubtoposLattice.ColimitFrame
 import RuleSys.SubtoposLattice.UnnamedSubtoposes
 import RuleSys.SubtoposLattice.JNWComparison

@@ -12,4 +12,4 @@ require mathlib from git
 
 @[default_target]
 lean_lib «RuleSys» where
-  globs := #[.submodules `RuleSys]
+  globs := #[.andSubmodules `RuleSys]

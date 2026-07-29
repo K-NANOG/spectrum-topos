@@ -41,6 +41,13 @@ import RuleSys.SubtoposLattice.LatticeClosureComputation
 
 set_option autoImplicit false
 
+-- Kernel-checked `decide` replaces `native_decide` throughout this file, so that
+-- throughout this file, so that downstream results carry only the standard axioms
+-- (`propext`, `Classical.choice`, `Quot.sound`) rather than `Lean.ofReduceBool` /
+-- `Lean.trustCompiler`. The 900-pair round-trip lemmas need a raised recursion limit.
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
+
 universe u
 
 namespace RTS
@@ -151,14 +158,14 @@ def allElements : List SpectrumElement :=
    .if_join_simRv, .if_join_simR, .rt_meet_simPf, .if_join_pfRt,
    .sim_meet_ifJoinRt]
 
-private theorem allElements_nodup : allElements.Nodup := by native_decide
+private theorem allElements_nodup : allElements.Nodup := by decide
 
 instance : Fintype SpectrumElement where
   elems := ⟨allElements, allElements_nodup⟩
-  complete := fun x => by cases x <;> native_decide
+  complete := fun x => by cases x <;> decide
 
 /-- L₃₀ has exactly 30 elements. -/
-theorem card : Fintype.card SpectrumElement = 30 := by native_decide
+theorem card : Fintype.card SpectrumElement = 30 := by decide
 
 /-!
 ## Part 4: Injectivity
@@ -245,12 +252,12 @@ def join (a b : SpectrumElement) : SpectrumElement :=
 /-- The meet operation produces the correct energy budget (all 900 pairs). -/
 theorem meet_toEnergyBudget : ∀ (a b : SpectrumElement),
     (meet a b).toEnergyBudget = EnergyBudget.meet a.toEnergyBudget b.toEnergyBudget := by
-  native_decide
+  decide
 
 /-- The join operation produces the correct energy budget (all 900 pairs). -/
 theorem join_toEnergyBudget : ∀ (a b : SpectrumElement),
     (join a b).toEnergyBudget = EnergyBudget.join a.toEnergyBudget b.toEnergyBudget := by
-  native_decide
+  decide
 
 /-!
 ## Part 8: Lattice Instance
@@ -376,14 +383,14 @@ def coveringRelations : List (SpectrumElement × SpectrumElement) :=
 
 /-- All pairs in coveringRelations are genuine covering relations. -/
 theorem coveringRelations_correct :
-    ∀ p ∈ coveringRelations, covers p.1 p.2 := by native_decide
+    ∀ p ∈ coveringRelations, covers p.1 p.2 := by decide
 
 /-- All covering relations are listed in coveringRelations. -/
 theorem coveringRelations_complete :
-    ∀ a b : SpectrumElement, covers a b → (a, b) ∈ coveringRelations := by native_decide
+    ∀ a b : SpectrumElement, covers a b → (a, b) ∈ coveringRelations := by decide
 
 /-- The Hasse diagram has exactly 54 covering relations. -/
-theorem coveringRelations_length : coveringRelations.length = 54 := by native_decide
+theorem coveringRelations_length : coveringRelations.length = 54 := by decide
 
 /-!
 ## Part 10: Join-Irreducibles and Meet-Irreducibles
@@ -423,28 +430,28 @@ def meetIrreducibles : List SpectrumElement :=
 
 /-- All listed join-irreducibles are indeed join-irreducible. -/
 theorem joinIrreducibles_correct :
-    ∀ x ∈ joinIrreducibles, isJoinIrreducible x := by native_decide
+    ∀ x ∈ joinIrreducibles, isJoinIrreducible x := by decide
 
 /-- All join-irreducible elements are in the list. -/
 theorem joinIrreducibles_complete :
-    ∀ x : SpectrumElement, isJoinIrreducible x → x ∈ joinIrreducibles := by native_decide
+    ∀ x : SpectrumElement, isJoinIrreducible x → x ∈ joinIrreducibles := by decide
 
 /-- All listed meet-irreducibles are indeed meet-irreducible. -/
 theorem meetIrreducibles_correct :
-    ∀ x ∈ meetIrreducibles, isMeetIrreducible x := by native_decide
+    ∀ x ∈ meetIrreducibles, isMeetIrreducible x := by decide
 
 /-- All meet-irreducible elements are in the list. -/
 theorem meetIrreducibles_complete :
-    ∀ x : SpectrumElement, isMeetIrreducible x → x ∈ meetIrreducibles := by native_decide
+    ∀ x : SpectrumElement, isMeetIrreducible x → x ∈ meetIrreducibles := by decide
 
 /-- |J(L₃₀)| = 10 -/
-theorem card_joinIrreducibles : joinIrreducibles.length = 10 := by native_decide
+theorem card_joinIrreducibles : joinIrreducibles.length = 10 := by decide
 
 /-- |M(L₃₀)| = 10 -/
-theorem card_meetIrreducibles : meetIrreducibles.length = 10 := by native_decide
+theorem card_meetIrreducibles : meetIrreducibles.length = 10 := by decide
 
 /-- |J(L₃₀)| = |M(L₃₀)| = 10 — Birkhoff duality check. -/
-theorem card_J_eq_M : joinIrreducibles.length = meetIrreducibles.length := by native_decide
+theorem card_J_eq_M : joinIrreducibles.length = meetIrreducibles.length := by decide
 
 end SpectrumElement
 

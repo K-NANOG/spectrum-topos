@@ -40,6 +40,8 @@ Derived operations:
 import RuleSys.SubtoposLattice.BirkhoffDownsets
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -67,11 +69,11 @@ def birkhoffHimp (x y : SpectrumElement) : SpectrumElement :=
 
 /-- The Heyting implication satisfies the left adjunction: (x → y) ∧ x ≤ y. -/
 theorem birkhoffHimp_property :
-    ∀ x y : SpectrumElement, birkhoffHimp x y ⊓ x ≤ y := by native_decide
+    ∀ x y : SpectrumElement, birkhoffHimp x y ⊓ x ≤ y := by decide
 
 /-- The Heyting implication is the LARGEST z with z ∧ x ≤ y. -/
 theorem birkhoffHimp_largest :
-    ∀ x y z : SpectrumElement, z ⊓ x ≤ y → z ≤ birkhoffHimp x y := by native_decide
+    ∀ x y z : SpectrumElement, z ⊓ x ≤ y → z ≤ birkhoffHimp x y := by decide
 
 /-!
 ## Part 2: Derived Operations
@@ -99,23 +101,23 @@ def doubleNeg (x : SpectrumElement) : SpectrumElement := pseudocomplement (pseud
 
 /-- The pseudocomplement is disjoint from x: ¬x ∧ x = ⊥. -/
 theorem pseudocomplement_property :
-    ∀ x : SpectrumElement, pseudocomplement x ⊓ x = ⊥ := by native_decide
+    ∀ x : SpectrumElement, pseudocomplement x ⊓ x = ⊥ := by decide
 
 /-- The co-Heyting negation covers x: ~x ∨ x = ⊤. -/
 theorem coHeytingNeg_property :
-    ∀ x : SpectrumElement, coHeytingNeg x ⊔ x = ⊤ := by native_decide
+    ∀ x : SpectrumElement, coHeytingNeg x ⊔ x = ⊤ := by decide
 
 /-- The Heyting boundary is below x. -/
 theorem heytingBoundary_le :
-    ∀ x : SpectrumElement, heytingBoundary x ≤ x := by native_decide
+    ∀ x : SpectrumElement, heytingBoundary x ≤ x := by decide
 
 /-- Double negation is inflationary: x ≤ ¬¬x. -/
 theorem doubleNeg_ge :
-    ∀ x : SpectrumElement, x ≤ doubleNeg x := by native_decide
+    ∀ x : SpectrumElement, x ≤ doubleNeg x := by decide
 
 /-- Double negation is idempotent: ¬¬(¬¬x) = ¬¬x. -/
 theorem doubleNeg_idempotent :
-    ∀ x : SpectrumElement, doubleNeg (doubleNeg x) = doubleNeg x := by native_decide
+    ∀ x : SpectrumElement, doubleNeg (doubleNeg x) = doubleNeg x := by decide
 
 /-!
 ## Part 3: Pseudocomplement Catalog
@@ -132,60 +134,60 @@ But traces ≤ ¬x would also require traces ≤ ¬x, and traces ≤ x, contradi
 
 /-- ¬⊥ = ⊤: the pseudocomplement of bottom is top. -/
 theorem pseudocomplement_enabledness :
-    pseudocomplement .enabledness = .bisimulation := by native_decide
+    pseudocomplement .enabledness = .bisimulation := by decide
 
 /-- ¬T = ⊥: traces already covers all join-irreducibles via connectivity. -/
 theorem pseudocomplement_traces :
-    pseudocomplement .traces = .enabledness := by native_decide
+    pseudocomplement .traces = .enabledness := by decide
 
 /-- ¬F = ⊥. -/
 theorem pseudocomplement_failures :
-    pseudocomplement .failures = .enabledness := by native_decide
+    pseudocomplement .failures = .enabledness := by decide
 
 /-- ¬RV = ⊥. -/
 theorem pseudocomplement_revivals :
-    pseudocomplement .revivals = .enabledness := by native_decide
+    pseudocomplement .revivals = .enabledness := by decide
 
 /-- ¬R = ⊥. -/
 theorem pseudocomplement_readiness :
-    pseudocomplement .readiness = .enabledness := by native_decide
+    pseudocomplement .readiness = .enabledness := by decide
 
 /-- ¬IF = ⊥. -/
 theorem pseudocomplement_impossibleFutures :
-    pseudocomplement .impossibleFutures = .enabledness := by native_decide
+    pseudocomplement .impossibleFutures = .enabledness := by decide
 
 /-- ¬S = ⊥. -/
 theorem pseudocomplement_simulation :
-    pseudocomplement .simulation = .enabledness := by native_decide
+    pseudocomplement .simulation = .enabledness := by decide
 
 /-- ¬FT = ⊥. -/
 theorem pseudocomplement_failureTraces :
-    pseudocomplement .failureTraces = .enabledness := by native_decide
+    pseudocomplement .failureTraces = .enabledness := by decide
 
 /-- ¬PF = ⊥. -/
 theorem pseudocomplement_possibleFutures :
-    pseudocomplement .possibleFutures = .enabledness := by native_decide
+    pseudocomplement .possibleFutures = .enabledness := by decide
 
 /-- ¬RT = ⊥. -/
 theorem pseudocomplement_readyTraces :
-    pseudocomplement .readyTraces = .enabledness := by native_decide
+    pseudocomplement .readyTraces = .enabledness := by decide
 
 /-- ¬RS = ⊥. -/
 theorem pseudocomplement_readySimulation :
-    pseudocomplement .readySimulation = .enabledness := by native_decide
+    pseudocomplement .readySimulation = .enabledness := by decide
 
 /-- ¬2S = ⊥. -/
 theorem pseudocomplement_twoNestedSim :
-    pseudocomplement .twoNestedSim = .enabledness := by native_decide
+    pseudocomplement .twoNestedSim = .enabledness := by decide
 
 /-- ¬⊤ = ⊥: the pseudocomplement of top is bottom. -/
 theorem pseudocomplement_bisimulation :
-    pseudocomplement .bisimulation = .enabledness := by native_decide
+    pseudocomplement .bisimulation = .enabledness := by decide
 
 /-- Summary: every non-⊥ element has trivial pseudocomplement.
 This is a direct consequence of J being connected. -/
 theorem pseudocomplement_trivial :
-    ∀ x : SpectrumElement, x ≠ ⊥ → pseudocomplement x = ⊥ := by native_decide
+    ∀ x : SpectrumElement, x ≠ ⊥ → pseudocomplement x = ⊥ := by decide
 
 /-!
 ## Part 4: Co-Heyting Negation Catalog
@@ -197,60 +199,60 @@ for all non-⊤ elements. The meet-irreducible structure is also connected
 
 /-- ~⊥ = ⊤: the co-Heyting negation of bottom is top. -/
 theorem coHeytingNeg_enabledness :
-    coHeytingNeg .enabledness = .bisimulation := by native_decide
+    coHeytingNeg .enabledness = .bisimulation := by decide
 
 /-- ~T = ⊤. -/
 theorem coHeytingNeg_traces :
-    coHeytingNeg .traces = .bisimulation := by native_decide
+    coHeytingNeg .traces = .bisimulation := by decide
 
 /-- ~F = ⊤. -/
 theorem coHeytingNeg_failures :
-    coHeytingNeg .failures = .bisimulation := by native_decide
+    coHeytingNeg .failures = .bisimulation := by decide
 
 /-- ~RV = ⊤. -/
 theorem coHeytingNeg_revivals :
-    coHeytingNeg .revivals = .bisimulation := by native_decide
+    coHeytingNeg .revivals = .bisimulation := by decide
 
 /-- ~R = ⊤. -/
 theorem coHeytingNeg_readiness :
-    coHeytingNeg .readiness = .bisimulation := by native_decide
+    coHeytingNeg .readiness = .bisimulation := by decide
 
 /-- ~IF = ⊤. -/
 theorem coHeytingNeg_impossibleFutures :
-    coHeytingNeg .impossibleFutures = .bisimulation := by native_decide
+    coHeytingNeg .impossibleFutures = .bisimulation := by decide
 
 /-- ~S = ⊤. -/
 theorem coHeytingNeg_simulation :
-    coHeytingNeg .simulation = .bisimulation := by native_decide
+    coHeytingNeg .simulation = .bisimulation := by decide
 
 /-- ~FT = ⊤. -/
 theorem coHeytingNeg_failureTraces :
-    coHeytingNeg .failureTraces = .bisimulation := by native_decide
+    coHeytingNeg .failureTraces = .bisimulation := by decide
 
 /-- ~PF = ⊤. -/
 theorem coHeytingNeg_possibleFutures :
-    coHeytingNeg .possibleFutures = .bisimulation := by native_decide
+    coHeytingNeg .possibleFutures = .bisimulation := by decide
 
 /-- ~RT = ⊤. -/
 theorem coHeytingNeg_readyTraces :
-    coHeytingNeg .readyTraces = .bisimulation := by native_decide
+    coHeytingNeg .readyTraces = .bisimulation := by decide
 
 /-- ~RS = ⊤. -/
 theorem coHeytingNeg_readySimulation :
-    coHeytingNeg .readySimulation = .bisimulation := by native_decide
+    coHeytingNeg .readySimulation = .bisimulation := by decide
 
 /-- ~2S = ⊤. -/
 theorem coHeytingNeg_twoNestedSim :
-    coHeytingNeg .twoNestedSim = .bisimulation := by native_decide
+    coHeytingNeg .twoNestedSim = .bisimulation := by decide
 
 /-- ~⊤ = ⊥: the co-Heyting negation of top is bottom. -/
 theorem coHeytingNeg_bisimulation :
-    coHeytingNeg .bisimulation = .enabledness := by native_decide
+    coHeytingNeg .bisimulation = .enabledness := by decide
 
 /-- Summary: every non-⊤ element has maximal co-Heyting negation.
 This is the dual of pseudocomplement_trivial. -/
 theorem coHeytingNeg_trivial :
-    ∀ x : SpectrumElement, x ≠ ⊤ → coHeytingNeg x = ⊤ := by native_decide
+    ∀ x : SpectrumElement, x ≠ ⊤ → coHeytingNeg x = ⊤ := by decide
 
 /-!
 ## Part 5: Heyting Boundary Catalog
@@ -264,7 +266,7 @@ completely that the boundary operator carries no information.
 
 /-- All Heyting boundaries are trivial. -/
 theorem heytingBoundary_trivial :
-    ∀ x : SpectrumElement, heytingBoundary x = ⊥ := by native_decide
+    ∀ x : SpectrumElement, heytingBoundary x = ⊥ := by decide
 
 /-- Elements with nontrivial Heyting boundary. -/
 def nontrivialBoundaryElements : List SpectrumElement :=
@@ -273,7 +275,7 @@ def nontrivialBoundaryElements : List SpectrumElement :=
 /-- There are 0 elements with nontrivial Heyting boundary.
 Since ¬x = ⊥ for all x ≠ ⊥, every boundary x ∧ ¬x = x ∧ ⊥ = ⊥. -/
 theorem nontrivialBoundaryElements_count :
-    nontrivialBoundaryElements.length = 0 := by native_decide
+    nontrivialBoundaryElements.length = 0 := by decide
 
 /-!
 ## Part 6: Double Negation and Boolean Core
@@ -291,25 +293,25 @@ def regularElements : List SpectrumElement :=
 
 /-- There are exactly 2 regular elements. -/
 theorem regularElements_count :
-    regularElements.length = 2 := by native_decide
+    regularElements.length = 2 := by decide
 
 /-- The regular elements are exactly ⊥ and ⊤. -/
 theorem regularElements_eq :
-    regularElements = [.enabledness, .bisimulation] := by native_decide
+    regularElements = [.enabledness, .bisimulation] := by decide
 
 /-- Every regular element is complemented. -/
 theorem regularElements_are_complemented :
-    ∀ x : SpectrumElement, doubleNeg x = x → isComplemented x := by native_decide
+    ∀ x : SpectrumElement, doubleNeg x = x → isComplemented x := by decide
 
 /-- Double negation always produces a regular element. -/
 theorem doubleNeg_maps_to_regular :
-    ∀ x : SpectrumElement, doubleNeg x ∈ regularElements := by native_decide
+    ∀ x : SpectrumElement, doubleNeg x ∈ regularElements := by decide
 
 /-- The double negation closure maps non-⊥ elements to ⊤.
 This is the extreme case: the Boolean reflection L → L_¬¬ collapses
 28 of 30 elements to ⊤. -/
 theorem doubleNeg_collapses :
-    ∀ x : SpectrumElement, x ≠ ⊥ → doubleNeg x = ⊤ := by native_decide
+    ∀ x : SpectrumElement, x ≠ ⊥ → doubleNeg x = ⊤ := by decide
 
 /-!
 ## Part 7: Key Named Heyting Implications
@@ -322,45 +324,45 @@ captures relative "information content" between specific elements.
 Since S is not below F (they are incomparable), but F → S captures the
 largest z with z ∧ F ≤ S. That largest z is S itself. -/
 theorem himp_failures_simulation :
-    birkhoffHimp .failures .simulation = .simulation := by native_decide
+    birkhoffHimp .failures .simulation = .simulation := by decide
 
 /-- T → F = ⊤: traces implies failures is the whole lattice.
 Since T ≤ F (traces is below failures in the spectrum), we have
 x ∧ T ≤ T ≤ F for all x, so every element satisfies the condition. -/
 theorem himp_traces_failures :
-    birkhoffHimp .traces .failures = .bisimulation := by native_decide
+    birkhoffHimp .traces .failures = .bisimulation := by decide
 
 /-- RS → S = S: ready simulation implies simulation gives S.
 S ≤ RS, so the implication RS → S captures the elements z with z ∧ RS ≤ S.
 The largest such z is S itself. -/
 theorem himp_readySimulation_simulation :
-    birkhoffHimp .readySimulation .simulation = .simulation := by native_decide
+    birkhoffHimp .readySimulation .simulation = .simulation := by decide
 
 /-- PF → IF = IF: possible futures implies impossible futures gives IF.
 Since IF ≤ PF, we have z ∧ PF ≤ IF iff z ≤ (PF → IF). The largest such z
 is IF itself (since IF ∧ PF = IF ≤ IF). -/
 theorem himp_possibleFutures_impossibleFutures :
-    birkhoffHimp .possibleFutures .impossibleFutures = .impossibleFutures := by native_decide
+    birkhoffHimp .possibleFutures .impossibleFutures = .impossibleFutures := by decide
 
 /-- S → B = ⊤: simulation implies bisimulation is the whole lattice.
 Since S ≤ B, every z satisfies z ∧ S ≤ S ≤ B. -/
 theorem himp_simulation_bisimulation :
-    birkhoffHimp .simulation .bisimulation = .bisimulation := by native_decide
+    birkhoffHimp .simulation .bisimulation = .bisimulation := by decide
 
 /-- T → S = ⊤: traces implies simulation is the whole lattice.
 Since T ≤ S, every z satisfies z ∧ T ≤ T ≤ S. -/
 theorem himp_traces_simulation :
-    birkhoffHimp .traces .simulation = .bisimulation := by native_decide
+    birkhoffHimp .traces .simulation = .bisimulation := by decide
 
 /-- Heyting implication of comparable elements: if x ≤ y then x → y = ⊤.
 This is the deduction theorem: if x already implies y in the lattice order,
 then x → y is trivially true (⊤). -/
 theorem birkhoffHimp_of_le :
-    ∀ x y : SpectrumElement, x ≤ y → birkhoffHimp x y = ⊤ := by native_decide
+    ∀ x y : SpectrumElement, x ≤ y → birkhoffHimp x y = ⊤ := by decide
 
 /-- Heyting self-implication: x → x = ⊤ for all x. -/
 theorem birkhoffHimp_self :
-    ∀ x : SpectrumElement, birkhoffHimp x x = ⊤ := by native_decide
+    ∀ x : SpectrumElement, birkhoffHimp x x = ⊤ := by decide
 
 /-!
 ## Part 8: Structural Assessment
@@ -388,13 +390,13 @@ Combined with J connected (1 component), this confirms the spectrum lattice
 has the minimum possible number of complemented elements for any non-trivial
 distributive lattice. -/
 theorem boolean_core_minimal :
-    regularElements.length = complementedElements.length := by native_decide
+    regularElements.length = complementedElements.length := by decide
 
 /-- Regular elements coincide with complemented elements.
 In a finite distributive lattice, x is regular (¬¬x = x) iff x is complemented.
 We verify this computationally. -/
 theorem regular_eq_complemented :
-    regularElements = complementedElements := by native_decide
+    regularElements = complementedElements := by decide
 
 /-- L₃₀ structural assessment: the lattice is maximally non-Boolean.
 - Only 2 of 30 elements are regular/complemented (⊥ and ⊤)
@@ -411,7 +413,7 @@ theorem spectrum_structural_assessment :
     regularElements = complementedElements ∧
     -- Only ⊥ and ⊤ are regular
     regularElements = [.enabledness, .bisimulation] := by
-  exact ⟨by native_decide, by native_decide, by native_decide, by native_decide⟩
+  exact ⟨by decide, by decide, by decide, by decide⟩
 
 end SpectrumElement
 

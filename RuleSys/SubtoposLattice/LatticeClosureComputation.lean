@@ -35,6 +35,8 @@ a concrete componentwise formula: (A \ B)_i = A_i if A_i > B_i, else ⊥.
 import RuleSys.SubtoposLattice.SpectrumNonSublattice
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -56,7 +58,7 @@ theorem sim_meet_revivals_eq :
     EnergyBudget.meet
       simulation.toEnergyBudget
       revivals.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), (1 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), (1 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 theorem sim_meet_revivals_unnamed :
     ∀ x : NamedEquivalence,
@@ -69,7 +71,7 @@ theorem sim_meet_readiness_eq :
     EnergyBudget.meet
       simulation.toEnergyBudget
       readiness.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), (1 : ℕ), (1 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), (1 : ℕ), (1 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 theorem sim_meet_readiness_unnamed :
     ∀ x : NamedEquivalence,
@@ -82,7 +84,7 @@ theorem sim_meet_pf_eq :
     EnergyBudget.meet
       simulation.toEnergyBudget
       possibleFutures.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 theorem sim_meet_pf_unnamed :
     ∀ x : NamedEquivalence,
@@ -95,7 +97,7 @@ theorem pf_meet_rt_eq :
     EnergyBudget.meet
       possibleFutures.toEnergyBudget
       readyTraces.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), ⊤, (1 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), ⊤, (1 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by decide
 
 theorem pf_meet_rt_unnamed :
     ∀ x : NamedEquivalence,
@@ -108,7 +110,7 @@ theorem pf_meet_rs_eq :
     EnergyBudget.meet
       possibleFutures.toEnergyBudget
       readySimulation.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), ⊤, ⊤, (1 : ℕ), (1 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), ⊤, ⊤, (1 : ℕ), (1 : ℕ)⟩ := by decide
 
 theorem pf_meet_rs_unnamed :
     ∀ x : NamedEquivalence,
@@ -121,7 +123,7 @@ theorem if_join_rt_eq :
     EnergyBudget.join
       impossibleFutures.toEnergyBudget
       readyTraces.toEnergyBudget =
-    ⟨⊤, ⊤, ⊤, (1 : ℕ), ⊤, (1 : ℕ)⟩ := by native_decide
+    ⟨⊤, ⊤, ⊤, (1 : ℕ), ⊤, (1 : ℕ)⟩ := by decide
 
 theorem if_join_rt_unnamed :
     ∀ x : NamedEquivalence,
@@ -189,7 +191,7 @@ private def latticeClosureFinset : Finset EnergyBudget :=
   latticeClosureList.toFinset
 
 private theorem latticeClosureFinset_card : latticeClosureFinset.card = 30 := by
-  native_decide
+  decide
 
 private theorem latticeClosureFinset_named :
     ∀ x : NamedEquivalence, x.toEnergyBudget ∈ latticeClosureFinset := by
@@ -198,12 +200,12 @@ private theorem latticeClosureFinset_named :
 private theorem latticeClosureFinset_meet_closed :
     ∀ a ∈ latticeClosureFinset, ∀ b ∈ latticeClosureFinset,
       EnergyBudget.meet a b ∈ latticeClosureFinset := by
-  native_decide
+  decide
 
 private theorem latticeClosureFinset_join_closed :
     ∀ a ∈ latticeClosureFinset, ∀ b ∈ latticeClosureFinset,
       EnergyBudget.join a b ∈ latticeClosureFinset := by
-  native_decide
+  decide
 
 /-- The lattice closure of the 13 named equivalences in the ambient energy frame
 (WithTop ℕ)⁶ contains exactly 30 elements: 13 named + 17 unnamed. -/
@@ -268,7 +270,7 @@ theorem bisim_sdiff_readySim :
     EnergyBudget.sdiff
       bisimulation.toEnergyBudget
       readySimulation.toEnergyBudget =
-    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), ⊤, ⊤⟩ := by native_decide
+    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), ⊤, ⊤⟩ := by decide
 
 /-- S \ T = (0, ∞, ∞, ∞, 0, 0): "unbounded branching content".
 Simulation's excess over traces is unlimited conjunction and positive clause
@@ -280,7 +282,7 @@ theorem sim_sdiff_traces :
     EnergyBudget.sdiff
       simulation.toEnergyBudget
       traces.toEnergyBudget =
-    ⟨(0 : ℕ), ⊤, ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨(0 : ℕ), ⊤, ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 /-- F \ T = (0, 2, 0, 0, 1, 1): "bounded conjunction + single negation".
 Failures' excess over traces is bounded conjunction (depth 2) plus
@@ -291,7 +293,7 @@ theorem failures_sdiff_traces :
     EnergyBudget.sdiff
       failures.toEnergyBudget
       traces.toEnergyBudget =
-    ⟨(0 : ℕ), (2 : ℕ), (0 : ℕ), (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by native_decide
+    ⟨(0 : ℕ), (2 : ℕ), (0 : ℕ), (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by decide
 
 /-- RS \ S = (0, 0, 0, 0, 1, 1): "flat negation content".
 Ready simulation's excess over simulation is single-depth negation —
@@ -302,7 +304,7 @@ theorem readySim_sdiff_sim :
     EnergyBudget.sdiff
       readySimulation.toEnergyBudget
       simulation.toEnergyBudget =
-    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by native_decide
+    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by decide
 
 /-- 2S \ RS = (0, 0, 0, 0, ∞, 0): "deep negation clause content".
 Two-nested simulation's excess over ready simulation is unlimited
@@ -312,7 +314,7 @@ theorem twoNested_sdiff_readySim :
     EnergyBudget.sdiff
       twoNestedSimulation.toEnergyBudget
       readySimulation.toEnergyBudget =
-    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), ⊤, (0 : ℕ)⟩ := by native_decide
+    ⟨(0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), ⊤, (0 : ℕ)⟩ := by decide
 
 /-- PF \ IF = (0, 0, ∞, ∞, 0, 0): "deep positive clause content".
 Possible futures' excess over impossible futures is unlimited positive
@@ -322,7 +324,7 @@ theorem pf_sdiff_if :
     EnergyBudget.sdiff
       possibleFutures.toEnergyBudget
       impossibleFutures.toEnergyBudget =
-    ⟨(0 : ℕ), (0 : ℕ), ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨(0 : ℕ), (0 : ℕ), ⊤, ⊤, (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 end NamedEquivalence
 

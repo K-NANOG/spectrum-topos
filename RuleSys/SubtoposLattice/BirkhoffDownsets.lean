@@ -38,6 +38,8 @@ This is the join of join-irreducibles below x but not below y.
 import RuleSys.SubtoposLattice.BirkhoffRepresentation
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -63,7 +65,7 @@ def downsetOf (x : SpectrumElement) : List SpectrumElement :=
 downsets of join-irreducibles. This is the key property of the Birkhoff
 representation — elements are uniquely determined by their join-irreducibles. -/
 theorem downsetOf_injective :
-    ∀ a b : SpectrumElement, downsetOf a = downsetOf b → a = b := by native_decide
+    ∀ a b : SpectrumElement, downsetOf a = downsetOf b → a = b := by decide
 
 /-!
 ### Order-Preservation
@@ -73,13 +75,13 @@ theorem downsetOf_injective :
 (as lists, every element of the first appears in the second). -/
 theorem downsetOf_monotone :
     ∀ a b : SpectrumElement, a ≤ b →
-      ∀ j, j ∈ downsetOf a → j ∈ downsetOf b := by native_decide
+      ∀ j, j ∈ downsetOf a → j ∈ downsetOf b := by decide
 
 /-- The downset map reflects order: if downsetOf x ⊆ downsetOf y then x ≤ y.
 Combined with monotonicity, this gives: x ≤ y ↔ downsetOf x ⊆ downsetOf y. -/
 theorem downsetOf_reflects_order :
     ∀ a b : SpectrumElement,
-      (∀ j, j ∈ downsetOf a → j ∈ downsetOf b) → a ≤ b := by native_decide
+      (∀ j, j ∈ downsetOf a → j ∈ downsetOf b) → a ≤ b := by decide
 
 /-!
 ### Meet and Join Preservation
@@ -90,14 +92,14 @@ join-irreducibles in both downsetOf x and downsetOf y. -/
 theorem downsetOf_preserves_meet :
     ∀ a b : SpectrumElement,
       downsetOf (a ⊓ b) = joinIrreducibles.filter (fun j => j ∈ downsetOf a ∧ j ∈ downsetOf b) := by
-  native_decide
+  decide
 
 /-- The downset map preserves joins: downsetOf (x ⊔ y) contains exactly the
 join-irreducibles in either downsetOf x or downsetOf y. -/
 theorem downsetOf_preserves_join :
     ∀ a b : SpectrumElement,
       downsetOf (a ⊔ b) = joinIrreducibles.filter (fun j => j ∈ downsetOf a ∨ j ∈ downsetOf b) := by
-  native_decide
+  decide
 
 /-!
 ### Downset Property
@@ -108,7 +110,7 @@ and j' ≤ j with j' ∈ J, then j' ∈ downsetOf x. -/
 theorem downsetOf_isDownset :
     ∀ x : SpectrumElement, ∀ j j' : SpectrumElement,
       j' ∈ joinIrreducibles → j ∈ downsetOf x → j' ≤ j → j' ∈ downsetOf x := by
-  native_decide
+  decide
 
 /-!
 ### Cardinality Verification
@@ -118,14 +120,14 @@ theorem downsetOf_isDownset :
 Since downsetOf is injective and |L₃₀| = 30, the image has exactly 30 elements,
 confirming the Birkhoff bijection L₃₀ ≅ O(J). -/
 theorem downset_image_card :
-    (allElements.map downsetOf).Nodup := by native_decide
+    (allElements.map downsetOf).Nodup := by decide
 
 /-- Every element is the join of the join-irreducibles below it.
 This is the fundamental reconstruction property of the Birkhoff representation:
 x = ⊔(downsetOf x). -/
 theorem birkhoff_reconstruction :
     ∀ x : SpectrumElement,
-      x = (downsetOf x).foldl (· ⊔ ·) ⊥ := by native_decide
+      x = (downsetOf x).foldl (· ⊔ ·) ⊥ := by decide
 
 /-!
 ## Part 2: Co-Heyting Subtraction via Birkhoff Formula
@@ -151,15 +153,15 @@ birkhoffSdiff x y is the smallest z such that x ≤ z ⊔ y.
 
 We verify this computationally: for all x y, x ≤ birkhoffSdiff x y ⊔ y. -/
 theorem birkhoffSdiff_property :
-    ∀ x y : SpectrumElement, x ≤ birkhoffSdiff x y ⊔ y := by native_decide
+    ∀ x y : SpectrumElement, x ≤ birkhoffSdiff x y ⊔ y := by decide
 
 /-- The Birkhoff subtraction gives the SMALLEST z with x ≤ z ⊔ y. -/
 theorem birkhoffSdiff_smallest :
-    ∀ x y z : SpectrumElement, x ≤ z ⊔ y → birkhoffSdiff x y ≤ z := by native_decide
+    ∀ x y z : SpectrumElement, x ≤ z ⊔ y → birkhoffSdiff x y ≤ z := by decide
 
 /-- The Birkhoff subtraction is below x. -/
 theorem birkhoffSdiff_le :
-    ∀ x y : SpectrumElement, birkhoffSdiff x y ≤ x := by native_decide
+    ∀ x y : SpectrumElement, birkhoffSdiff x y ≤ x := by decide
 
 /-!
 ### The 6 Named Co-Heyting Subtractions
@@ -173,7 +175,7 @@ The only j ∈ J with j ≤ B and j ≰ RS is bisimulation itself.
 v17.0 ambient: (0,0,0,0,∞,∞) which is NOT in L₃₀.
 Birkhoff (exact): bisimulation. These DISAGREE. -/
 theorem birkhoff_bisim_sdiff_readySim :
-    birkhoffSdiff .bisimulation .readySimulation = .bisimulation := by native_decide
+    birkhoffSdiff .bisimulation .readySimulation = .bisimulation := by decide
 
 /-- S \ T via Birkhoff = simulation.
 All j ∈ J with j ≤ S and j ≰ T... S = (∞,∞,∞,∞,0,0). T = (∞,1,0,0,0,0).
@@ -187,7 +189,7 @@ All except traces satisfy this. Their join = simulation.
 v17.0 ambient: (0,∞,∞,∞,0,0) which is NOT in L₃₀.
 Birkhoff (exact): simulation. These DISAGREE. -/
 theorem birkhoff_sim_sdiff_traces :
-    birkhoffSdiff .simulation .traces = .simulation := by native_decide
+    birkhoffSdiff .simulation .traces = .simulation := by decide
 
 /-- F \ T via Birkhoff = failures.
 j ∈ J with j ≤ F and j ≰ T.
@@ -198,7 +200,7 @@ Join of {sim_meet_failures, failures} = failures (since S∧F ≤ F).
 v17.0 ambient: (0,2,0,0,1,1) which is NOT in L₃₀ (obsDepth=0).
 Birkhoff (exact): failures. These DISAGREE. -/
 theorem birkhoff_failures_sdiff_traces :
-    birkhoffSdiff .failures .traces = .failures := by native_decide
+    birkhoffSdiff .failures .traces = .failures := by decide
 
 /-- RS \ S via Birkhoff = failures.
 j ∈ J with j ≤ RS and j ≰ S.
@@ -209,7 +211,7 @@ So only failures. Their join = failures.
 v17.0 ambient: (0,0,0,0,1,1) which is NOT in L₃₀.
 Birkhoff (exact): failures. These DISAGREE. -/
 theorem birkhoff_readySim_sdiff_sim :
-    birkhoffSdiff .readySimulation .simulation = .failures := by native_decide
+    birkhoffSdiff .readySimulation .simulation = .failures := by decide
 
 /-- 2S \ RS via Birkhoff = impossibleFutures.
 j ∈ J with j ≤ 2S and j ≰ RS.
@@ -219,7 +221,7 @@ Only impossibleFutures(∞,2,0,0,∞,1) has negClause=∞>1 and negNesting=1≤1
 v17.0 ambient: (0,0,0,0,∞,0) which is NOT in L₃₀.
 Birkhoff (exact): impossibleFutures. These DISAGREE. -/
 theorem birkhoff_twoNested_sdiff_readySim :
-    birkhoffSdiff .twoNestedSim .readySimulation = .impossibleFutures := by native_decide
+    birkhoffSdiff .twoNestedSim .readySimulation = .impossibleFutures := by decide
 
 /-- PF \ IF via Birkhoff.
 j ∈ J with j ≤ PF and j ≰ IF.
@@ -238,7 +240,7 @@ So join = sim_meet_pf.
 v17.0 ambient: (0,0,∞,∞,0,0) which is NOT in L₃₀.
 Birkhoff (exact): sim_meet_pf. These DISAGREE. -/
 theorem birkhoff_pf_sdiff_if :
-    birkhoffSdiff .possibleFutures .impossibleFutures = .sim_meet_pf := by native_decide
+    birkhoffSdiff .possibleFutures .impossibleFutures = .sim_meet_pf := by decide
 
 /-!
 ### Summary: All 6 Birkhoff subtractions DISAGREE with v17.0 ambient results
@@ -280,7 +282,7 @@ theorem all_ambient_sdiff_disagree :
     -- PF \ IF
     birkhoffSdiff .possibleFutures .impossibleFutures ≠
       fromEnergyBudget (EnergyBudget.sdiff possibleFutures.toEnergyBudget impossibleFutures.toEnergyBudget) := by
-  native_decide
+  decide
 
 /-!
 ## Part 3: Complemented Elements
@@ -304,20 +306,20 @@ def complementedElements : List SpectrumElement :=
 
 /-- All elements in complementedElements are indeed complemented. -/
 theorem complementedElements_correct :
-    ∀ x ∈ complementedElements, isComplemented x := by native_decide
+    ∀ x ∈ complementedElements, isComplemented x := by decide
 
 /-- All complemented elements are in the list. -/
 theorem complementedElements_complete :
-    ∀ x : SpectrumElement, isComplemented x → x ∈ complementedElements := by native_decide
+    ∀ x : SpectrumElement, isComplemented x → x ∈ complementedElements := by decide
 
 /-- There are exactly 2 complemented elements: ⊥ and ⊤ (enabledness and bisimulation).
 This means J is connected (1 connected component), so 2^1 = 2 complemented elements. -/
 theorem complementedElements_count :
-    complementedElements.length = 2 := by native_decide
+    complementedElements.length = 2 := by decide
 
 /-- The complemented elements are exactly ⊥ and ⊤. -/
 theorem complementedElements_eq :
-    complementedElements = [.enabledness, .bisimulation] := by native_decide
+    complementedElements = [.enabledness, .bisimulation] := by decide
 
 /-!
 ## Part 4: Connected Components of J
@@ -343,7 +345,7 @@ def comparabilityEdges : List (SpectrumElement × SpectrumElement) :=
 /-- traces is comparable to (i.e., below) every other join-irreducible.
 Since traces ≤ all j ∈ J, it connects everything. -/
 theorem traces_below_all_J :
-    ∀ j ∈ joinIrreducibles, .traces ≤ j := by native_decide
+    ∀ j ∈ joinIrreducibles, .traces ≤ j := by decide
 
 /-- J has exactly 1 connected component (J is connected).
 Proof: traces ≤ every element of J, so every pair is connected via traces.
@@ -351,7 +353,7 @@ This means L₃₀ is maximally non-Boolean: only ⊥ and ⊤ are complemented. 
 theorem J_connected :
     ∀ j₁ j₂ : SpectrumElement, j₁ ∈ joinIrreducibles → j₂ ∈ joinIrreducibles →
       ∃ j₃ ∈ joinIrreducibles, (j₃ ≤ j₁ ∨ j₁ ≤ j₃) ∧ (j₃ ≤ j₂ ∨ j₂ ≤ j₃) := by
-  native_decide
+  decide
 
 /-- Number of connected components of J = 1. -/
 theorem J_components_count : 1 = 1 := rfl
@@ -374,20 +376,20 @@ This means the process-equivalence spectrum has no non-trivial "independent fact
 every pair of non-extremal equivalences is entangled through the join-irreducible
 structure. -/
 theorem spectrum_maximally_nonBoolean :
-    ∀ x : SpectrumElement, isComplemented x → x = ⊥ ∨ x = ⊤ := by native_decide
+    ∀ x : SpectrumElement, isComplemented x → x = ⊥ ∨ x = ⊤ := by decide
 
 /-- The Birkhoff co-Heyting subtraction is always ≥ ⊥ (non-trivial verification
 that the formula actually produces valid elements). -/
 theorem birkhoffSdiff_valid :
-    ∀ x y : SpectrumElement, ⊥ ≤ birkhoffSdiff x y := by native_decide
+    ∀ x y : SpectrumElement, ⊥ ≤ birkhoffSdiff x y := by decide
 
 /-- If x ≤ y, then x \ y = ⊥. -/
 theorem birkhoffSdiff_of_le :
-    ∀ x y : SpectrumElement, x ≤ y → birkhoffSdiff x y = ⊥ := by native_decide
+    ∀ x y : SpectrumElement, x ≤ y → birkhoffSdiff x y = ⊥ := by decide
 
 /-- The self-subtraction is always ⊥. -/
 theorem birkhoffSdiff_self :
-    ∀ x : SpectrumElement, birkhoffSdiff x x = ⊥ := by native_decide
+    ∀ x : SpectrumElement, birkhoffSdiff x x = ⊥ := by decide
 
 end SpectrumElement
 

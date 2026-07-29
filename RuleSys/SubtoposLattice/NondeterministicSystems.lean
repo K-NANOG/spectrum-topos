@@ -75,7 +75,7 @@ instance : Fintype HubSpokesState where
 
 /-- Hub-spokes rooted transition system: a→b, a→c, b→a, c→a.
 State a is nondeterministic (two outgoing transitions). -/
-def hubSpokes : RootedTS.{0, 0} where
+def hubSpokesND : RootedTS.{0, 0} where
   State := HubSpokesState
   Step := fun s t => match s, t with
     | .a, .b => Unit  -- a → b
@@ -114,7 +114,7 @@ to the toggle system from SmallSystems.lean. Both states are deterministic
 
 /-- The two-cycle rooted transition system is the toggle system under a different name.
 Both have states {a, b} with bidirectional transitions a ↔ b. -/
-def twoCycle : RootedTS.{0, 0} := toggle
+def twoCycleND : RootedTS.{0, 0} := toggle
 
 /-- The two-cycle transition-enriched theory is identical to toggleTransTheory.
 Both have states {a, b} with bidirectional transitions a ↔ b.

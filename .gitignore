@@ -1,0 +1,13 @@
+# Lake build output (oleans, mathlib cache) — several GB, never committed
+/.lake/
+/build/
+/lake-packages/
+
+# Editor / OS
+*.olean
+*.ilean
+*.trace
+.DS_Store
+
+# Planning scratch, not part of the development
+.planning/
