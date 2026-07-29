@@ -54,7 +54,9 @@ import RuleSys
 #print axioms RTS.depth2_unique_bisimInvariant
 
 -- Characteristic formulas.
+#print axioms RTS.PresheafTopos.characteristicHML_iff
 #print axioms RTS.PresheafTopos.characteristicHML_self_satisfies
+#print axioms RTS.PresheafTopos.characteristicHML_root_hom_transfer
 
 /-! ## The algebraic direction -/
 
