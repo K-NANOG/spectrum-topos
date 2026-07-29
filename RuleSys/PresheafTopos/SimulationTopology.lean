@@ -649,6 +649,31 @@ explicit covering sieves. See Open Problem (a) in paper Section 8.
 axiom isLabeledSimCovering {L : Type} [Fintype L] [DecidableEq L]
     (G : FinLTS L) (S : LTSSieve G) : Prop
 
+/-!
+**Reader's warning about `isLabeledSimCovering`.**
+
+The declaration above is an *uninterpreted* predicate: an `axiom` of type `Prop` with
+no defining clause and no characterising property. Nothing in this development pins
+down which sieves satisfy it.
+
+Every statement below that mentions it, including the maximality, stability and
+transitivity axioms and the separation axioms
+`sim_covering_separates_trace_sim` and `sim_covering_separates_sim_bisim`,
+therefore constrains an unknown predicate rather than a constructed one. They are
+mutually consistent, but they carry no mathematical content on their own: any
+predicate satisfying the stated constraints would do, and none is exhibited.
+
+This is deliberate and matches the paper, which obtains the simulation topology
+through Caramello's quotient-theory duality and records the construction of explicit
+covering sieves for it as the central open problem. It is recorded here so that a
+reader does not mistake the axioms below for a construction, and so that the
+strictness of the three-topology chain is understood to rest on them.
+
+Note also that the separately defined `energyTopology .simulation` is *not* this
+predicate; it collapses onto the bisimulation topology, as documented at
+`SubtoposLattice.EnergyTestObjects.energyObsClass`.
+-/
+
 /-- **Maximality axiom:** The maximal sieve is sim-covering for every G.
     This is the first Grothendieck topology axiom: the maximal sieve (containing all
     morphisms into G) covers G. Follows automatically from any valid Grothendieck topology.
