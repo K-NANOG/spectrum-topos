@@ -6,7 +6,7 @@ Released under the MIT license as described in the file LICENSE.
 
 This file defines a computable 5-element lattice isomorphic to the hub-spokes
 Lindenbaum algebra and constructs all 8 nuclei with their properties proved
-by `native_decide` or explicit case analysis.
+by `decide` or explicit case analysis.
 
 ## Mathematical Background
 
@@ -43,6 +43,8 @@ import Mathlib.Data.Fintype.Order
 import Mathlib.Data.Fintype.Basic
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -143,7 +145,7 @@ instance : DistribLattice HubSpokesElem where
 ## Part 4: CompleteLattice and Frame
 
 The CompleteLattice is noncomputable (sSup/sInf take Set arguments), but that's
-fine -- we only need native_decide on the finite lattice operations.
+fine -- we only need decide on the finite lattice operations.
 -/
 
 noncomputable instance : CompleteLattice HubSpokesElem :=

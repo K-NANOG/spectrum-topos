@@ -62,6 +62,8 @@ kernel AND non-trivial cokernel) can occur. For connected reachable systems:
 import RuleSys.SubtoposLattice.KernelDichotomy
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -140,10 +142,10 @@ The homomorphism is an isomorphism: aligned regime.
 -/
 
 /-- Hub-spokes image cardinality: |im(phi)| = |Aut(graph)| / |ker| = 2/1 = 2. -/
-theorem hubSpokes_image_card : imageCard 2 1 = 2 := by native_decide
+theorem hubSpokes_image_card : imageCard 2 1 = 2 := by decide
 
 /-- Hub-spokes cokernel cardinality: |coker(phi)| = |Aut(Lind)| / |im| = 2/2 = 1. -/
-theorem hubSpokes_cokernel_card : cokernelCard 2 2 = 1 := by native_decide
+theorem hubSpokes_cokernel_card : cokernelCard 2 2 = 1 := by decide
 
 /-!
 ### Two-Cycle: image = 1, cokernel = 1
@@ -156,10 +158,10 @@ All graph symmetry is killed: deterministic regime.
 -/
 
 /-- Two-cycle image cardinality: |im(phi)| = |Aut(graph)| / |ker| = 2/2 = 1. -/
-theorem twoCycle_image_card : imageCard 2 2 = 1 := by native_decide
+theorem twoCycle_image_card : imageCard 2 2 = 1 := by decide
 
 /-- Two-cycle cokernel cardinality: |coker(phi)| = |Aut(Lind)| / |im| = 1/1 = 1. -/
-theorem twoCycle_cokernel_card : cokernelCard 1 1 = 1 := by native_decide
+theorem twoCycle_cokernel_card : cokernelCard 1 1 = 1 := by decide
 
 /-!
 ### Asymmetric Diamond: image = 1, cokernel = 2
@@ -172,10 +174,10 @@ The topos creates symmetry ex nihilo: creative regime.
 -/
 
 /-- Asymmetric diamond image cardinality: |im(phi)| = |Aut(graph)| / |ker| = 1/1 = 1. -/
-theorem asymDiamond_image_card : imageCard 1 1 = 1 := by native_decide
+theorem asymDiamond_image_card : imageCard 1 1 = 1 := by decide
 
 /-- Asymmetric diamond cokernel cardinality: |coker(phi)| = |Aut(Lind)| / |im| = 2/1 = 2. -/
-theorem asymDiamond_cokernel_card : cokernelCard 2 1 = 2 := by native_decide
+theorem asymDiamond_cokernel_card : cokernelCard 2 1 = 2 := by decide
 
 /-!
 ## Part 3: Regime Classification Function and Per-System Proofs
@@ -206,15 +208,15 @@ def classifyRegime (kernelCard graphAutCard cokernelCardVal : Nat) : SymmetryReg
 
 /-- Hub-spokes is in the aligned regime: cokernel=1 (not creative),
 ker=1 != graphAut=2, so aligned. phi is an isomorphism. -/
-theorem hubSpokes_regime : classifyRegime 1 2 1 = .aligned := by native_decide
+theorem hubSpokes_regime : classifyRegime 1 2 1 = .aligned := by decide
 
 /-- Two-cycle is in the deterministic regime: cokernel=1 (not creative),
 ker=2 = graphAut=2, so deterministic. All graph symmetry killed. -/
-theorem twoCycle_regime : classifyRegime 2 2 1 = .deterministic := by native_decide
+theorem twoCycle_regime : classifyRegime 2 2 1 = .deterministic := by decide
 
 /-- Asymmetric diamond is in the creative regime: cokernel=2 > 1, so creative.
 The topos creates symmetry invisible to graph theory. -/
-theorem asymDiamond_regime : classifyRegime 1 1 2 = .creative := by native_decide
+theorem asymDiamond_regime : classifyRegime 1 1 2 = .creative := by decide
 
 /-!
 ## Part 4: Headline Three-Regime Table
@@ -244,7 +246,7 @@ theorem regime_table :
     -- Asymmetric diamond: creative (ker=1, im=1, coker=2)
     classifyRegime 1 1 2 = .creative ∧
     imageCard 1 1 = 1 ∧ cokernelCard 2 1 = 2 := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> native_decide
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> decide
 
 /-!
 ## Part 5: Exhaustiveness via Kernel Dichotomy

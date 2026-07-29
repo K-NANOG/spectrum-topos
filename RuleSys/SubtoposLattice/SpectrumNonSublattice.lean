@@ -41,6 +41,8 @@ different.
 import RuleSys.SubtoposLattice.EnergyVectors
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -120,7 +122,7 @@ theorem pf_meet_ft_eq :
     EnergyBudget.meet
       possibleFutures.toEnergyBudget
       failureTraces.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), ⊤, (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), ⊤, (0 : ℕ), (1 : ℕ), (1 : ℕ)⟩ := by decide
 
 /-- The energy vector (∞, 2, ∞, 0, 1, 1) is not the image of any named equivalence. -/
 theorem pf_meet_ft_unnamed :
@@ -150,7 +152,7 @@ theorem sim_meet_failures_eq :
     EnergyBudget.meet
       simulation.toEnergyBudget
       failures.toEnergyBudget =
-    ⟨⊤, (2 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by native_decide
+    ⟨⊤, (2 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ), (0 : ℕ)⟩ := by decide
 
 /-- The energy vector (∞, 2, 0, 0, 0, 0) is not the image of any named equivalence. -/
 theorem sim_meet_failures_unnamed :
@@ -162,7 +164,7 @@ the ambient meet of simulation and failures. Both reduce to (∞, 2, 0, 0, 0, 0)
 theorem sim_meet_if_eq_sim_meet_failures :
     EnergyBudget.meet simulation.toEnergyBudget impossibleFutures.toEnergyBudget =
     EnergyBudget.meet simulation.toEnergyBudget failures.toEnergyBudget := by
-  native_decide
+  decide
 
 /-- IF ∨ FT in the ambient frame: impossibleFutures join failureTraces = (∞, ∞, ∞, 0, ∞, 1).
 This is unnamed — no named equivalence has this energy vector. -/
@@ -170,7 +172,7 @@ theorem if_join_ft_eq :
     EnergyBudget.join
       impossibleFutures.toEnergyBudget
       failureTraces.toEnergyBudget =
-    ⟨⊤, ⊤, ⊤, (0 : ℕ), ⊤, (1 : ℕ)⟩ := by native_decide
+    ⟨⊤, ⊤, ⊤, (0 : ℕ), ⊤, (1 : ℕ)⟩ := by decide
 
 /-- The energy vector (∞, ∞, ∞, 0, ∞, 1) is not the image of any named equivalence. -/
 theorem if_join_ft_unnamed :
@@ -201,7 +203,7 @@ theorem if_meet_ft_eq_failures :
     EnergyBudget.meet
       impossibleFutures.toEnergyBudget
       failureTraces.toEnergyBudget =
-    failures.toEnergyBudget := by native_decide
+    failures.toEnergyBudget := by decide
 
 /-- S ∨ F in the ambient frame equals readySimulation: (∞, ∞, ∞, ∞, 1, 1) = RS.
 The linear-time/branching-time split rejoins at ready simulation. -/
@@ -209,14 +211,14 @@ theorem sim_join_failures_eq_readySim :
     EnergyBudget.join
       simulation.toEnergyBudget
       failures.toEnergyBudget =
-    readySimulation.toEnergyBudget := by native_decide
+    readySimulation.toEnergyBudget := by decide
 
 /-- S ∨ IF in the ambient frame equals twoNestedSimulation: (∞, ∞, ∞, ∞, ∞, 1) = 2S. -/
 theorem sim_join_if_eq_twoNested :
     EnergyBudget.join
       simulation.toEnergyBudget
       impossibleFutures.toEnergyBudget =
-    twoNestedSimulation.toEnergyBudget := by native_decide
+    twoNestedSimulation.toEnergyBudget := by decide
 
 end NamedEquivalence
 

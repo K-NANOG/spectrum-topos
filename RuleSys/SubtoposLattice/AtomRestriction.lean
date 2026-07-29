@@ -33,6 +33,8 @@ access (e₅ ≥ 1, e₆ ≥ 1). The restricted atom set A_ē is monotone in the
 import RuleSys.SubtoposLattice.EnergyVectors
 
 set_option autoImplicit false
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 4000000
 
 universe u
 
@@ -221,7 +223,7 @@ theorem simulation_base_visible :
 
 theorem simulation_branch_visible :
     AtomKind.isVisibleAt .branch (NamedEquivalence.toEnergyBudget .simulation) = true := by
-  native_decide
+  decide
 
 theorem simulation_unable_invisible :
     AtomKind.isVisibleAt .unable (NamedEquivalence.toEnergyBudget .simulation) = false := rfl
@@ -232,11 +234,11 @@ theorem readySim_base_visible :
 
 theorem readySim_branch_visible :
     AtomKind.isVisibleAt .branch (NamedEquivalence.toEnergyBudget .readySimulation) = true := by
-  native_decide
+  decide
 
 theorem readySim_unable_visible :
     AtomKind.isVisibleAt .unable (NamedEquivalence.toEnergyBudget .readySimulation) = true := by
-  native_decide
+  decide
 
 /-- Under the bisimulation budget (∞,∞,∞,∞,∞,∞), all atom kinds are visible. -/
 theorem bisim_base_visible :
@@ -244,11 +246,11 @@ theorem bisim_base_visible :
 
 theorem bisim_branch_visible :
     AtomKind.isVisibleAt .branch (NamedEquivalence.toEnergyBudget .bisimulation) = true := by
-  native_decide
+  decide
 
 theorem bisim_unable_visible :
     AtomKind.isVisibleAt .unable (NamedEquivalence.toEnergyBudget .bisimulation) = true := by
-  native_decide
+  decide
 
 /-!
 ## Part 7: Failures Budget — First Negation Access Below Ready Simulation
@@ -262,11 +264,11 @@ simulation cannot.
 
 theorem failures_unable_visible :
     AtomKind.isVisibleAt .unable (NamedEquivalence.toEnergyBudget .failures) = true := by
-  native_decide
+  decide
 
 theorem failures_branch_visible :
     AtomKind.isVisibleAt .branch (NamedEquivalence.toEnergyBudget .failures) = true := by
-  native_decide
+  decide
 
 /-!
 ## Part 8: GradedAtom Recovery
