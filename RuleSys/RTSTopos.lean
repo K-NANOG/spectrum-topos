@@ -37,6 +37,7 @@ import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesFiniteLimit
 import Mathlib.CategoryTheory.Sites.Sheaf
 import Mathlib.CategoryTheory.Sites.SheafOfTypes
+import Mathlib.CategoryTheory.Sites.Canonical
 
 open CategoryTheory
 open CategoryTheory.Limits
@@ -210,45 +211,40 @@ from Morita equivalence.
 
 namespace RTSTopos
 
-/-- Representable presheaves are sheaves for any subcanonical topology.
+/-- Representable presheaves are sheaves for any **subcanonical** topology.
 
-    **Why axiomatized:** The proof requires unwinding Mathlib's `Presheaf.IsSheaf`
-    API (which involves `FamilyOfElements`, matching families, and amalgamations)
-    and showing the sheaf condition holds for representables よ(N). The mathematical
-    argument is standard: for any covering sieve S on P, a compatible family of
-    morphisms Q_i → N (for (g_i : Q_i → P) ∈ S) has a unique amalgamation P → N
-    by the Yoneda lemma and the covering property. This is equivalent to the
-    topology being subcanonical (Mac Lane & Moerdijk, III.5, Lemma 1).
-
-    The Mathlib API for this result (`Functor.IsSheaf` / subcanonical topologies)
-    does not directly provide the theorem in the form needed here. The mathematical
-    content is sound but the API translation is non-trivial. -/
-axiom yoneda_isSheaf (J : GrothendieckTopology (RootedTS.{0, 0}))
-    (N : RootedTS.{0, 0}) :
-    Presheaf.IsSheaf J (よ N)
+    The subcanonicity hypothesis is essential and was previously missing: without it
+    the statement is false at `J = ⊤`, where the empty sieve covers and the sheaf
+    condition would force every hom-set to be a singleton. Proved from Mathlib's
+    `GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable`. -/
+theorem yoneda_isSheaf (J : GrothendieckTopology (RootedTS.{0, 0})) [J.Subcanonical] (N : RootedTS.{0, 0}) :
+    Presheaf.IsSheaf J (よ N) := by
+  rw [CategoryTheory.isSheaf_iff_isSheaf_of_type]
+  show Presieve.IsSheaf J (CategoryTheory.yoneda.obj N)
+  exact GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable _
 
 /-- Construct a sheaf from a representable presheaf.
 
     Given that representable presheaves satisfy the sheaf condition,
     we can lift them to the sheaf category. -/
-def yonedaSheaf (J : GrothendieckTopology (RootedTS.{0, 0}))
+def yonedaSheaf (J : GrothendieckTopology (RootedTS.{0, 0})) [J.Subcanonical]
     (N : RootedTS.{0, 0}) : Sheaf J Type :=
   ⟨よ N, yoneda_isSheaf J N⟩
 
 /-- A sheaf is representable if it's isomorphic to some yonedaSheaf. -/
-def IsRepresentableSheaf {J : GrothendieckTopology (RootedTS.{0, 0})}
+def IsRepresentableSheaf {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     (F : Sheaf J Type) : Prop :=
   ∃ N : RootedTS.{0, 0}, Nonempty (F ≅ yonedaSheaf J N)
 
 /-- Extract the representing object from a proof of representability.
 
     Uses Classical.choice since IsRepresentableSheaf is a Prop with existential. -/
-noncomputable def representingObject {J : GrothendieckTopology (RootedTS.{0, 0})}
+noncomputable def representingObject {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     (F : Sheaf J Type) (h : IsRepresentableSheaf F) : RootedTS.{0, 0} :=
   Classical.choose h
 
 /-- The isomorphism witnessing representability. -/
-noncomputable def representingIso {J : GrothendieckTopology (RootedTS.{0, 0})}
+noncomputable def representingIso {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     (F : Sheaf J Type) (h : IsRepresentableSheaf F) :
     F ≅ yonedaSheaf J (representingObject F h) :=
   Classical.choice (Classical.choose_spec h)
@@ -269,7 +265,7 @@ This is crucial for extracting simulations from sheaf morphisms.
     **Key insight:** A sheaf morphism (yonedaSheaf J M ⟶ yonedaSheaf J N) is
     a natural transformation between the underlying presheaves よ(M) → よ(N),
     which by Yoneda corresponds to a simulation M → N. -/
-def yonedaSheaf_homEquiv (J : GrothendieckTopology (RootedTS.{0, 0}))
+def yonedaSheaf_homEquiv (J : GrothendieckTopology (RootedTS.{0, 0})) [J.Subcanonical]
     (M N : RootedTS.{0, 0}) :
     (yonedaSheaf J M ⟶ yonedaSheaf J N) ≃ (M ⟶ N) where
   toFun f := yoneda_fullyFaithful.preimage f.val
@@ -281,25 +277,25 @@ def yonedaSheaf_homEquiv (J : GrothendieckTopology (RootedTS.{0, 0}))
   right_inv g := yoneda_fullyFaithful.preimage_map g
 
 /-- Extract a simulation from a morphism between representable sheaves. -/
-def simulation_from_sheafHom {J : GrothendieckTopology (RootedTS.{0, 0})}
+def simulation_from_sheafHom {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     {M N : RootedTS.{0, 0}}
     (f : yonedaSheaf J M ⟶ yonedaSheaf J N) : Simulation M N :=
   (yonedaSheaf_homEquiv J M N) f
 
 /-- Construct a sheaf morphism from a simulation. -/
-def sheafHom_from_simulation {J : GrothendieckTopology (RootedTS.{0, 0})}
+def sheafHom_from_simulation {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     {M N : RootedTS.{0, 0}}
     (f : Simulation M N) : yonedaSheaf J M ⟶ yonedaSheaf J N :=
   (yonedaSheaf_homEquiv J M N).symm f
 
 /-- simulation_from_sheafHom and sheafHom_from_simulation are inverses. -/
-theorem simulation_sheafHom_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0}))
+theorem simulation_sheafHom_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0})) [J.Subcanonical]
     (M N : RootedTS.{0, 0}) (f : Simulation M N) :
     simulation_from_sheafHom (J := J) (sheafHom_from_simulation (J := J) f) = f := by
   unfold simulation_from_sheafHom sheafHom_from_simulation
   exact (yonedaSheaf_homEquiv J M N).apply_symm_apply f
 
-theorem sheafHom_simulation_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0}))
+theorem sheafHom_simulation_roundtrip (J : GrothendieckTopology (RootedTS.{0, 0})) [J.Subcanonical]
     (M N : RootedTS.{0, 0}) (f : yonedaSheaf J M ⟶ yonedaSheaf J N) :
     sheafHom_from_simulation (simulation_from_sheafHom f) = f := by
   unfold simulation_from_sheafHom sheafHom_from_simulation
@@ -325,7 +321,7 @@ preservation in our setting.
 
 /-- Two sheaves with the same underlying presheaf are isomorphic.
     This is because IsSheaf is a Prop, so the cond field is irrelevant. -/
-def sheafIsoOfValEq {J : GrothendieckTopology (RootedTS.{0, 0})}
+def sheafIsoOfValEq {J : GrothendieckTopology (RootedTS.{0, 0})} [J.Subcanonical]
     (F G : Sheaf J Type) (h : F.val = G.val) : F ≅ G where
   hom := ⟨eqToHom h⟩
   inv := ⟨eqToHom h.symm⟩
@@ -346,6 +342,7 @@ def sheafIsoOfValEq {J : GrothendieckTopology (RootedTS.{0, 0})}
     then E.functor.obj F is also representable (by the same N!). -/
 theorem equiv_preserves_representable_of_val_eq
     {J J' : GrothendieckTopology (RootedTS.{0, 0})}
+    [J.Subcanonical] [J'.Subcanonical]
     (E : Sheaf J Type ≌ Sheaf J' Type)
     (hE : ∀ F : Sheaf J Type, (E.functor.obj F).val = F.val)
     (F : Sheaf J Type) (hF : IsRepresentableSheaf F) :
@@ -390,6 +387,7 @@ theorem equiv_preserves_representable_of_val_eq
       classifying topologies to geometric theories. -/
 axiom equiv_preserves_representable
     {J J' : GrothendieckTopology (RootedTS.{0, 0})}
+    [J.Subcanonical] [J'.Subcanonical]
     (E : Sheaf J Type ≌ Sheaf J' Type)
     (F : Sheaf J Type) (hF : IsRepresentableSheaf F) :
     IsRepresentableSheaf (E.functor.obj F)
@@ -404,6 +402,7 @@ axiom equiv_preserves_representable
     corresponds to the interpretation of the generic M-model as an N-model. -/
 noncomputable def representingObject_image
     {J J' : GrothendieckTopology (RootedTS.{0, 0})}
+    [J.Subcanonical] [J'.Subcanonical]
     (E : Sheaf J Type ≌ Sheaf J' Type)
     (N : RootedTS.{0, 0})
     (h : IsRepresentableSheaf (E.functor.obj (yonedaSheaf J N))) :

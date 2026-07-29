@@ -71,6 +71,25 @@ The spectrum degenerates to ≤3 levels:
   {enabledness, traces≡failures≡..., simulation≡bisimulation}
 -/
 
+/-- Marker hypothesis: the nucleus family `E` arises from a transition system over a
+**single-letter** alphabet.
+
+This is a genuine side condition, not a formality. `EnergyNucleus L` records only the
+frame `L` and the assignment of nuclei, so the alphabet is not recoverable from the type.
+The condition was previously written as a comment inside the binder list of
+`single_label_collapse_axiom`, which is not a hypothesis: the axiom then applied to every
+`E`, and together with `two_label_order_reflects` it proved `False`.
+
+Deliberately uninhabited. Results depending on it are conditional, and the condition must
+be discharged by whoever builds a nucleus family from a concrete single-label system. -/
+class SingleLabelSource {L : Type*} [Order.Frame L] (E : EnergyNucleus L) : Prop
+
+/-- Marker hypothesis: the nucleus family `E` arises from a transition system over an
+alphabet with **at least two** letters. Dual to `SingleLabelSource`; see that docstring
+for why an explicit hypothesis is required. Deliberately uninhabited. -/
+class MultiLabelSource {L : Type*} [Order.Frame L] (E : EnergyNucleus L) : Prop
+
+
 /-- **Single-label collapse axiom**: For a Lindenbaum algebra L arising from a
 single-label LTS, the energy-to-nucleus map collapses branching-sensitive
 equivalences.
@@ -88,8 +107,7 @@ than ⟨a⟩(φ₁ ∧ φ₂) when a is the only label). Similarly, refusal info
 is trivial (can refuse a iff deadlocked). This collapses the spectrum from
 13 to at most 3 distinct points. -/
 axiom single_label_collapse_axiom {L : Type*} [Order.Frame L]
-    (E : EnergyNucleus L)
-    /- The algebra arises from a single-label system -/ :
+    (E : EnergyNucleus L) [SingleLabelSource E] :
     -- (a) Linear-time collapse: traces through possible futures coincide
     (E.nucleusAt .traces = E.nucleusAt .failures) ∧
     (E.nucleusAt .traces = E.nucleusAt .revivals) ∧
@@ -179,19 +197,22 @@ Mathematical justification: With at least 2 labels {a, b}, each dimension of
 the energy budget provides genuinely distinct observational power. If the
 nucleus at e₂ provides strictly less closure than at e₁, the e₂ equivalence
 is strictly finer, forcing e₁ < e₂ in the van Glabbeek ordering. -/
-axiom two_label_order_reflects {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+axiom two_label_order_reflects {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ∀ e₁ e₂ : NamedEquivalence, E.nucleusAt e₂ ≤ E.nucleusAt e₁ → e₁ ≤ e₂
 
 /-- For |L|≥2, the antitone energy-to-nucleus map is an order embedding:
 e₁ ≤ e₂ ↔ nucleusAt e₂ ≤ nucleusAt e₁.
 The forward direction is the antitone property; the reverse is two_label_order_reflects. -/
-theorem two_label_order_embedding {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem two_label_order_embedding {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ∀ e₁ e₂ : NamedEquivalence,
       e₁ ≤ e₂ ↔ E.nucleusAt e₂ ≤ E.nucleusAt e₁ :=
   fun e₁ e₂ => ⟨E.antitone e₁ e₂, two_label_order_reflects E e₁ e₂⟩
 
 /-- For |L|≥2, all 13 named equivalences give distinct nuclei. -/
-theorem two_label_nuclei_injective {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem two_label_nuclei_injective {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ∀ e₁ e₂ : NamedEquivalence, e₁ ≠ e₂ → E.nucleusAt e₁ ≠ E.nucleusAt e₂ := by
   intro e₁ e₂ hne heq
   exact hne (le_antisymm
@@ -200,7 +221,8 @@ theorem two_label_nuclei_injective {L : Type*} [Order.Frame L] (E : EnergyNucleu
 
 /-- For |L|≥2, all 13 named equivalences give distinct subtoposes in the coframe.
 This is the faithfulness of the spectrum-to-coframe embedding. -/
-theorem two_label_all_distinct {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem two_label_all_distinct {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ∀ e₁ e₂ : NamedEquivalence, e₁ ≠ e₂ →
       spectrumCoframeMap E e₁ ≠ spectrumCoframeMap E e₂ := by
   intro e₁ e₂ hne heq
@@ -208,7 +230,8 @@ theorem two_label_all_distinct {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
 
 /-- The spectrum image in the coframe has exactly 13 elements for |L|≥2:
 the map spectrumCoframeMap is injective on the 13-element NamedEquivalence type. -/
-theorem spectrum_image_injective {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem spectrum_image_injective {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     Function.Injective (spectrumCoframeMap E) := by
   intro e₁ e₂ heq
   by_contra hne
@@ -222,7 +245,8 @@ two_label_order_reflects), so it reflects both order and incomparability.
 If PF ≤ FT in SubtoposOrder (i.e., toDual j_PF ≤ toDual j_FT, meaning
 j_FT ≤ j_PF in Nucleus L), then by two_label_order_reflects, PF ≤ FT in
 NamedEquivalence — contradicting their known incomparability. -/
-theorem incomparable_in_coframe {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem incomparable_in_coframe {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ¬(spectrumCoframeMap E .possibleFutures ≤ spectrumCoframeMap E .failureTraces) ∧
     ¬(spectrumCoframeMap E .failureTraces ≤ spectrumCoframeMap E .possibleFutures) := by
   constructor
@@ -239,7 +263,8 @@ theorem incomparable_in_coframe {L : Type*} [Order.Frame L] (E : EnergyNucleus L
 
 /-- The coframe SubtoposOrder L has strictly more elements than the 13-point
 spectrum image: the PF ⊓ FT coframe meet is not in the spectrum. -/
-theorem coframe_strictly_larger {L : Type*} [Order.Frame L] (E : EnergyNucleus L) :
+theorem coframe_strictly_larger {L : Type*} [Order.Frame L] (E : EnergyNucleus L)
+    [MultiLabelSource E] :
     ∃ s : SubtoposOrder L,
       (∀ e : NamedEquivalence, s ≠ spectrumCoframeMap E e) :=
   ⟨spectrumCoframeMap E .possibleFutures ⊓ spectrumCoframeMap E .failureTraces,
@@ -286,7 +311,7 @@ Since the closure has 30 energy vectors and only 13 are named, at least 17
 energy vectors are unnamed. Each maps through the antitone bridge to a
 coframe element with no classical process-algebraic name. -/
 theorem lattice_closure_transfers {L : Type*} [Order.Frame L]
-    (E : EnergyNucleus L) :
+    (E : EnergyNucleus L) [MultiLabelSource E] :
     -- (a) Faithfulness: spectrumCoframeMap is injective
     (Function.Injective (spectrumCoframeMap E)) ∧
     -- (b) Unnamed coframe elements exist
@@ -338,7 +363,7 @@ unnamed coframe elements, and lattice closure transfer.
     to the coframe, with each unnamed element representing a subtopos outside
     the classical van Glabbeek taxonomy. -/
 theorem coframe_computation_summary {L : Type*} [Order.Frame L]
-    (E : EnergyNucleus L) :
+    (E : EnergyNucleus L) [MultiLabelSource E] :
     -- (a) Single-label collapse structure is available
     (∀ (C : SingleLabelCollapse L),
       ∀ e : NamedEquivalence,
@@ -388,9 +413,9 @@ theorem coframe_computation_summary {L : Type*} [Order.Frame L]
 - `lattice_closure_transfers`: 30-element closure induces coframe structure
 - `coframe_computation_summary`: master theorem
 
-### Axiom count: 2
-1. `single_label_collapse_axiom`: |L|=1 collapse (traces=failures, sim=bisim)
-2. `two_label_order_reflects`: |L|≥2 antitone map reflects order
+### Axiom count: 2, each under an explicit alphabet hypothesis
+1. `single_label_collapse_axiom` [SingleLabelSource E]: |L|=1 collapse
+2. `two_label_order_reflects` [MultiLabelSource E]: |L|≥2 antitone map reflects order
 -/
 
 end RTS
