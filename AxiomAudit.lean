@@ -14,11 +14,11 @@ Expected: every declaration below reports only some subset of
     propext, Classical.choice, Quot.sound
 
 which are Lean's three standard axioms. In particular **no** `Lean.ofReduceBool`
-and **no** `Lean.trustCompiler` — those are introduced by `native_decide`, which
-trusts the compiler and runtime rather than the kernel, and which Mathlib
-forbids for that reason. Their absence is what "zero custom axioms" means here.
+and **no** `Lean.trustCompiler`. Both come from `native_decide`, which discharges
+a goal by compiled evaluation instead of kernel reduction and is forbidden in
+Mathlib for that reason. Their absence is what "zero custom axioms" means here.
 
-Several results are stronger than the claim requires: `hml_bisimInvariant`
+Several results are stronger than the claim requires. `hml_bisimInvariant`
 depends on no axioms at all, and the depth-1/2 van Benthem instances on
 `propext` alone.
 -/
