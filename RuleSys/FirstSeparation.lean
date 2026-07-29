@@ -21,7 +21,16 @@ witness systems, replacing the earlier detCounter/binarySplit witnesses.
 - `fork_to_path` / `path_to_fork`: mutual simulation (PROVED, 0 axioms)
 - `fork_path_not_relBisimilar`: ¬RelationallyBisimilar (PROVED, 0 axioms)
 - `fork_path_not_bisimilar`: ¬Bisimilar (PROVED, 0 axioms, direct proof)
-- `first_separation_theorem`: the full theorem (PROVED, 1 axiom for topos direction)
+- `first_separation_theorem`: the full theorem (PROVED; see the axiom note below)
+
+The topos direction rests on the geometric-logic layer rather than on a single
+axiom. `#print axioms first_separation_theorem` reports twelve custom axioms
+beyond `propext`, `Classical.choice` and `Quot.sound`, namely
+`provability_separation_implies_topos_nonequiv`, `theoryOfSystem_complete_canonical`,
+`syntactic_sub_semantic`, `systemSpecificAxioms`, `FunctionalFormula.geometric_completeness`,
+`IsGeometricCovering` with its three closure properties, and three private lemmas of
+`GeometricLogic.SyntacticCategory`. The results audited by `AxiomAudit.lean` are
+disjoint from these; the separations are not among them.
 
 The non-bisimilarity proof uses the relational (Park-Milner) definition directly:
 any bisimulation R with (a,x) ∈ R forces (c,y) ∈ R via the forth condition on a→c,

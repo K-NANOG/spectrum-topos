@@ -21,8 +21,17 @@ the second level of the three-level hierarchy:
 ## Main Results
 
 - `hubSpokes_twoCycle_bisimilar`: Bisimilar hubSpokes twoCycle (PROVED)
-- `hubSpokes_twoCycle_topos_nonequiv`: ¬ topos equivalent (1 axiom, σ_det)
-- `second_separation_theorem`: the full theorem (PROVED, 1 axiom)
+- `hubSpokes_twoCycle_topos_nonequiv`: ¬ topos equivalent (via σ_det)
+- `second_separation_theorem`: the full theorem (PROVED; see the axiom note below)
+
+The topos direction rests on the geometric-logic layer rather than on a single
+axiom. `#print axioms second_separation_theorem` reports twelve custom axioms
+beyond `propext`, `Classical.choice` and `Quot.sound`, namely
+`provability_separation_implies_topos_nonequiv`, `theoryOfSystem_complete_canonical`,
+`syntactic_sub_semantic`, `systemSpecificAxioms`, `FunctionalFormula.geometric_completeness`,
+`IsGeometricCovering` with its three closure properties, and three private lemmas of
+`GeometricLogic.SyntacticCategory`. The results audited by `AxiomAudit.lean` are
+disjoint from these; the separations are not among them.
 
 The hub-spokes system is non-deterministic (a has two successors b ≠ c),
 while the two-cycle is deterministic. The determinism sequent σ_det separates
