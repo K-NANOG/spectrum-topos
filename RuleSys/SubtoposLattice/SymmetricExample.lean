@@ -1,6 +1,6 @@
 /-
 Copyright (c) 2026. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
+Released under the MIT license as described in the file LICENSE.
 
 # Symmetric Labeled System: a.b + a.b (Van Glabbeek-Style Z/2 Example)
 

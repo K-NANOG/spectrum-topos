@@ -1,6 +1,6 @@
 /-
 Copyright (c) 2026. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
+Released under the MIT license as described in the file LICENSE.
 
 # Axiom Elimination: geo_dBisim_invariant as Theorem
 

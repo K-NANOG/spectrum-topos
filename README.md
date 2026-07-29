@@ -26,4 +26,4 @@ paper's main theorems. Each reports a subset of `propext`, `Classical.choice` an
 
 ## Licence
 
-Apache 2.0.
+MIT. See `LICENSE`.
