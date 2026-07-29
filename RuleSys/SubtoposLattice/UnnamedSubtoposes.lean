@@ -254,7 +254,8 @@ so the poset of join-irreducibles is not an antichain).
 
 The exact value depends on the lattice's internal structure (which products/chains
 of join-irreducibles generate the 25-element lattice). -/
-axiom pe_joinIrred_count_ge : ∃ j : ℕ, j ≥ 5 ∧ 2 ^ j ≥ 25
+theorem pe_joinIrred_count_ge : ∃ j : ℕ, j ≥ 5 ∧ 2 ^ j ≥ 25 :=
+  ⟨5, by decide, by decide⟩
 
 /-- Subtopos enumeration for peSystem (parameterized by join-irreducible count).
 

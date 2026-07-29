@@ -122,13 +122,33 @@ trees with structural complexity bounded by the energy budget.
 **Key examples**:
 - C(traces) = C(∞,1,0,∞,0,0): depth unbounded, branching ≤ 1 → paths
 - C(simulation) = C(∞,∞,∞,∞,0,0): depth and branching unbounded → all trees
-- C(bisimulation) = C(∞,∞,∞,∞,∞,∞): same as simulation for trees → all trees -/
+- C(bisimulation) = C(∞,∞,∞,∞,∞,∞): same as simulation for trees → all trees
+
+**Known limitation.** This reads only `E.obsDepth` and `E.conjNesting`. The
+remaining four coordinates (`deepPosClause`, `otherPosClause`, `negClause`,
+`negNesting`) are not consulted, so budgets agreeing on the first two produce a
+*definitionally equal* observation class. Concretely `simulation`, `failureTraces`,
+`readyTraces`, `readySimulation`, `twoNestedSimulation` and `bisimulation` all share
+`(obsDepth, conjNesting) = (⊤, ⊤)` and therefore collapse to one class, so the induced
+`energyTopology` takes at most four distinct values on the thirteen named equivalences
+rather than thirteen. See `energyObsClass_collapses_sim_bisim` below.
+
+Distinguishing the remaining coordinates would need polarity and negation structure that
+a bare labelled tree does not carry; no such refinement is formalised here. Nothing in
+this development asserts that the thirteen topologies are distinct, and the injectivity
+results in `SubtoposLattice.CoframeComputations` concern nuclei, not these topologies. -/
 def energyObsClass {L : Type} [Fintype L] [DecidableEq L]
     (E : EnergyBudget) : LabeledObservationClass L :=
   fun T => LabeledIsRootedTree T ∧
            ∃ (hT : LabeledIsRootedTree T),
              natLeWithTop (treeDepth T hT) E.obsDepth ∧
              natLeWithTop (maxBranching T hT) E.conjNesting
+
+/-- The collapse recorded in `energyObsClass`'s docstring, stated so that it is a
+checkable fact of the development rather than something a reader must discover. -/
+theorem energyObsClass_collapses_sim_bisim {L : Type} [Fintype L] [DecidableEq L] :
+    energyObsClass (L := L) NamedEquivalence.simulation.toEnergyBudget
+      = energyObsClass (L := L) NamedEquivalence.bisimulation.toEnergyBudget := rfl
 
 /-- Every tree in C(E₁) is in C(E₂) when E₁ ≤ E₂ componentwise.
 Larger energy budget → relaxed bounds → more test objects.

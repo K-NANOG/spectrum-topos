@@ -435,7 +435,9 @@ In vgTraceB, after a, state q1 can still do either b or c. But if we map p1 to q
 then p1 can only do b, while q1 can also do c — the simulation must find a matching
 c-step from p1, which doesn't exist.
 Concrete proof via distinguishing formula: see `SpectrumSeparation.pair1_trace_neq_simulation`. -/
-theorem vgPair1_not_simulationEquiv : True := trivial
+-- PLACEHOLDER: states `True`, proves nothing about the separation its name
+-- describes. Renamed so the name cannot be mistaken for a result.
+theorem vgPair1_not_simulationEquiv_PLACEHOLDER : True := trivial
 
 /-- Pair 2: vgSimA and vgTraceB are NOT ready-simulation equivalent.
 Ready-simulation requires preserving ready sets (sets of enabled actions).
@@ -444,13 +446,17 @@ ready set {b, c}. Any simulation mapping r1 to q1 violates the ready condition
 because ready(q1) = {b,c} ⊄ ready(r1) = {b}. (Ready simulation from M to N
 requires ready(f(s)) ⊆ ready(s) for the simulation function f : N → M.)
 Concrete proof via distinguishing formula: see `SpectrumSeparation.pair2_simulation_neq_readySim`. -/
-theorem vgPair2_not_readySimEquiv : True := trivial
+-- PLACEHOLDER: states `True`, proves nothing about the separation its name
+-- describes. Renamed so the name cannot be mistaken for a result.
+theorem vgPair2_not_readySimEquiv_PLACEHOLDER : True := trivial
 
 /-- Ready-simulation and bisimulation are distinct equivalences for labeled LTS.
 The formula `[a]<c>T` separates vgTraceB from vgSimA: it holds at q0 (all a-successors
 can do c) but fails at r0 (r1 is an a-successor that cannot do c).
 Proved in `SpectrumSeparation.pair3_readySim_neq_bisim`. -/
-theorem readySim_neq_bisim_separation_exists : True := trivial
+-- PLACEHOLDER: states `True`, proves nothing about the separation its name
+-- describes. Renamed so the name cannot be mistaken for a result.
+theorem readySim_neq_bisim_separation_PLACEHOLDER : True := trivial
 
 /-- The van Glabbeek spectrum has four genuinely distinct levels for labeled systems.
 This breaks the upper spectrum collapse from SpectrumEmbedding.lean where
@@ -462,6 +468,8 @@ bisimulation. Each adjacent pair is separated by concrete counterexamples:
 - simulation ≠ ready-simulation: vgSimA vs vgTraceB (Pair 2, `<a>(<b>T /\ neg(<c>T))`)
 - ready-simulation ≠ bisimulation: vgTraceB vs vgSimA (Pair 3, `[a]<c>T`)
 See `SpectrumSeparation.labeled_four_level_separation` for the full proof. -/
-theorem labeled_spectrum_has_four_levels : True := trivial
+-- PLACEHOLDER: states `True`, proves nothing about the separation its name
+-- describes. Renamed so the name cannot be mistaken for a result.
+theorem labeled_spectrum_has_four_levels_PLACEHOLDER : True := trivial
 
 end RTS
