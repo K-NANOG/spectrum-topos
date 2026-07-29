@@ -359,8 +359,10 @@ theorem fork_path_topos_nonequiv :
     it holds in pathSys (all states have successors) and fails in fork
     (state c is halting).
 
-    Parts 1-2 are fully proved (0 axioms). Part 3 uses provability
-    separation via σ_tot (1 axiom). -/
+    Parts 1-2 are fully proved (0 custom axioms). Part 3 cites provability
+    separation via σ_tot, which brings in the geometric-logic layer: the
+    statement below depends on twelve custom axioms in total. See the axiom
+    note in the module header. -/
 theorem first_separation_theorem :
     ∃ (M N : RootedTS.{0, 0}),
       (Nonempty (Simulation M N) ∧ Nonempty (Simulation N M)) ∧

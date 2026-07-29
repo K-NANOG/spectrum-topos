@@ -333,7 +333,9 @@ theorem hubSpokes_twoCycle_topos_nonequiv :
 
     Parts:
     - Bisimilarity is fully proved (constructive, no axioms)
-    - Topos non-equivalence uses provability separation via σ_det (1 axiom) -/
+    - Topos non-equivalence cites provability separation via σ_det, which brings
+      in the geometric-logic layer: the statement below depends on twelve custom
+      axioms in total. See the axiom note in the module header. -/
 theorem second_separation_theorem :
     ∃ (M N : RootedTS.{0, 0}),
       Bisimilar M N ∧
